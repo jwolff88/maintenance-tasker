@@ -1,0 +1,408 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Multi-tenant company
+model Company {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  phone     String?
+  address   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users      User[]
+  properties Property[]
+  vendors    Vendor[]
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  COMPANY_ADMIN
+  PROPERTY_MANAGER
+  MAINTENANCE_STAFF
+  VENDOR
+  READ_ONLY
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  firstName    String
+  lastName     String
+  role         UserRole @default(READ_ONLY)
+  phone        String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  managedProperties Property[]         @relation("PropertyManager")
+  tickets           MaintenanceTicket[] @relation("TicketCreator")
+  assignedTickets   MaintenanceTicket[] @relation("TicketAssignee")
+  notes             Note[]
+  activityLogs      ActivityLog[]
+
+  @@index([companyId])
+}
+
+enum PropertyStatus {
+  HEALTHY
+  ATTENTION_NEEDED
+  CRITICAL
+}
+
+enum PropertyType {
+  SINGLE_FAMILY
+  MULTI_FAMILY
+  APARTMENT
+  CONDO
+  TOWNHOUSE
+  COMMERCIAL
+}
+
+model Property {
+  id          String         @id @default(uuid())
+  name        String
+  address     String
+  city        String
+  state       String
+  zipCode     String
+  type        PropertyType
+  units       Int            @default(1)
+  sqft        Int?
+  yearBuilt   Int?
+  status      PropertyStatus @default(HEALTHY)
+  riskScore   Int            @default(0) // 0-100 predictive maintenance score
+  occupancy   Int            @default(0)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  managerId String?
+  manager   User?   @relation("PropertyManager", fields: [managerId], references: [id])
+
+  ownerId String?
+  owner   PropertyOwner? @relation(fields: [ownerId], references: [id])
+
+  leases         Lease[]
+  tickets        MaintenanceTicket[]
+  notes          Note[]
+  inspections    Inspection[]
+  equipment      Equipment[]
+  activityLogs   ActivityLog[]
+  events         PropertyEvent[]
+
+  @@index([companyId])
+  @@index([managerId])
+  @@index([status])
+}
+
+model PropertyOwner {
+  id        String   @id @default(uuid())
+  firstName String
+  lastName  String
+  email     String
+  phone     String?
+  address   String?
+  notes     String?  // Owner preferences, approval rules
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  properties Property[]
+}
+
+enum NoteType {
+  PROPERTY
+  TENANT
+  BUILDING
+  OWNER
+}
+
+model Note {
+  id          String   @id @default(uuid())
+  content     String
+  type        NoteType
+  isInternal  Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id])
+
+  attachments Attachment[]
+
+  @@index([propertyId, type])
+}
+
+model Attachment {
+  id        String   @id @default(uuid())
+  filename  String
+  url       String
+  mimeType  String
+  size      Int
+  createdAt DateTime @default(now())
+
+  noteId   String?
+  note     Note?   @relation(fields: [noteId], references: [id], onDelete: Cascade)
+
+  ticketId String?
+  ticket   MaintenanceTicket? @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+}
+
+model Tenant {
+  id        String   @id @default(uuid())
+  firstName String
+  lastName  String
+  email     String
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  leases  Lease[]
+  tickets MaintenanceTicket[]
+}
+
+enum LeaseStatus {
+  ACTIVE
+  EXPIRED
+  TERMINATED
+  PENDING
+}
+
+model Lease {
+  id            String      @id @default(uuid())
+  startDate     DateTime
+  endDate       DateTime
+  rentAmount    Decimal     @db.Decimal(10, 2)
+  depositAmount Decimal     @db.Decimal(10, 2)
+  status        LeaseStatus @default(PENDING)
+  terms         String?     // Special terms
+  renewalProb   Int         @default(50) // 0-100 renewal probability
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  @@index([propertyId])
+  @@index([endDate])
+  @@index([status])
+}
+
+enum TicketStatus {
+  NEW
+  IN_PROGRESS
+  WAITING_ON_TENANT
+  WAITING_ON_VENDOR
+  COMPLETED
+  CANCELLED
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TicketCategory {
+  PLUMBING
+  ELECTRICAL
+  HVAC
+  APPLIANCE
+  STRUCTURAL
+  PEST_CONTROL
+  LANDSCAPING
+  CLEANING
+  SAFETY
+  OTHER
+}
+
+model MaintenanceTicket {
+  id              String         @id @default(uuid())
+  title           String
+  description     String
+  status          TicketStatus   @default(NEW)
+  priority        TicketPriority @default(MEDIUM)
+  category        TicketCategory @default(OTHER)
+  estimatedCost   Decimal?       @db.Decimal(10, 2)
+  actualCost      Decimal?       @db.Decimal(10, 2)
+  slaDeadline     DateTime?
+  completedAt     DateTime?
+  suggestedFix    String?        // AI-suggested fix
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  creatorId String
+  creator   User   @relation("TicketCreator", fields: [creatorId], references: [id])
+
+  assigneeId String?
+  assignee   User?   @relation("TicketAssignee", fields: [assigneeId], references: [id])
+
+  tenantId String?
+  tenant   Tenant? @relation(fields: [tenantId], references: [id])
+
+  vendorId String?
+  vendor   Vendor? @relation(fields: [vendorId], references: [id])
+
+  attachments Attachment[]
+  comments    TicketComment[]
+
+  @@index([propertyId])
+  @@index([status])
+  @@index([priority])
+  @@index([createdAt])
+}
+
+model TicketComment {
+  id        String   @id @default(uuid())
+  content   String
+  isInternal Boolean @default(false)
+  createdAt DateTime @default(now())
+
+  ticketId String
+  ticket   MaintenanceTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+
+  authorId String
+}
+
+model Vendor {
+  id                 String   @id @default(uuid())
+  name               String
+  email              String
+  phone              String?
+  specialties        String[] // e.g., ["plumbing", "hvac"]
+  insuranceExpiry    DateTime?
+  licenseNumber      String?
+  rating             Decimal  @default(0) @db.Decimal(2, 1) // 0.0-5.0
+  totalJobs          Int      @default(0)
+  avgResponseTime    Int?     // in hours
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  tickets MaintenanceTicket[]
+
+  @@index([companyId])
+}
+
+enum InspectionType {
+  CITY
+  FIRE
+  SAFETY
+  ROUTINE
+  MOVE_IN
+  MOVE_OUT
+}
+
+enum InspectionStatus {
+  SCHEDULED
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+model Inspection {
+  id           String           @id @default(uuid())
+  type         InspectionType
+  status       InspectionStatus @default(SCHEDULED)
+  scheduledAt  DateTime
+  completedAt  DateTime?
+  notes        String?
+  passedItems  String[]
+  failedItems  String[]
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId])
+  @@index([scheduledAt])
+}
+
+model Equipment {
+  id                String    @id @default(uuid())
+  name              String
+  type              String    // e.g., "HVAC", "Water Heater"
+  manufacturer      String?
+  model             String?
+  serialNumber      String?
+  installDate       DateTime?
+  warrantyExpiry    DateTime?
+  lastServiceDate   DateTime?
+  nextServiceDate   DateTime?
+  expectedLifespan  Int?      // in years
+  notes             String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId])
+  @@index([nextServiceDate])
+}
+
+enum EventType {
+  INSPECTION
+  LEASE_EXPIRY
+  WARRANTY_EXPIRY
+  SCHEDULED_MAINTENANCE
+  COMPLIANCE_DEADLINE
+}
+
+model PropertyEvent {
+  id          String    @id @default(uuid())
+  title       String
+  type        EventType
+  date        DateTime
+  description String?
+  isCompleted Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId])
+  @@index([date])
+}
+
+model ActivityLog {
+  id        String   @id @default(uuid())
+  action    String
+  details   String?
+  createdAt DateTime @default(now())
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
+  propertyId String?
+  property   Property? @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId])
+  @@index([createdAt])
+}

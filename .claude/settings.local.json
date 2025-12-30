@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npx prisma generate)",
+      "Bash(npx prisma migrate:*)",
+      "Bash(npm run db:seed:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(taskkill:*)",
+      "Bash(curl:*)",
+      "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJiMWM1M2ExMi1hOTJiLTQ2NDQtYmRhYS0zMGFhM2U0MWJiZDIiLCJlbWFpbCI6ImFkbWluQGFjbWUtcG0uY29tIiwicm9sZSI6IkNPTVBBTllfQURNSU4iLCJjb21wYW55SWQiOiJkY2FlYWRhOC0zNjgwLTQ4OTUtODk0Yy1iMDE3ZWYyNDc4MDciLCJpYXQiOjE3NjcwNjUyODEsImV4cCI6MTc2NzE1MTY4MX0.n1KS_avPdYhxE6M3s_GwaRZO4hHA4nZq36weIzneyuo\")",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(dir /b:*)"
+    ]
+  }
+}
