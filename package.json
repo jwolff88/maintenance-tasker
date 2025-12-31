@@ -12,10 +12,12 @@
     "dev:backend": "npm run dev --workspace=backend",
     "dev:frontend": "npm run dev --workspace=frontend",
     "build": "npm run build --workspace=backend && npm run build --workspace=frontend",
+    "vercel-build": "cd backend && npm run build && cd ../frontend && npm run build",
     "db:migrate": "npm run db:migrate --workspace=backend",
     "db:seed": "npm run db:seed --workspace=backend"
   },
   "devDependencies": {
+    "@vercel/node": "^5.5.16",
     "concurrently": "^8.2.2"
   }
 }
