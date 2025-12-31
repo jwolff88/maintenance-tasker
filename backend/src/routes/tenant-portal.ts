@@ -116,7 +116,7 @@ router.post('/submit-ticket', async (req: Request, res: Response, next: NextFunc
           role: { in: ['COMPANY_ADMIN', 'SUPER_ADMIN'] }
         }
       });
-      creatorId = companyAdmin?.id;
+      creatorId = companyAdmin?.id ?? null;
     }
 
     if (!creatorId) {
