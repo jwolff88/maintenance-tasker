@@ -20,6 +20,8 @@ model Company {
   users      User[]
   properties Property[]
   vendors    Vendor[]
+  assets     Asset[]
+  tasks      Task[]
 }
 
 enum UserRole {
@@ -51,6 +53,11 @@ model User {
   assignedTickets   MaintenanceTicket[] @relation("TicketAssignee")
   notes             Note[]
   activityLogs      ActivityLog[]
+
+  // Maintenance Tasker relations
+  assignedTasks     Task[]           @relation("TaskAssignee")
+  createdTasks      Task[]           @relation("TaskCreator")
+  taskComments      TaskComment[]    @relation("TaskCommentAuthor")
 
   @@index([companyId])
 }
@@ -103,6 +110,7 @@ model Property {
   equipment      Equipment[]
   activityLogs   ActivityLog[]
   events         PropertyEvent[]
+  assets         Asset[]
 
   @@index([companyId])
   @@index([managerId])
@@ -405,4 +413,143 @@ model ActivityLog {
 
   @@index([propertyId])
   @@index([createdAt])
+}
+
+// ============================================
+// MAINTENANCE TASKER - Asset & Task Management
+// ============================================
+
+enum AssetStatus {
+  OPERATIONAL
+  NEEDS_MAINTENANCE
+  OUT_OF_SERVICE
+  RETIRED
+}
+
+enum AssetCategory {
+  ELECTRICAL
+  PLUMBING
+  HVAC
+  MECHANICAL
+  SAFETY
+  STRUCTURAL
+  IT_EQUIPMENT
+  VEHICLES
+  OTHER
+}
+
+enum TaskStatus {
+  OPEN
+  IN_PROGRESS
+  UNDER_REVIEW
+  COMPLETED
+  CANCELLED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum RecurrenceType {
+  DAILY
+  WEEKLY
+  BIWEEKLY
+  MONTHLY
+  QUARTERLY
+  YEARLY
+  CUSTOM
+}
+
+model Asset {
+  id          String        @id @default(uuid())
+  name        String
+  description String?
+  category    AssetCategory @default(OTHER)
+  location    String?
+  qrCode      String?       @unique
+  status      AssetStatus   @default(OPERATIONAL)
+  manufacturer String?
+  model        String?
+  serialNumber String?
+  purchaseDate DateTime?
+  warrantyExpiry DateTime?
+  notes        String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  propertyId String?
+  property   Property? @relation(fields: [propertyId], references: [id])
+
+  tasks Task[]
+
+  @@index([companyId])
+  @@index([status])
+  @@index([category])
+}
+
+model Task {
+  id            String       @id @default(uuid())
+  title         String
+  description   String?
+  status        TaskStatus   @default(OPEN)
+  priority      TaskPriority @default(MEDIUM)
+  dueDate       DateTime?
+  startedAt     DateTime?
+  completedAt   DateTime?
+  photoBefore   String?      // URL to before photo
+  photoAfter    String?      // URL to after photo
+  notes         String?
+  estimatedTime Int?         // in minutes
+  actualTime    Int?         // in minutes
+
+  // Recurrence
+  isRecurring     Boolean        @default(false)
+  recurrenceType  RecurrenceType?
+  recurrenceValue Int?           // e.g., 30 for "every 30 days"
+  nextDueDate     DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  assetId String
+  asset   Asset  @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  assignedToId String?
+  assignedTo   User?   @relation("TaskAssignee", fields: [assignedToId], references: [id])
+
+  createdById String
+  createdBy   User   @relation("TaskCreator", fields: [createdById], references: [id])
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  comments TaskComment[]
+
+  @@index([companyId])
+  @@index([assetId])
+  @@index([status])
+  @@index([priority])
+  @@index([dueDate])
+  @@index([assignedToId])
+}
+
+model TaskComment {
+  id        String   @id @default(uuid())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  taskId String
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  authorId String
+  author   User   @relation("TaskCommentAuthor", fields: [authorId], references: [id])
+
+  @@index([taskId])
 }

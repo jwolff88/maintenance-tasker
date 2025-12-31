@@ -319,10 +319,213 @@ async function main() {
     },
   });
 
+  // Create technician user
+  const technician = await prisma.user.create({
+    data: {
+      email: 'tech@acme-pm.com',
+      passwordHash,
+      firstName: 'Mike',
+      lastName: 'Technician',
+      role: 'MAINTENANCE_STAFF',
+      phone: '555-456-7890',
+      companyId: company.id,
+    },
+  });
+
+  // Create Assets
+  const asset1 = await prisma.asset.create({
+    data: {
+      name: 'Generator 01',
+      description: 'Main backup generator for building power',
+      category: 'ELECTRICAL',
+      location: 'Basement, Room B-12',
+      manufacturer: 'Caterpillar',
+      model: 'C15',
+      serialNumber: 'CAT-2019-45678',
+      purchaseDate: new Date(2019, 5, 15),
+      warrantyExpiry: new Date(now.getFullYear() + 1, 5, 15),
+      status: 'OPERATIONAL',
+      companyId: company.id,
+      propertyId: property1.id,
+    },
+  });
+
+  const asset2 = await prisma.asset.create({
+    data: {
+      name: 'HVAC Unit - Floor 1',
+      description: 'Central air conditioning unit for first floor',
+      category: 'HVAC',
+      location: 'Rooftop, Unit A',
+      manufacturer: 'Carrier',
+      model: 'WeatherMaster 50XC',
+      serialNumber: 'WM-50XC-2020-001',
+      purchaseDate: new Date(2020, 2, 10),
+      warrantyExpiry: new Date(now.getFullYear(), 2, 10),
+      status: 'NEEDS_MAINTENANCE',
+      companyId: company.id,
+      propertyId: property1.id,
+    },
+  });
+
+  const asset3 = await prisma.asset.create({
+    data: {
+      name: 'Elevator - Main',
+      description: 'Main passenger elevator',
+      category: 'MECHANICAL',
+      location: 'Building Core',
+      manufacturer: 'Otis',
+      model: 'Gen3',
+      serialNumber: 'OTIS-GEN3-2015-789',
+      purchaseDate: new Date(2015, 8, 20),
+      status: 'OPERATIONAL',
+      companyId: company.id,
+      propertyId: property1.id,
+    },
+  });
+
+  const asset4 = await prisma.asset.create({
+    data: {
+      name: 'Fire Suppression System',
+      description: 'Building-wide fire sprinkler system',
+      category: 'SAFETY',
+      location: 'All Floors',
+      manufacturer: 'SimplexGrinnell',
+      model: 'TrueAlert ES',
+      serialNumber: 'SGT-2018-45612',
+      purchaseDate: new Date(2018, 1, 5),
+      status: 'OPERATIONAL',
+      companyId: company.id,
+      propertyId: property1.id,
+    },
+  });
+
+  const asset5 = await prisma.asset.create({
+    data: {
+      name: 'Water Pump Station',
+      description: 'Main water pressure pump for building',
+      category: 'PLUMBING',
+      location: 'Basement, Utility Room',
+      manufacturer: 'Grundfos',
+      model: 'CR 15-3',
+      serialNumber: 'GRD-CR15-2017-123',
+      purchaseDate: new Date(2017, 11, 1),
+      status: 'OUT_OF_SERVICE',
+      notes: 'Motor failure detected, awaiting replacement parts',
+      companyId: company.id,
+      propertyId: property3.id,
+    },
+  });
+
+  // Create Maintenance Tasks
+  const yesterdayDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+  await prisma.task.create({
+    data: {
+      title: 'Generator monthly inspection',
+      description: 'Perform monthly inspection and oil level check',
+      status: 'OPEN',
+      priority: 'MEDIUM',
+      dueDate: weekFromNow,
+      estimatedTime: 60,
+      isRecurring: true,
+      recurrenceType: 'MONTHLY',
+      assetId: asset1.id,
+      assignedToId: technician.id,
+      createdById: admin.id,
+      companyId: company.id,
+    },
+  });
+
+  await prisma.task.create({
+    data: {
+      title: 'Replace HVAC filters',
+      description: 'Replace all air filters and check refrigerant levels',
+      status: 'IN_PROGRESS',
+      priority: 'HIGH',
+      dueDate: yesterdayDate,
+      startedAt: weekAgo,
+      estimatedTime: 120,
+      assetId: asset2.id,
+      assignedToId: technician.id,
+      createdById: manager.id,
+      companyId: company.id,
+    },
+  });
+
+  await prisma.task.create({
+    data: {
+      title: 'Elevator safety inspection',
+      description: 'Annual safety inspection required by regulations',
+      status: 'OPEN',
+      priority: 'CRITICAL',
+      dueDate: new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000),
+      estimatedTime: 180,
+      assetId: asset3.id,
+      createdById: admin.id,
+      companyId: company.id,
+    },
+  });
+
+  await prisma.task.create({
+    data: {
+      title: 'Fire suppression system test',
+      description: 'Quarterly test of fire suppression system',
+      status: 'UNDER_REVIEW',
+      priority: 'HIGH',
+      dueDate: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000),
+      startedAt: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000),
+      estimatedTime: 90,
+      isRecurring: true,
+      recurrenceType: 'QUARTERLY',
+      assetId: asset4.id,
+      assignedToId: technician.id,
+      createdById: manager.id,
+      companyId: company.id,
+      photoBefore: '/uploads/sample/fire-system-before.jpg',
+      photoAfter: '/uploads/sample/fire-system-after.jpg',
+    },
+  });
+
+  await prisma.task.create({
+    data: {
+      title: 'Repair water pump motor',
+      description: 'Replace failed motor and test system',
+      status: 'OPEN',
+      priority: 'CRITICAL',
+      dueDate: yesterdayDate,
+      estimatedTime: 240,
+      assetId: asset5.id,
+      createdById: admin.id,
+      companyId: company.id,
+      notes: 'Parts ordered from supplier, expected delivery in 2 days',
+    },
+  });
+
+  await prisma.task.create({
+    data: {
+      title: 'Lubricate elevator cables',
+      description: 'Routine lubrication of elevator cables and pulleys',
+      status: 'COMPLETED',
+      priority: 'LOW',
+      dueDate: weekAgo,
+      startedAt: new Date(weekAgo.getTime() - 24 * 60 * 60 * 1000),
+      completedAt: weekAgo,
+      estimatedTime: 45,
+      actualTime: 50,
+      assetId: asset3.id,
+      assignedToId: technician.id,
+      createdById: manager.id,
+      companyId: company.id,
+    },
+  });
+
   console.log('Database seeded successfully!');
   console.log('\nDemo credentials:');
-  console.log('Email: admin@acme-pm.com');
-  console.log('Password: password123');
+  console.log('Admin: admin@acme-pm.com / password123');
+  console.log('Manager: manager@acme-pm.com / password123');
+  console.log('Technician: tech@acme-pm.com / password123');
 }
 
 main()

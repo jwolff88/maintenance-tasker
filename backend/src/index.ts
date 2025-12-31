@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
 import authRoutes from './routes/auth.js';
 import companyRoutes from './routes/companies.js';
 import propertyRoutes from './routes/properties.js';
@@ -12,6 +13,8 @@ import noteRoutes from './routes/notes.js';
 import equipmentRoutes from './routes/equipment.js';
 import inspectionRoutes from './routes/inspections.js';
 import tenantPortalRoutes from './routes/tenant-portal.js';
+import assetRoutes from './routes/assets.js';
+import taskRoutes from './routes/tasks.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 dotenv.config();
@@ -30,6 +33,9 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// Serve static files for uploads
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/companies', companyRoutes);
@@ -42,6 +48,8 @@ app.use('/api/notes', noteRoutes);
 app.use('/api/equipment', equipmentRoutes);
 app.use('/api/inspections', inspectionRoutes);
 app.use('/api/tenant-portal', tenantPortalRoutes);
+app.use('/api/assets', assetRoutes);
+app.use('/api/tasks', taskRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

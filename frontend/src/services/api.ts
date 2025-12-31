@@ -114,3 +114,33 @@ export const tenantPortalApi = {
   getTicketStatus: (ticketId: string, tenantId: string) =>
     api.get(`/tenant-portal/ticket-status/${ticketId}`, { params: { tenantId } }),
 };
+
+// Assets API (Maintenance Tasker)
+export const assetsApi = {
+  getAll: (params?: Record<string, string>) =>
+    api.get('/assets', { params }),
+  getById: (id: string) => api.get(`/assets/${id}`),
+  getHistory: (id: string) => api.get(`/assets/${id}/history`),
+  getStats: () => api.get('/assets/stats/overview'),
+  create: (data: any) => api.post('/assets', data),
+  update: (id: string, data: any) => api.patch(`/assets/${id}`, data),
+  delete: (id: string) => api.delete(`/assets/${id}`),
+};
+
+// Tasks API (Maintenance Tasker)
+export const tasksApi = {
+  getAll: (params?: Record<string, string>) =>
+    api.get('/tasks', { params }),
+  getById: (id: string) => api.get(`/tasks/${id}`),
+  getMyTasks: () => api.get('/tasks/my/assigned'),
+  getStats: () => api.get('/tasks/stats/overview'),
+  create: (data: any) => api.post('/tasks', data),
+  update: (id: string, data: any) => api.patch(`/tasks/${id}`, data),
+  updateStatus: (id: string, status: string) => api.put(`/tasks/${id}/status`, { status }),
+  uploadPhoto: (id: string, formData: FormData) =>
+    api.post(`/tasks/${id}/photos`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+  addComment: (id: string, content: string) => api.post(`/tasks/${id}/comments`, { content }),
+  delete: (id: string) => api.delete(`/tasks/${id}`),
+};

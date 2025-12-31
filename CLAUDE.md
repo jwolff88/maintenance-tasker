@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-A **property management maintenance platform** - multi-tenant SaaS for property management companies. Features predictive maintenance, lease intelligence, and full property operational profiles.
+A **property management and maintenance tasking platform** - multi-tenant SaaS for property management companies. Features:
+- **Maintenance Tasker**: Asset management, task lifecycle tracking (Open → In Progress → Under Review → Completed), photo evidence, recurring schedules
+- **Property Management**: Predictive maintenance, lease intelligence, full property operational profiles
 
 ## Tech Stack
 
@@ -37,8 +39,9 @@ npm run db:generate   # regenerate Prisma client
 
 ## Demo Credentials (after seeding)
 
-- Email: `admin@acme-pm.com`
-- Password: `password123`
+- Admin: `admin@acme-pm.com` / `password123`
+- Manager: `manager@acme-pm.com` / `password123`
+- Technician: `tech@acme-pm.com` / `password123`
 
 ## Project Structure
 
@@ -79,10 +82,14 @@ All routes prefixed with `/api`:
 - `/notes` - four-category property notes
 - `/dashboard` - overview stats, analytics
 - `/companies` - company settings, user management
+- `/assets` - asset registry (CRUD, service history, stats)
+- `/tasks` - maintenance tasks (CRUD, lifecycle status, photo uploads, recurring)
 
 ## Database Schema Highlights
 
-- `Company` → `User`, `Property`, `Vendor` (tenant isolation)
-- `Property` → `Lease`, `MaintenanceTicket`, `Note`, `Equipment`, `Inspection`, `PropertyEvent`
+- `Company` → `User`, `Property`, `Vendor`, `Asset`, `Task` (tenant isolation)
+- `Property` → `Lease`, `MaintenanceTicket`, `Note`, `Equipment`, `Inspection`, `PropertyEvent`, `Asset`
 - `MaintenanceTicket` → `TicketComment`, `Attachment`
 - `Note` has `type` enum for the four categories
+- `Asset` → `Task` (maintenance task tracking per asset)
+- `Task` has lifecycle: OPEN → IN_PROGRESS → UNDER_REVIEW → COMPLETED

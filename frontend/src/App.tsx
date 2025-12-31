@@ -13,6 +13,10 @@ import Vendors from './pages/Vendors';
 import Inspections from './pages/Inspections';
 import Settings from './pages/Settings';
 import TenantPortal from './pages/TenantPortal';
+import Assets from './pages/Assets';
+import AssetDetail from './pages/AssetDetail';
+import MaintenanceTasks from './pages/MaintenanceTasks';
+import TaskDetail from './pages/TaskDetail';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
@@ -48,6 +52,10 @@ export default function App() {
                 <Route path="/leases" element={<Leases />} />
                 <Route path="/vendors" element={<Vendors />} />
                 <Route path="/inspections" element={<Inspections />} />
+                <Route path="/assets" element={<Assets />} />
+                <Route path="/assets/:id" element={<AssetDetail />} />
+                <Route path="/maintenance-tasks" element={<MaintenanceTasks />} />
+                <Route path="/maintenance-tasks/:id" element={<TaskDetail />} />
                 <Route path="/settings" element={<Settings />} />
               </Routes>
             </Layout>

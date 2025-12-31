@@ -13,10 +13,14 @@ import {
   Menu,
   X,
   Bell,
+  Cog,
+  ClipboardList,
 } from 'lucide-react';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+  { name: 'Assets', href: '/assets', icon: Cog },
+  { name: 'Tasks', href: '/maintenance-tasks', icon: ClipboardList },
   { name: 'Properties', href: '/properties', icon: Building2 },
   { name: 'Tickets', href: '/tickets', icon: Wrench },
   { name: 'Leases', href: '/leases', icon: FileText },

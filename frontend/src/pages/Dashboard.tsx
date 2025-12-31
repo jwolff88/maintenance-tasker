@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { dashboardApi } from '../services/api';
+import { dashboardApi, assetsApi, tasksApi } from '../services/api';
 import {
   Building2,
   Wrench,
@@ -8,6 +8,10 @@ import {
   Calendar,
   TrendingUp,
   DollarSign,
+  Cog,
+  ClipboardList,
+  Clock,
+  CheckCircle,
 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -48,6 +52,21 @@ export default function Dashboard() {
     queryFn: () => dashboardApi.getCostAnalytics().then((res) => res.data),
   });
 
+  const { data: assetStats } = useQuery({
+    queryKey: ['asset-stats'],
+    queryFn: () => assetsApi.getStats().then((res) => res.data),
+  });
+
+  const { data: taskStats } = useQuery({
+    queryKey: ['task-stats'],
+    queryFn: () => tasksApi.getStats().then((res) => res.data),
+  });
+
+  const { data: overdueTasks } = useQuery({
+    queryKey: ['overdue-tasks'],
+    queryFn: () => tasksApi.getAll({ overdue: 'true' }).then((res) => res.data),
+  });
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -58,28 +77,32 @@ export default function Dashboard() {
 
   const stats = [
     {
-      name: 'Total Properties',
-      value: data?.propertyStats.total || 0,
-      icon: Building2,
+      name: 'Total Assets',
+      value: assetStats?.total || 0,
+      icon: Cog,
+      color: 'bg-indigo-500',
+      link: '/assets',
+    },
+    {
+      name: 'Open Tasks',
+      value: (taskStats?.open || 0) + (taskStats?.inProgress || 0),
+      icon: ClipboardList,
       color: 'bg-blue-500',
+      link: '/maintenance-tasks',
     },
     {
-      name: 'Open Tickets',
-      value: (data?.tickets.new || 0) + (data?.tickets.inProgress || 0),
-      icon: Wrench,
-      color: 'bg-orange-500',
-    },
-    {
-      name: 'Critical Properties',
-      value: data?.propertyStats.critical || 0,
-      icon: AlertTriangle,
+      name: 'Overdue Tasks',
+      value: taskStats?.overdue || 0,
+      icon: Clock,
       color: 'bg-red-500',
+      link: '/maintenance-tasks?overdue=true',
     },
     {
-      name: 'Avg Risk Score',
-      value: data?.propertyStats.avgRiskScore || 0,
-      icon: TrendingUp,
-      color: 'bg-purple-500',
+      name: 'Critical Tasks',
+      value: taskStats?.critical || 0,
+      icon: AlertTriangle,
+      color: 'bg-orange-500',
+      link: '/maintenance-tasks?priority=CRITICAL',
     },
   ];
 
@@ -93,7 +116,7 @@ export default function Dashboard() {
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat) => (
-          <div key={stat.name} className="card flex items-center gap-4">
+          <Link key={stat.name} to={stat.link} className="card flex items-center gap-4 hover:shadow-md transition-shadow">
             <div className={`p-3 rounded-lg ${stat.color}`}>
               <stat.icon className="w-6 h-6 text-white" />
             </div>
@@ -101,8 +124,109 @@ export default function Dashboard() {
               <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
               <p className="text-sm text-gray-600">{stat.name}</p>
             </div>
-          </div>
+          </Link>
         ))}
+      </div>
+
+      {/* Maintenance Task Status Overview */}
+      <div className="card">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold">Maintenance Task Overview</h2>
+          <Link to="/maintenance-tasks" className="text-sm text-primary-600 hover:text-primary-700">
+            View all tasks
+          </Link>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div className="p-4 bg-yellow-50 rounded-lg text-center">
+            <p className="text-3xl font-bold text-yellow-600">{taskStats?.open || 0}</p>
+            <p className="text-sm text-gray-600">Open</p>
+          </div>
+          <div className="p-4 bg-blue-50 rounded-lg text-center">
+            <p className="text-3xl font-bold text-blue-600">{taskStats?.inProgress || 0}</p>
+            <p className="text-sm text-gray-600">In Progress</p>
+          </div>
+          <div className="p-4 bg-purple-50 rounded-lg text-center">
+            <p className="text-3xl font-bold text-purple-600">{taskStats?.underReview || 0}</p>
+            <p className="text-sm text-gray-600">Under Review</p>
+          </div>
+          <div className="p-4 bg-green-50 rounded-lg text-center">
+            <p className="text-3xl font-bold text-green-600">{taskStats?.completed || 0}</p>
+            <p className="text-sm text-gray-600">Completed</p>
+          </div>
+          <div className="p-4 bg-gray-50 rounded-lg text-center">
+            <p className="text-3xl font-bold text-gray-600">{taskStats?.total || 0}</p>
+            <p className="text-sm text-gray-600">Total</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Asset Status Overview */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="card">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold">Asset Status</h2>
+            <Link to="/assets" className="text-sm text-primary-600 hover:text-primary-700">
+              View all
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="p-4 bg-green-50 rounded-lg text-center">
+              <p className="text-2xl font-bold text-green-600">{assetStats?.operational || 0}</p>
+              <p className="text-sm text-gray-600">Operational</p>
+            </div>
+            <div className="p-4 bg-yellow-50 rounded-lg text-center">
+              <p className="text-2xl font-bold text-yellow-600">{assetStats?.needsMaintenance || 0}</p>
+              <p className="text-sm text-gray-600">Needs Maintenance</p>
+            </div>
+            <div className="p-4 bg-red-50 rounded-lg text-center">
+              <p className="text-2xl font-bold text-red-600">{assetStats?.outOfService || 0}</p>
+              <p className="text-sm text-gray-600">Out of Service</p>
+            </div>
+            <div className="p-4 bg-gray-50 rounded-lg text-center">
+              <p className="text-2xl font-bold text-gray-600">{assetStats?.total || 0}</p>
+              <p className="text-sm text-gray-600">Total Assets</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Overdue Tasks */}
+        <div className="card">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <Clock className="w-5 h-5 text-red-500" />
+              Overdue Tasks
+            </h2>
+            <Link to="/maintenance-tasks?overdue=true" className="text-sm text-primary-600 hover:text-primary-700">
+              View all
+            </Link>
+          </div>
+          {overdueTasks?.length > 0 ? (
+            <div className="space-y-3">
+              {overdueTasks.slice(0, 5).map((task: any) => (
+                <Link
+                  key={task.id}
+                  to={`/maintenance-tasks/${task.id}`}
+                  className="block p-3 bg-red-50 rounded-lg hover:bg-red-100 transition-colors"
+                >
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="font-medium text-gray-900">{task.title}</p>
+                      <p className="text-sm text-gray-600">{task.asset?.name}</p>
+                    </div>
+                    <span className="text-xs text-red-600">
+                      Due {format(new Date(task.dueDate), 'MMM d')}
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-2" />
+              <p className="text-gray-500">No overdue tasks</p>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
