@@ -17,6 +17,7 @@ import Assets from './pages/Assets';
 import AssetDetail from './pages/AssetDetail';
 import MaintenanceTasks from './pages/MaintenanceTasks';
 import TaskDetail from './pages/TaskDetail';
+import Pricing from './pages/Pricing';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
@@ -37,6 +38,7 @@ export default function App() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/pricing" element={<Pricing />} />
       <Route path="/tenant" element={<TenantPortal />} />
       <Route
         path="/*"

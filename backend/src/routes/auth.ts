@@ -19,10 +19,17 @@ router.post('/register', async (req: Request, res: Response, next: NextFunction)
 
     const passwordHash = await bcrypt.hash(password, 12);
 
+    // Set trial to expire in 14 days
+    const trialEndsAt = new Date();
+    trialEndsAt.setDate(trialEndsAt.getDate() + 14);
+
     const company = await prisma.company.create({
       data: {
         name: companyName,
         email,
+        plan: 'TRIAL',
+        subscriptionStatus: 'TRIALING',
+        trialEndsAt,
         users: {
           create: {
             email,
@@ -52,7 +59,12 @@ router.post('/register', async (req: Request, res: Response, next: NextFunction)
         lastName: user.lastName,
         role: user.role,
         companyId: company.id,
-        companyName: company.name
+        companyName: company.name,
+        subscription: {
+          plan: company.plan,
+          status: company.subscriptionStatus,
+          trialEndsAt: company.trialEndsAt,
+        },
       }
     });
   } catch (error) {
@@ -94,7 +106,12 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction) =>
         lastName: user.lastName,
         role: user.role,
         companyId: user.companyId,
-        companyName: user.company.name
+        companyName: user.company.name,
+        subscription: {
+          plan: user.company.plan,
+          status: user.company.subscriptionStatus,
+          trialEndsAt: user.company.trialEndsAt,
+        },
       }
     });
   } catch (error) {
@@ -121,7 +138,12 @@ router.get('/me', authenticate, async (req: AuthRequest, res: Response, next: Ne
       lastName: user.lastName,
       role: user.role,
       companyId: user.companyId,
-      companyName: user.company.name
+      companyName: user.company.name,
+      subscription: {
+        plan: user.company.plan,
+        status: user.company.subscriptionStatus,
+        trialEndsAt: user.company.trialEndsAt,
+      },
     });
   } catch (error) {
     next(error);

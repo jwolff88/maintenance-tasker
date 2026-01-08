@@ -32,7 +32,17 @@
       "Bash(npx vercel:*)",
       "Bash(DATABASE_URL=\"postgresql://postgres.oywzkgthbedaxscvpzuz:mikescowboyhat@aws-0-us-west-2.pooler.supabase.com:6543/postgres\" npx prisma db push:*)",
       "Bash(DATABASE_URL=\"postgresql://postgres.oywzkgthbedaxscvpzuz:mikescowboyhat@aws-0-us-west-2.pooler.supabase.com:5432/postgres\" npx prisma db push:*)",
-      "Bash(DATABASE_URL=\"postgresql://postgres.oywzkgthbedaxscvpzuz:mikescowboyhat@aws-0-us-west-2.pooler.supabase.com:5432/postgres\" npx tsx:*)"
+      "Bash(DATABASE_URL=\"postgresql://postgres.oywzkgthbedaxscvpzuz:mikescowboyhat@aws-0-us-west-2.pooler.supabase.com:5432/postgres\" npx tsx:*)",
+      "Bash(npm run build:*)",
+      "Bash(cmd //c \"taskkill /IM node.exe /F\")",
+      "Bash(dir /s /b)",
+      "Bash(timeout /t 8 /nobreak)",
+      "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5NmJjNDg1YS1kZGEwLTRmYjgtOGM5OS1mYzMzODEwODAzZWUiLCJlbWFpbCI6ImFkbWluQGFjbWUtcG0uY29tIiwicm9sZSI6IkNPTVBBTllfQURNSU4iLCJjb21wYW55SWQiOiIxNjc0N2VlYy0yNjIxLTRiM2ItYTU0My01MzBhMjMwYTc1OWUiLCJpYXQiOjE3NjcxODE3NTYsImV4cCI6MTc2NzI2ODE1Nn0.Enr7pnhYlew-6d7E22j6ALY-vj-UAl5QV_D96PedGVw\")",
+      "Bash(dir:*)",
+      "Bash(tasklist /FI \"PID eq 20052\")",
+      "Bash(cmd //c \"taskkill /F /PID 20052\")",
+      "Bash(start \"\" \"C:\\\\Users\\\\misfi\\\\Desktop\\\\maintenance tasker\\\\Maintenance-Tasker-Overview.html\")",
+      "Bash(start \"\" \"C:\\\\Users\\\\misfi\\\\Desktop\\\\maintenance tasker\\\\Maintenance-Tasker-User-Manual.html\")"
     ]
   }
 }

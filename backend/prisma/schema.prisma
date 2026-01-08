@@ -7,6 +7,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Subscription plans
+enum SubscriptionPlan {
+  TRIAL
+  STARTER
+  PRO
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  UNPAID
+}
+
 // Multi-tenant company
 model Company {
   id        String   @id @default(uuid())
@@ -16,6 +32,14 @@ model Company {
   address   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // Subscription & Billing
+  stripeCustomerId     String?           @unique
+  stripeSubscriptionId String?           @unique
+  plan                 SubscriptionPlan  @default(TRIAL)
+  subscriptionStatus   SubscriptionStatus @default(TRIALING)
+  trialEndsAt          DateTime?
+  currentPeriodEnd     DateTime?
 
   users      User[]
   properties Property[]

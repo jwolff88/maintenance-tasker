@@ -1,6 +1,12 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { api } from '../services/api';
 
+interface Subscription {
+  plan: string;
+  status: string;
+  trialEndsAt: string | null;
+}
+
 interface User {
   id: string;
   email: string;
@@ -9,6 +15,7 @@ interface User {
   role: string;
   companyId: string;
   companyName: string;
+  subscription?: Subscription;
 }
 
 interface AuthContextType {

@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useSearchParams, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { companyApi } from '../services/api';
-import { Building2, Users, Plus, User } from 'lucide-react';
+import { companyApi, billingApi } from '../services/api';
+import { Building2, Users, Plus, User, CreditCard, AlertTriangle, Check, ExternalLink } from 'lucide-react';
+import { format } from 'date-fns';
 
 const roleLabels: Record<string, string> = {
   SUPER_ADMIN: 'Super Admin',
@@ -13,10 +15,27 @@ const roleLabels: Record<string, string> = {
   READ_ONLY: 'Read Only',
 };
 
+const planLabels: Record<string, string> = {
+  TRIAL: 'Free Trial',
+  STARTER: 'Starter',
+  PRO: 'Professional',
+  ENTERPRISE: 'Enterprise',
+};
+
+const statusColors: Record<string, string> = {
+  TRIALING: 'bg-blue-100 text-blue-800',
+  ACTIVE: 'bg-green-100 text-green-800',
+  PAST_DUE: 'bg-red-100 text-red-800',
+  CANCELED: 'bg-gray-100 text-gray-800',
+  UNPAID: 'bg-red-100 text-red-800',
+};
+
 export default function Settings() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const [searchParams] = useSearchParams();
   const [showUserModal, setShowUserModal] = useState(false);
+  const [billingMessage, setBillingMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -25,6 +44,17 @@ export default function Settings() {
     role: 'PROPERTY_MANAGER',
     phone: '',
   });
+
+  // Handle billing callback messages
+  useEffect(() => {
+    const billing = searchParams.get('billing');
+    if (billing === 'success') {
+      setBillingMessage({ type: 'success', text: 'Subscription activated successfully!' });
+      queryClient.invalidateQueries({ queryKey: ['subscription'] });
+    } else if (billing === 'canceled') {
+      setBillingMessage({ type: 'error', text: 'Checkout was canceled.' });
+    }
+  }, [searchParams, queryClient]);
 
   const { data: company } = useQuery({
     queryKey: ['company'],
@@ -35,6 +65,11 @@ export default function Settings() {
     queryKey: ['company-users'],
     queryFn: () => companyApi.getUsers().then((res) => res.data),
     enabled: user?.role === 'COMPANY_ADMIN' || user?.role === 'SUPER_ADMIN',
+  });
+
+  const { data: subscription } = useQuery({
+    queryKey: ['subscription'],
+    queryFn: () => billingApi.getSubscription().then((res) => res.data),
   });
 
   const createUserMutation = useMutation({
@@ -50,6 +85,15 @@ export default function Settings() {
         role: 'PROPERTY_MANAGER',
         phone: '',
       });
+    },
+  });
+
+  const portalMutation = useMutation({
+    mutationFn: () => billingApi.createPortal(),
+    onSuccess: (data) => {
+      if (data.data.url) {
+        window.location.href = data.data.url;
+      }
     },
   });
 
@@ -130,6 +174,109 @@ export default function Settings() {
               </div>
             </div>
           </div>
+
+          {/* Billing / Subscription */}
+          {isAdmin && (
+            <div className="card mt-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-purple-100 rounded-lg">
+                  <CreditCard className="w-5 h-5 text-purple-600" />
+                </div>
+                <h2 className="text-lg font-semibold">Billing & Subscription</h2>
+              </div>
+
+              {billingMessage && (
+                <div className={`mb-4 p-3 rounded-lg flex items-center gap-2 ${
+                  billingMessage.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
+                }`}>
+                  {billingMessage.type === 'success' ? <Check className="w-4 h-4" /> : <AlertTriangle className="w-4 h-4" />}
+                  {billingMessage.text}
+                </div>
+              )}
+
+              {subscription && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-500">Current Plan</p>
+                      <p className="font-semibold text-lg">{planLabels[subscription.plan] || subscription.plan}</p>
+                    </div>
+                    <span className={`badge ${statusColors[subscription.status] || 'bg-gray-100'}`}>
+                      {subscription.status}
+                    </span>
+                  </div>
+
+                  {subscription.plan === 'TRIAL' && subscription.trialEndsAt && (
+                    <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                      <div className="flex items-start gap-2">
+                        <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="font-medium text-yellow-800">Trial ends {format(new Date(subscription.trialEndsAt), 'MMM d, yyyy')}</p>
+                          <p className="text-sm text-yellow-700">Upgrade now to keep your data and continue using all features.</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {subscription.status === 'PAST_DUE' && (
+                    <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                      <div className="flex items-start gap-2">
+                        <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="font-medium text-red-800">Payment failed</p>
+                          <p className="text-sm text-red-700">Please update your payment method to avoid service interruption.</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Usage */}
+                  <div className="pt-3 border-t">
+                    <p className="text-sm font-medium text-gray-700 mb-2">Usage</p>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Properties</span>
+                        <span className="font-medium">
+                          {subscription.usage?.properties || 0}
+                          {subscription.limits?.properties !== -1 && ` / ${subscription.limits?.properties}`}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Team Members</span>
+                        <span className="font-medium">
+                          {subscription.usage?.users || 0}
+                          {subscription.limits?.users !== -1 && ` / ${subscription.limits?.users}`}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-2 pt-3">
+                    {subscription.plan === 'TRIAL' || subscription.status === 'CANCELED' ? (
+                      <Link to="/pricing" className="btn-primary text-center flex items-center justify-center gap-2">
+                        View Plans & Upgrade
+                        <ExternalLink className="w-4 h-4" />
+                      </Link>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => portalMutation.mutate()}
+                          disabled={portalMutation.isPending}
+                          className="btn-secondary flex items-center justify-center gap-2"
+                        >
+                          <CreditCard className="w-4 h-4" />
+                          {portalMutation.isPending ? 'Loading...' : 'Manage Subscription'}
+                        </button>
+                        <Link to="/pricing" className="text-sm text-center text-primary-600 hover:text-primary-700">
+                          View all plans
+                        </Link>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Team Members */}

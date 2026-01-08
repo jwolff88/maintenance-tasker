@@ -15,6 +15,7 @@ import inspectionRoutes from './routes/inspections.js';
 import tenantPortalRoutes from './routes/tenant-portal.js';
 import assetRoutes from './routes/assets.js';
 import taskRoutes from './routes/tasks.js';
+import billingRoutes from './routes/billing.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
 dotenv.config();
@@ -52,6 +53,7 @@ app.use('/api/inspections', inspectionRoutes);
 app.use('/api/tenant-portal', tenantPortalRoutes);
 app.use('/api/assets', assetRoutes);
 app.use('/api/tasks', taskRoutes);
+app.use('/api/billing', billingRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

@@ -152,3 +152,11 @@ export const tasksApi = {
     return api.get(`/tasks/export/csv${queryString}`, { responseType: 'blob' });
   },
 };
+
+// Billing API
+export const billingApi = {
+  getSubscription: () => api.get('/billing/subscription'),
+  getPricing: () => api.get('/billing/pricing'),
+  createCheckout: (plan: string) => api.post('/billing/create-checkout', { plan }),
+  createPortal: () => api.post('/billing/create-portal'),
+};
