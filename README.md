@@ -66,6 +66,9 @@ npm install
 cp backend/.env.example backend/.env
 # Edit backend/.env with your database URL and secrets
 
+cp frontend/.env.example frontend/.env
+# Frontend .env is preconfigured for local development
+
 # Run database migrations
 cd backend
 npx prisma db push
@@ -78,7 +81,7 @@ npm run dev
 
 ### Environment Variables
 
-Create `backend/.env` with:
+**Backend:** Create `backend/.env` with:
 
 ```env
 DATABASE_URL="postgresql://user:password@localhost:5432/maintenance_tasker"
@@ -96,6 +99,12 @@ STRIPE_PRICE_ENTERPRISE="price_..."
 
 # Frontend URL (for CORS)
 FRONTEND_URL="http://localhost:5173"
+```
+
+**Frontend:** Create `frontend/.env` with:
+
+```env
+VITE_API_URL=http://localhost:3001/api
 ```
 
 ## Demo Credentials
