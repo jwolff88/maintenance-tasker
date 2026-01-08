@@ -4,18 +4,29 @@
 
 body {
   @apply bg-gray-50 text-gray-900 antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent iOS zoom on input focus */
+@media screen and (max-width: 768px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
 }
 
 .btn-primary {
   @apply bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply active:scale-95 touch-manipulation;
 }
 
 .btn-secondary {
   @apply bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors font-medium;
+  @apply active:scale-95 touch-manipulation;
 }
 
 .btn-danger {
   @apply bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium;
+  @apply active:scale-95 touch-manipulation;
 }
 
 .input {
@@ -23,11 +34,11 @@ body {
 }
 
 .card {
-  @apply bg-white rounded-xl shadow-sm border border-gray-100 p-6;
+  @apply bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6;
 }
 
 .badge {
-  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap;
 }
 
 .badge-green {
@@ -48,4 +59,35 @@ body {
 
 .badge-gray {
   @apply bg-gray-100 text-gray-800;
+}
+
+/* Mobile-friendly touch targets */
+@media screen and (max-width: 640px) {
+  .btn-primary, .btn-secondary, .btn-danger {
+    @apply min-h-[44px] px-4 py-3;
+  }
+
+  .card {
+    @apply rounded-lg;
+  }
+
+  /* Stack badges on mobile */
+  .badge-stack {
+    @apply flex flex-wrap gap-1;
+  }
+}
+
+/* Smooth scrolling for mobile */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Safe area insets for notched devices */
+@supports (padding: max(0px)) {
+  body {
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+  }
 }

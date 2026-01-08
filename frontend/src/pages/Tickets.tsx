@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ticketsApi, propertiesApi } from '../services/api';
-import { Plus, Search, Wrench, Clock, User } from 'lucide-react';
+import { Plus, Search, Wrench, Clock, User, AlertCircle, CheckCircle2, Timer } from 'lucide-react';
 import { format } from 'date-fns';
 
 const priorityColors = {
@@ -25,6 +25,60 @@ const categories = [
   'PLUMBING', 'ELECTRICAL', 'HVAC', 'APPLIANCE', 'STRUCTURAL',
   'PEST_CONTROL', 'LANDSCAPING', 'CLEANING', 'SAFETY', 'OTHER'
 ];
+
+// SLA Countdown Component
+function SlaCountdown({ ticket }: { ticket: any }) {
+  const [now, setNow] = useState(new Date());
+
+  useEffect(() => {
+    const interval = setInterval(() => setNow(new Date()), 60000); // Update every minute
+    return () => clearInterval(interval);
+  }, []);
+
+  if (!ticket.slaDeadline) return null;
+
+  const deadline = new Date(ticket.slaDeadline);
+  const isCompleted = ['COMPLETED', 'CANCELLED'].includes(ticket.status);
+
+  if (isCompleted) {
+    return ticket.slaStatus === 'MET' ? (
+      <span className="flex items-center gap-1 text-xs text-green-600 bg-green-50 px-2 py-1 rounded">
+        <CheckCircle2 className="w-3 h-3" /> SLA Met
+      </span>
+    ) : (
+      <span className="flex items-center gap-1 text-xs text-red-600 bg-red-50 px-2 py-1 rounded">
+        <AlertCircle className="w-3 h-3" /> SLA Breached
+      </span>
+    );
+  }
+
+  const remainingMs = deadline.getTime() - now.getTime();
+  const isBreached = remainingMs <= 0;
+  const isWarning = remainingMs > 0 && remainingMs < 2 * 60 * 60 * 1000; // Less than 2 hours
+
+  if (isBreached) {
+    const breachedHours = Math.abs(Math.floor(remainingMs / (1000 * 60 * 60)));
+    const breachedMins = Math.abs(Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60)));
+    return (
+      <span className="flex items-center gap-1 text-xs text-red-600 bg-red-50 px-2 py-1 rounded animate-pulse">
+        <AlertCircle className="w-3 h-3" />
+        SLA Breached ({breachedHours}h {breachedMins}m ago)
+      </span>
+    );
+  }
+
+  const hours = Math.floor(remainingMs / (1000 * 60 * 60));
+  const minutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+
+  return (
+    <span className={`flex items-center gap-1 text-xs px-2 py-1 rounded ${
+      isWarning ? 'text-orange-600 bg-orange-50 animate-pulse' : 'text-blue-600 bg-blue-50'
+    }`}>
+      <Timer className="w-3 h-3" />
+      {hours}h {minutes}m left
+    </span>
+  );
+}
 
 export default function Tickets() {
   const [searchParams] = useSearchParams();
@@ -130,7 +184,7 @@ export default function Tickets() {
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
                     <span className={`badge ${priorityColors[ticket.priority as keyof typeof priorityColors]}`}>
                       {ticket.priority}
                     </span>
@@ -138,6 +192,7 @@ export default function Tickets() {
                       {ticket.status.replace(/_/g, ' ')}
                     </span>
                     <span className="badge badge-gray">{ticket.category.replace(/_/g, ' ')}</span>
+                    <SlaCountdown ticket={ticket} />
                   </div>
                   <h3 className="font-semibold text-gray-900">{ticket.title}</h3>
                   <p className="text-sm text-gray-600 mt-1 line-clamp-2">{ticket.description}</p>

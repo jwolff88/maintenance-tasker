@@ -1,16 +1,17 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "npm run build --workspace=backend && npm run build --workspace=frontend",
-  "outputDirectory": "frontend/dist",
-  "installCommand": "npm install --workspaces --include-workspace-root",
   "framework": "vite",
-  "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api" }
-  ],
+  "buildCommand": "cd /vercel/path0 && npm run build -w backend && npm run build -w frontend",
+  "installCommand": "npm install --workspaces --include-workspace-root --include=dev",
+  "outputDirectory": "frontend/dist",
   "functions": {
     "api/index.ts": {
-      "includeFiles": "backend/**",
+      "runtime": "@vercel/node@3.2.0",
+      "includeFiles": "backend/build/**",
       "maxDuration": 30
     }
-  }
+  },
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "/api" }
+  ]
 }

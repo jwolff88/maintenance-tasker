@@ -34,7 +34,9 @@ app.use(cors({
 app.use(express.json());
 
 // Serve static files for uploads
-app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+const isServerless = process.env.VERCEL === '1' || process.env.AWS_LAMBDA_FUNCTION_NAME;
+const uploadsPath = isServerless ? '/tmp/uploads' : path.join(process.cwd(), 'uploads');
+app.use('/uploads', express.static(uploadsPath));
 
 // Routes
 app.use('/api/auth', authRoutes);

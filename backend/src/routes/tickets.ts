@@ -5,6 +5,50 @@ import { authenticate, AuthRequest } from '../middleware/auth.js';
 
 const router = Router();
 
+// SLA hours by priority
+const SLA_HOURS: Record<string, number> = {
+  URGENT: 4,
+  HIGH: 24,
+  MEDIUM: 72,
+  LOW: 168 // 1 week
+};
+
+// Helper: Calculate SLA info for a ticket
+function calculateSlaInfo(ticket: any) {
+  const now = new Date();
+  let slaDeadline = ticket.slaDeadline;
+
+  // If no explicit SLA deadline, calculate from priority
+  if (!slaDeadline && ticket.priority) {
+    const slaHours = SLA_HOURS[ticket.priority] || 72;
+    slaDeadline = new Date(new Date(ticket.createdAt).getTime() + slaHours * 60 * 60 * 1000);
+  }
+
+  if (!slaDeadline) return { slaDeadline: null, slaStatus: null, slaRemaining: null };
+
+  const deadline = new Date(slaDeadline);
+  const isCompleted = ['COMPLETED', 'CANCELLED'].includes(ticket.status);
+
+  if (isCompleted) {
+    const completedAt = ticket.completedAt ? new Date(ticket.completedAt) : now;
+    return {
+      slaDeadline: deadline,
+      slaStatus: completedAt <= deadline ? 'MET' : 'BREACHED',
+      slaRemaining: null
+    };
+  }
+
+  const remainingMs = deadline.getTime() - now.getTime();
+  const remainingHours = Math.floor(remainingMs / (1000 * 60 * 60));
+  const remainingMins = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+
+  return {
+    slaDeadline: deadline,
+    slaStatus: remainingMs > 0 ? 'ON_TRACK' : 'BREACHED',
+    slaRemaining: remainingMs > 0 ? { hours: remainingHours, minutes: remainingMins } : null
+  };
+}
+
 // Get all tickets
 router.get('/', authenticate, async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
@@ -37,7 +81,13 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response, next: Next
       orderBy: [{ priority: 'desc' }, { createdAt: 'desc' }]
     });
 
-    res.json(tickets);
+    // Add SLA info to each ticket
+    const ticketsWithSla = tickets.map(ticket => ({
+      ...ticket,
+      ...calculateSlaInfo(ticket)
+    }));
+
+    res.json(ticketsWithSla);
   } catch (error) {
     next(error);
   }
@@ -65,7 +115,13 @@ router.get('/:id', authenticate, async (req: AuthRequest, res: Response, next: N
       throw new AppError('Ticket not found', 404);
     }
 
-    res.json(ticket);
+    // Add SLA info
+    const ticketWithSla = {
+      ...ticket,
+      ...calculateSlaInfo(ticket)
+    };
+
+    res.json(ticketWithSla);
   } catch (error) {
     next(error);
   }

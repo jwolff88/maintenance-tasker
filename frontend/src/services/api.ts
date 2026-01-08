@@ -122,6 +122,7 @@ export const assetsApi = {
   getById: (id: string) => api.get(`/assets/${id}`),
   getHistory: (id: string) => api.get(`/assets/${id}/history`),
   getStats: () => api.get('/assets/stats/overview'),
+  getNeedingAttention: () => api.get('/assets/needing-attention/list'),
   create: (data: any) => api.post('/assets', data),
   update: (id: string, data: any) => api.patch(`/assets/${id}`, data),
   delete: (id: string) => api.delete(`/assets/${id}`),
@@ -134,13 +135,20 @@ export const tasksApi = {
   getById: (id: string) => api.get(`/tasks/${id}`),
   getMyTasks: () => api.get('/tasks/my/assigned'),
   getStats: () => api.get('/tasks/stats/overview'),
+  getTemplates: () => api.get('/tasks/templates/list'),
   create: (data: any) => api.post('/tasks', data),
   update: (id: string, data: any) => api.patch(`/tasks/${id}`, data),
   updateStatus: (id: string, status: string) => api.put(`/tasks/${id}/status`, { status }),
+  bulkUpdateStatus: (taskIds: string[], status: string) =>
+    api.put('/tasks/bulk/status', { taskIds, status }),
   uploadPhoto: (id: string, formData: FormData) =>
     api.post(`/tasks/${id}/photos`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     }),
   addComment: (id: string, content: string) => api.post(`/tasks/${id}/comments`, { content }),
   delete: (id: string) => api.delete(`/tasks/${id}`),
+  exportCsv: (params?: Record<string, string>) => {
+    const queryString = params ? '?' + new URLSearchParams(params).toString() : '';
+    return api.get(`/tasks/export/csv${queryString}`, { responseType: 'blob' });
+  },
 };

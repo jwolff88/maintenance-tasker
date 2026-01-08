@@ -9,9 +9,18 @@ import fs from 'fs';
 const router = Router();
 
 // Configure multer for photo uploads
-const uploadsDir = path.join(process.cwd(), 'uploads', 'tasks');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
+// Use /tmp for serverless environments (Vercel), otherwise use local uploads dir
+const isServerless = process.env.VERCEL === '1' || process.env.AWS_LAMBDA_FUNCTION_NAME;
+const uploadsDir = isServerless
+  ? '/tmp/uploads/tasks'
+  : path.join(process.cwd(), 'uploads', 'tasks');
+
+try {
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  }
+} catch (err) {
+  console.warn('Could not create uploads directory:', err);
 }
 
 const storage = multer.diskStorage({
@@ -447,6 +456,235 @@ router.get('/stats/overview', authenticate, async (req: AuthRequest, res: Respon
       overdue,
       critical
     });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Bulk update task status
+router.put('/bulk/status', authenticate, async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const { taskIds, status } = req.body;
+    const validStatuses = ['OPEN', 'IN_PROGRESS', 'UNDER_REVIEW', 'COMPLETED', 'CANCELLED'];
+
+    if (!Array.isArray(taskIds) || taskIds.length === 0) {
+      throw new AppError('Task IDs array is required', 400);
+    }
+
+    if (!validStatuses.includes(status)) {
+      throw new AppError('Invalid status', 400);
+    }
+
+    // Verify all tasks belong to the company
+    const tasks = await prisma.task.findMany({
+      where: {
+        id: { in: taskIds },
+        companyId: req.user!.companyId
+      }
+    });
+
+    if (tasks.length !== taskIds.length) {
+      throw new AppError('Some tasks not found or not authorized', 404);
+    }
+
+    // Check photo requirements for CRITICAL tasks going to COMPLETED
+    if (status === 'COMPLETED') {
+      const criticalWithoutPhotos = tasks.filter(
+        t => t.priority === 'CRITICAL' && (!t.photoBefore || !t.photoAfter)
+      );
+      if (criticalWithoutPhotos.length > 0) {
+        throw new AppError(
+          `${criticalWithoutPhotos.length} critical task(s) require before/after photos to complete`,
+          400
+        );
+      }
+    }
+
+    const now = new Date();
+    const updateData: any = { status };
+
+    if (status === 'IN_PROGRESS') {
+      updateData.startedAt = now;
+    }
+    if (status === 'COMPLETED') {
+      updateData.completedAt = now;
+    }
+
+    await prisma.task.updateMany({
+      where: {
+        id: { in: taskIds },
+        companyId: req.user!.companyId
+      },
+      data: updateData
+    });
+
+    res.json({ updated: taskIds.length, status });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Export tasks as CSV
+router.get('/export/csv', authenticate, async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const { status, priority, assetId, startDate, endDate } = req.query;
+
+    const tasks = await prisma.task.findMany({
+      where: {
+        companyId: req.user!.companyId,
+        ...(status && { status: status as any }),
+        ...(priority && { priority: priority as any }),
+        ...(assetId && { assetId: assetId as string }),
+        ...(startDate && endDate && {
+          createdAt: {
+            gte: new Date(startDate as string),
+            lte: new Date(endDate as string)
+          }
+        })
+      },
+      include: {
+        asset: { select: { name: true, category: true, location: true } },
+        assignedTo: { select: { firstName: true, lastName: true } },
+        createdBy: { select: { firstName: true, lastName: true } }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    // Generate CSV content
+    const headers = [
+      'Title', 'Description', 'Asset', 'Asset Category', 'Location',
+      'Status', 'Priority', 'Assigned To', 'Created By',
+      'Due Date', 'Created At', 'Completed At', 'Estimated Time (min)', 'Actual Time (min)',
+      'Is Recurring', 'Recurrence Type'
+    ];
+
+    const rows = tasks.map(task => [
+      `"${(task.title || '').replace(/"/g, '""')}"`,
+      `"${(task.description || '').replace(/"/g, '""')}"`,
+      `"${task.asset?.name || ''}"`,
+      `"${task.asset?.category || ''}"`,
+      `"${task.asset?.location || ''}"`,
+      task.status,
+      task.priority,
+      task.assignedTo ? `${task.assignedTo.firstName} ${task.assignedTo.lastName}` : '',
+      task.createdBy ? `${task.createdBy.firstName} ${task.createdBy.lastName}` : '',
+      task.dueDate ? task.dueDate.toISOString().split('T')[0] : '',
+      task.createdAt.toISOString().split('T')[0],
+      task.completedAt ? task.completedAt.toISOString().split('T')[0] : '',
+      task.estimatedTime || '',
+      task.actualTime || '',
+      task.isRecurring ? 'Yes' : 'No',
+      task.recurrenceType || ''
+    ]);
+
+    const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename=maintenance-tasks-export.csv');
+    res.send(csv);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Get task templates (predefined common maintenance tasks)
+router.get('/templates/list', authenticate, async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    // Predefined task templates for common maintenance work
+    const templates = [
+      {
+        id: 'hvac-filter',
+        title: 'HVAC Filter Replacement',
+        description: 'Replace HVAC air filters and inspect unit for proper operation',
+        category: 'HVAC',
+        priority: 'MEDIUM',
+        estimatedTime: 30,
+        recurrenceType: 'MONTHLY'
+      },
+      {
+        id: 'fire-extinguisher',
+        title: 'Fire Extinguisher Inspection',
+        description: 'Monthly inspection of fire extinguishers - check pressure gauge, inspect for damage, verify seal',
+        category: 'SAFETY',
+        priority: 'HIGH',
+        estimatedTime: 15,
+        recurrenceType: 'MONTHLY'
+      },
+      {
+        id: 'plumbing-check',
+        title: 'Plumbing System Check',
+        description: 'Inspect pipes for leaks, check water pressure, clear drains, inspect water heater',
+        category: 'PLUMBING',
+        priority: 'MEDIUM',
+        estimatedTime: 60,
+        recurrenceType: 'QUARTERLY'
+      },
+      {
+        id: 'electrical-inspection',
+        title: 'Electrical Panel Inspection',
+        description: 'Inspect electrical panels, check for hot spots, verify breaker operation, check GFCI outlets',
+        category: 'ELECTRICAL',
+        priority: 'HIGH',
+        estimatedTime: 45,
+        recurrenceType: 'QUARTERLY'
+      },
+      {
+        id: 'roof-inspection',
+        title: 'Roof Inspection',
+        description: 'Inspect roof for damage, check gutters and downspouts, look for signs of leaks',
+        category: 'STRUCTURAL',
+        priority: 'MEDIUM',
+        estimatedTime: 90,
+        recurrenceType: 'QUARTERLY'
+      },
+      {
+        id: 'generator-test',
+        title: 'Generator Test Run',
+        description: 'Start generator, run under load for 30 minutes, check oil level, inspect for issues',
+        category: 'ELECTRICAL',
+        priority: 'HIGH',
+        estimatedTime: 45,
+        recurrenceType: 'MONTHLY'
+      },
+      {
+        id: 'pest-inspection',
+        title: 'Pest Control Inspection',
+        description: 'Inspect for signs of pests, check entry points, verify bait stations, document findings',
+        category: 'OTHER',
+        priority: 'MEDIUM',
+        estimatedTime: 60,
+        recurrenceType: 'MONTHLY'
+      },
+      {
+        id: 'elevator-inspection',
+        title: 'Elevator Safety Check',
+        description: 'Test emergency stop, verify phone operation, check lighting, inspect cab condition',
+        category: 'SAFETY',
+        priority: 'CRITICAL',
+        estimatedTime: 30,
+        recurrenceType: 'WEEKLY'
+      },
+      {
+        id: 'lighting-check',
+        title: 'Lighting Walkthrough',
+        description: 'Check all interior and exterior lighting, replace burnt bulbs, clean fixtures',
+        category: 'ELECTRICAL',
+        priority: 'LOW',
+        estimatedTime: 60,
+        recurrenceType: 'MONTHLY'
+      },
+      {
+        id: 'appliance-check',
+        title: 'Appliance Maintenance',
+        description: 'Clean refrigerator coils, check dishwasher filters, inspect washer hoses, clean dryer vents',
+        category: 'APPLIANCE',
+        priority: 'MEDIUM',
+        estimatedTime: 90,
+        recurrenceType: 'QUARTERLY'
+      }
+    ];
+
+    res.json(templates);
   } catch (error) {
     next(error);
   }

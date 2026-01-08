@@ -12,6 +12,8 @@ import {
   ClipboardList,
   Clock,
   CheckCircle,
+  AlertOctagon,
+  ShieldAlert,
 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -65,6 +67,11 @@ export default function Dashboard() {
   const { data: overdueTasks } = useQuery({
     queryKey: ['overdue-tasks'],
     queryFn: () => tasksApi.getAll({ overdue: 'true' }).then((res) => res.data),
+  });
+
+  const { data: assetsNeedingAttention } = useQuery({
+    queryKey: ['assets-needing-attention'],
+    queryFn: () => assetsApi.getNeedingAttention().then((res) => res.data),
   });
 
   if (isLoading) {
@@ -227,6 +234,56 @@ export default function Dashboard() {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Assets Needing Attention */}
+      <div className="card">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold flex items-center gap-2">
+            <AlertOctagon className="w-5 h-5 text-orange-500" />
+            Assets Needing Attention
+          </h2>
+          <Link to="/assets?status=NEEDS_MAINTENANCE" className="text-sm text-primary-600 hover:text-primary-700">
+            View all
+          </Link>
+        </div>
+        {assetsNeedingAttention?.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {assetsNeedingAttention.slice(0, 6).map((asset: any) => (
+              <Link
+                key={asset.id}
+                to={`/assets/${asset.id}`}
+                className="block p-3 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors border border-orange-100"
+              >
+                <div className="flex items-start gap-3">
+                  <div className={`p-2 rounded-lg ${
+                    asset.status === 'OUT_OF_SERVICE' ? 'bg-red-100' : 'bg-orange-100'
+                  }`}>
+                    <ShieldAlert className={`w-4 h-4 ${
+                      asset.status === 'OUT_OF_SERVICE' ? 'text-red-600' : 'text-orange-600'
+                    }`} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-gray-900 truncate">{asset.name}</p>
+                    <p className="text-sm text-gray-600 truncate">{asset.property?.name || asset.location}</p>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {asset.attentionReasons?.map((reason: string, idx: number) => (
+                        <span key={idx} className="text-xs bg-white px-1.5 py-0.5 rounded text-orange-700">
+                          {reason}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-8">
+            <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-2" />
+            <p className="text-gray-500">All assets are operational</p>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

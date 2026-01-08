@@ -4,7 +4,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { tasksApi, assetsApi, companyApi } from '../services/api';
 import {
   Plus, Search, ClipboardList, Clock, AlertTriangle, Play, CheckCircle,
-  Eye, User, Calendar, ChevronRight, Filter
+  Eye, User, Calendar, ChevronRight, Filter, Download, CheckSquare, Square, XCircle
 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -37,6 +37,8 @@ export default function MaintenanceTasks() {
   const [statusFilter, setStatusFilter] = useState('');
   const [priorityFilter, setPriorityFilter] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
+  const [isExporting, setIsExporting] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -71,6 +73,26 @@ export default function MaintenanceTasks() {
     queryFn: () => companyApi.getUsers().then((res) => res.data),
   });
 
+  const { data: templates } = useQuery({
+    queryKey: ['task-templates'],
+    queryFn: () => tasksApi.getTemplates().then((res) => res.data),
+  });
+
+  const applyTemplate = (templateId: string) => {
+    const template = templates?.find((t: any) => t.id === templateId);
+    if (template) {
+      setFormData(prev => ({
+        ...prev,
+        title: template.title,
+        description: template.description,
+        priority: template.priority,
+        estimatedTime: template.estimatedTime?.toString() || '',
+        isRecurring: !!template.recurrenceType,
+        recurrenceType: template.recurrenceType || 'MONTHLY',
+      }));
+    }
+  };
+
   const createMutation = useMutation({
     mutationFn: tasksApi.create,
     onSuccess: () => {
@@ -98,6 +120,59 @@ export default function MaintenanceTasks() {
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
     },
   });
+
+  const bulkStatusMutation = useMutation({
+    mutationFn: ({ taskIds, status }: { taskIds: string[]; status: string }) =>
+      tasksApi.bulkUpdateStatus(taskIds, status),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      setSelectedTasks([]);
+    },
+  });
+
+  const handleExport = async () => {
+    setIsExporting(true);
+    try {
+      const response = await tasksApi.exportCsv({
+        ...(statusFilter && { status: statusFilter }),
+        ...(priorityFilter && { priority: priorityFilter }),
+      });
+      const blob = new Blob([response.data], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `maintenance-tasks-${format(new Date(), 'yyyy-MM-dd')}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Export failed:', error);
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const toggleTaskSelection = (taskId: string) => {
+    setSelectedTasks(prev =>
+      prev.includes(taskId) ? prev.filter(id => id !== taskId) : [...prev, taskId]
+    );
+  };
+
+  const toggleAllTasks = () => {
+    if (!tasks) return;
+    const selectableTasks = tasks.filter((t: any) => t.status !== 'COMPLETED' && t.status !== 'CANCELLED');
+    if (selectedTasks.length === selectableTasks.length) {
+      setSelectedTasks([]);
+    } else {
+      setSelectedTasks(selectableTasks.map((t: any) => t.id));
+    }
+  };
+
+  const handleBulkAction = (status: string) => {
+    if (selectedTasks.length === 0) return;
+    bulkStatusMutation.mutate({ taskIds: selectedTasks, status });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -155,16 +230,71 @@ export default function MaintenanceTasks() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Maintenance Tasks</h1>
           <p className="text-gray-600">Track and manage maintenance work</p>
         </div>
-        <button onClick={() => setShowModal(true)} className="btn-primary flex items-center gap-2">
-          <Plus className="w-4 h-4" />
-          Create Task
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleExport}
+            disabled={isExporting}
+            className="btn-secondary flex items-center gap-2"
+          >
+            <Download className="w-4 h-4" />
+            {isExporting ? 'Exporting...' : 'Export CSV'}
+          </button>
+          <button onClick={() => setShowModal(true)} className="btn-primary flex items-center gap-2">
+            <Plus className="w-4 h-4" />
+            Create Task
+          </button>
+        </div>
       </div>
+
+      {/* Bulk Actions Bar */}
+      {selectedTasks.length > 0 && (
+        <div className="bg-primary-50 border border-primary-200 rounded-lg p-3 flex flex-wrap items-center gap-3">
+          <span className="text-sm font-medium text-primary-700">
+            {selectedTasks.length} task{selectedTasks.length !== 1 ? 's' : ''} selected
+          </span>
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={() => handleBulkAction('IN_PROGRESS')}
+              disabled={bulkStatusMutation.isPending}
+              className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 flex items-center gap-1"
+            >
+              <Play className="w-3 h-3" /> Start All
+            </button>
+            <button
+              onClick={() => handleBulkAction('UNDER_REVIEW')}
+              disabled={bulkStatusMutation.isPending}
+              className="px-3 py-1.5 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700 flex items-center gap-1"
+            >
+              <Eye className="w-3 h-3" /> Submit All
+            </button>
+            <button
+              onClick={() => handleBulkAction('COMPLETED')}
+              disabled={bulkStatusMutation.isPending}
+              className="px-3 py-1.5 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 flex items-center gap-1"
+            >
+              <CheckCircle className="w-3 h-3" /> Complete All
+            </button>
+            <button
+              onClick={() => handleBulkAction('CANCELLED')}
+              disabled={bulkStatusMutation.isPending}
+              className="px-3 py-1.5 bg-gray-600 text-white rounded-lg text-sm hover:bg-gray-700 flex items-center gap-1"
+            >
+              <XCircle className="w-3 h-3" /> Cancel All
+            </button>
+          </div>
+          <button
+            onClick={() => setSelectedTasks([])}
+            className="ml-auto text-sm text-gray-600 hover:text-gray-800"
+          >
+            Clear selection
+          </button>
+        </div>
+      )}
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
@@ -209,51 +339,81 @@ export default function MaintenanceTasks() {
         </div>
       ) : tasks?.length > 0 ? (
         <div className="space-y-3">
-          {tasks.map((task: any) => (
-            <Link
-              key={task.id}
-              to={`/maintenance-tasks/${task.id}`}
-              className="card flex items-center gap-4 hover:shadow-md transition-shadow"
+          {/* Select All Header */}
+          <div className="flex items-center gap-3 px-4 py-2 bg-gray-50 rounded-lg">
+            <button
+              onClick={toggleAllTasks}
+              className="p-1 hover:bg-gray-200 rounded"
             >
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <h3 className="font-semibold text-gray-900 truncate">{task.title}</h3>
-                  {task.isOverdue && (
-                    <span className="flex items-center gap-1 text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded">
-                      <AlertTriangle className="w-3 h-3" /> Overdue
-                    </span>
+              {selectedTasks.length === tasks.filter((t: any) => t.status !== 'COMPLETED' && t.status !== 'CANCELLED').length && selectedTasks.length > 0 ? (
+                <CheckSquare className="w-5 h-5 text-primary-600" />
+              ) : (
+                <Square className="w-5 h-5 text-gray-400" />
+              )}
+            </button>
+            <span className="text-sm text-gray-600">
+              {selectedTasks.length > 0 ? `${selectedTasks.length} selected` : 'Select all'}
+            </span>
+          </div>
+          {tasks.map((task: any) => (
+            <div key={task.id} className="card flex items-center gap-4 hover:shadow-md transition-shadow">
+              {/* Checkbox - only show for non-completed tasks */}
+              {task.status !== 'COMPLETED' && task.status !== 'CANCELLED' && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); toggleTaskSelection(task.id); }}
+                  className="p-1 hover:bg-gray-100 rounded flex-shrink-0"
+                >
+                  {selectedTasks.includes(task.id) ? (
+                    <CheckSquare className="w-5 h-5 text-primary-600" />
+                  ) : (
+                    <Square className="w-5 h-5 text-gray-400" />
                   )}
+                </button>
+              )}
+              <Link
+                to={`/maintenance-tasks/${task.id}`}
+                className="flex-1 flex items-center gap-4 min-w-0"
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="font-semibold text-gray-900 truncate">{task.title}</h3>
+                    {task.isOverdue && (
+                      <span className="flex items-center gap-1 text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded">
+                        <AlertTriangle className="w-3 h-3" /> Overdue
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500">
+                    <span className="flex items-center gap-1">
+                      <ClipboardList className="w-3.5 h-3.5" />
+                      {task.asset?.name}
+                    </span>
+                    {task.assignedTo && (
+                      <span className="flex items-center gap-1">
+                        <User className="w-3.5 h-3.5" />
+                        {task.assignedTo.firstName} {task.assignedTo.lastName}
+                      </span>
+                    )}
+                    {task.dueDate && (
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-3.5 h-3.5" />
+                        {format(new Date(task.dueDate), 'MMM d, yyyy')}
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500">
-                  <span className="flex items-center gap-1">
-                    <ClipboardList className="w-3.5 h-3.5" />
-                    {task.asset?.name}
+                <div className="flex items-center gap-3">
+                  <span className={`badge ${priorityColors[task.priority]}`}>
+                    {priorityLabels[task.priority]}
                   </span>
-                  {task.assignedTo && (
-                    <span className="flex items-center gap-1">
-                      <User className="w-3.5 h-3.5" />
-                      {task.assignedTo.firstName} {task.assignedTo.lastName}
-                    </span>
-                  )}
-                  {task.dueDate && (
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5" />
-                      {format(new Date(task.dueDate), 'MMM d, yyyy')}
-                    </span>
-                  )}
+                  <span className={`badge ${statusColors[task.status]}`}>
+                    {task.status.replace('_', ' ')}
+                  </span>
+                  {getQuickActionButton(task)}
+                  <ChevronRight className="w-5 h-5 text-gray-400" />
                 </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className={`badge ${priorityColors[task.priority]}`}>
-                  {priorityLabels[task.priority]}
-                </span>
-                <span className={`badge ${statusColors[task.status]}`}>
-                  {task.status.replace('_', ' ')}
-                </span>
-                {getQuickActionButton(task)}
-                <ChevronRight className="w-5 h-5 text-gray-400" />
-              </div>
-            </Link>
+              </Link>
+            </div>
           ))}
         </div>
       ) : (
@@ -274,6 +434,27 @@ export default function MaintenanceTasks() {
             <div className="p-6">
               <h2 className="text-xl font-semibold mb-6">Create Maintenance Task</h2>
               <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Template Selector */}
+                {templates && templates.length > 0 && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                    <label className="block text-sm font-medium text-blue-800 mb-2">
+                      Quick Start from Template
+                    </label>
+                    <select
+                      onChange={(e) => e.target.value && applyTemplate(e.target.value)}
+                      className="input text-sm"
+                      defaultValue=""
+                    >
+                      <option value="">Select a template to auto-fill...</option>
+                      {templates.map((template: any) => (
+                        <option key={template.id} value={template.id}>
+                          {template.title} ({template.priority})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Task Title *

@@ -192,6 +192,65 @@ router.delete('/:id', authenticate, async (req: AuthRequest, res: Response, next
   }
 });
 
+// Get assets needing attention
+router.get('/needing-attention/list', authenticate, async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const now = new Date();
+
+    // Get assets that need maintenance, are out of service, or have overdue tasks
+    const assets = await prisma.asset.findMany({
+      where: {
+        companyId: req.user!.companyId,
+        OR: [
+          { status: 'NEEDS_MAINTENANCE' },
+          { status: 'OUT_OF_SERVICE' },
+          {
+            tasks: {
+              some: {
+                dueDate: { lt: now },
+                status: { notIn: ['COMPLETED', 'CANCELLED'] }
+              }
+            }
+          },
+          {
+            warrantyExpiry: {
+              lt: new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000) // Expiring in 30 days
+            }
+          }
+        ]
+      },
+      include: {
+        property: { select: { id: true, name: true } },
+        tasks: {
+          where: {
+            status: { notIn: ['COMPLETED', 'CANCELLED'] }
+          },
+          select: { id: true, title: true, status: true, priority: true, dueDate: true }
+        }
+      },
+      take: 10
+    });
+
+    // Add reason for each asset
+    const assetsWithReason = assets.map(asset => {
+      const reasons: string[] = [];
+      if (asset.status === 'NEEDS_MAINTENANCE') reasons.push('Needs maintenance');
+      if (asset.status === 'OUT_OF_SERVICE') reasons.push('Out of service');
+      if (asset.warrantyExpiry && new Date(asset.warrantyExpiry) < new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)) {
+        reasons.push('Warranty expiring soon');
+      }
+      const overdueTasks = asset.tasks.filter(t => t.dueDate && new Date(t.dueDate) < now);
+      if (overdueTasks.length > 0) reasons.push(`${overdueTasks.length} overdue task(s)`);
+
+      return { ...asset, attentionReasons: reasons };
+    });
+
+    res.json(assetsWithReason);
+  } catch (error) {
+    next(error);
+  }
+});
+
 // Get asset statistics
 router.get('/stats/overview', authenticate, async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {

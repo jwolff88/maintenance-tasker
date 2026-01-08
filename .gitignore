@@ -7,3 +7,7 @@ Thumbs.db
 .idea/
 .vscode/
 *.local
+
+.vercel
+.env*.local
+backend/build/
