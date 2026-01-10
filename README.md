@@ -52,41 +52,80 @@ A professional-grade SaaS application for property management companies to coord
 - PostgreSQL database (or Supabase account)
 - Stripe account (for billing - optional for development)
 
-### Installation
+### Installation & Setup
 
+**1. Clone and Install Dependencies**
 ```bash
 # Clone the repository
 git clone <repository-url>
 cd maintenance-tasker
 
-# Install dependencies
+# Install dependencies from the root directory
 npm install
-
-# Set up environment variables
-cp backend/.env.example backend/.env
-# Edit backend/.env with your database URL and secrets
-
-cp frontend/.env.example frontend/.env
-# Frontend .env is preconfigured for local development
-
-# Run database migrations
-cd backend
-npx prisma db push
-npm run db:seed  # Optional: seed demo data
-
-# Start development servers
-cd ..
-npm run dev
 ```
 
-### Environment Variables
+**2. Set Up PostgreSQL Database**
 
-**Backend:** Create `backend/.env` with:
+This project requires a PostgreSQL database. You can use a local installation or a cloud provider like Supabase (recommended) or Railway.
 
+- **Ensure PostgreSQL is running.**
+- **Create a database** for the project (e.g., `maintenance_tasker`).
+- **Get your connection string.** This is a URL with the format:
+  `postgresql://<user>:<password>@<host>:<port>/<database>`
+
+**3. Configure Environment Variables**
+
+You need to create two `.env` files: one for the backend and one for the frontend.
+
+- **Backend:**
+  ```bash
+  cp backend/.env.example backend/.env
+  ```
+  Now, open `backend/.env` and **update the `DATABASE_URL`** with your actual connection string. You should also set your own `JWT_SECRET` and `JWT_REFRESH_SECRET`.
+
+- **Frontend:**
+  ```bash
+  cp frontend/.env.example frontend/.env
+  ```
+  The default settings in this file are usually sufficient for local development.
+
+**4. Run Database Migrations**
+
+This command sets up your database schema based on `prisma/schema.prisma`.
+
+```bash
+# From the root directory
+npm run db:migrate
+```
+
+**5. (Optional) Seed Database with Demo Data**
+
+To populate the app with sample companies, users, and properties, run the seed script:
+
+```bash
+# From the root directory
+npm run db:seed
+```
+
+**6. Start the Development Servers**
+```bash
+# This will start both the backend (port 3001) and frontend (port 5173)
+npm run dev
+```
+The application should now be running at `http://localhost:5173`.
+
+### Environment Variables Explained
+
+#### `backend/.env`
 ```env
+# Database connection string (REQUIRED)
 DATABASE_URL="postgresql://user:password@localhost:5432/maintenance_tasker"
+
+# JWT secrets for authentication (REQUIRED - CHANGE THESE)
 JWT_SECRET="your-secret-key-min-32-chars"
 JWT_REFRESH_SECRET="your-refresh-secret-min-32-chars"
+
+# Port for the backend server
 PORT=3001
 NODE_ENV=development
 
@@ -101,9 +140,9 @@ STRIPE_PRICE_ENTERPRISE="price_..."
 FRONTEND_URL="http://localhost:5173"
 ```
 
-**Frontend:** Create `frontend/.env` with:
-
+#### `frontend/.env`
 ```env
+# URL for the backend API
 VITE_API_URL=http://localhost:3001/api
 ```
 
