@@ -3,9 +3,14 @@ import { prisma } from '../utils/prisma.js';
 import { AppError } from './errorHandler.js';
 import { AuthRequest } from './auth.js';
 import { PLAN_LIMITS } from '../routes/billing.js';
-import { SubscriptionPlan } from '@prisma/client';
 
 type ResourceType = 'properties' | 'users' | 'tasks' | 'assets';
+
+// Helper to get start of current month
+function getStartOfMonth(): Date {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), 1);
+}
 
 export function checkUsageLimit(resourceType: ResourceType) {
   return async (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -25,7 +30,6 @@ export function checkUsageLimit(resourceType: ResourceType) {
             select: {
               properties: true,
               users: true,
-              tasks: true,
               assets: true,
             },
           },
@@ -49,34 +53,50 @@ export function checkUsageLimit(resourceType: ResourceType) {
       }
 
       const limits = PLAN_LIMITS[company.plan as keyof typeof PLAN_LIMITS];
-      const currentCount = company._count[resourceType];
+      let currentCount: number;
+      let limit: number;
+      let resourceLabel: string = resourceType;
 
-      // Get the specific limit for this resource type
-      let limitKey: keyof typeof limits;
       switch (resourceType) {
         case 'properties':
-          limitKey = 'properties';
+          currentCount = company._count.properties;
+          limit = limits.properties;
           break;
-        case 'users':
-          limitKey = 'users';
-          break;
-        case 'tasks':
-          limitKey = 'tasksPerMonth';
-          break;
-        case 'assets':
-          limitKey = 'assetsPerProperty';
-          break;
-        default:
-          limitKey = 'properties';
-      }
 
-      const limit = limits[limitKey];
+        case 'users':
+          currentCount = company._count.users;
+          limit = limits.users;
+          break;
+
+        case 'tasks':
+          // Count only tasks created this month
+          const tasksThisMonth = await prisma.task.count({
+            where: {
+              companyId,
+              createdAt: { gte: getStartOfMonth() },
+            },
+          });
+          currentCount = tasksThisMonth;
+          limit = limits.tasksPerMonth;
+          resourceLabel = 'tasks this month';
+          break;
+
+        case 'assets':
+          // Use total assets as the limit (treating assetsPerProperty as total for simplicity)
+          currentCount = company._count.assets;
+          limit = limits.assetsPerProperty;
+          break;
+
+        default:
+          currentCount = 0;
+          limit = -1;
+      }
 
       // -1 means unlimited
       if (limit !== -1 && currentCount >= limit) {
         const planName = company.plan.toLowerCase();
         throw new AppError(
-          `You've reached the ${resourceType} limit for your ${planName} plan. Please upgrade to add more.`,
+          `You've reached the ${resourceLabel} limit for your ${planName} plan. Please upgrade to add more.`,
           403
         );
       }

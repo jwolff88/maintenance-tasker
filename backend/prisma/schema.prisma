@@ -3,8 +3,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // Subscription plans
@@ -68,6 +69,10 @@ model User {
   isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  // Custom permissions (JSON) - overrides role-based defaults
+  // Structure: { properties: { view, create, edit, delete }, tasks: {...}, etc. }
+  permissions  Json?
 
   companyId String
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)

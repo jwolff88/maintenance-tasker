@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSearchParams, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { companyApi, billingApi } from '../services/api';
-import { Building2, Users, Plus, User, CreditCard, AlertTriangle, Check, ExternalLink } from 'lucide-react';
+import { Building2, Users, Plus, User, CreditCard, AlertTriangle, Check, ExternalLink, Shield, RotateCcw } from 'lucide-react';
 import { format } from 'date-fns';
 
 const roleLabels: Record<string, string> = {
@@ -44,6 +44,10 @@ export default function Settings() {
     role: 'PROPERTY_MANAGER',
     phone: '',
   });
+  const [permissionsModal, setPermissionsModal] = useState<{ userId: string; userName: string } | null>(null);
+  const [editingPermissions, setEditingPermissions] = useState<any>(null);
+
+  const isAdmin = user?.role === 'COMPANY_ADMIN' || user?.role === 'SUPER_ADMIN';
 
   // Handle billing callback messages
   useEffect(() => {
@@ -70,6 +74,48 @@ export default function Settings() {
   const { data: subscription } = useQuery({
     queryKey: ['subscription'],
     queryFn: () => billingApi.getSubscription().then((res) => res.data),
+  });
+
+  const { data: permissionCategories } = useQuery({
+    queryKey: ['permission-categories'],
+    queryFn: () => companyApi.getPermissionCategories().then((res) => res.data),
+    enabled: isAdmin,
+  });
+
+  const { data: userPermissionsData } = useQuery({
+    queryKey: ['user-permissions', permissionsModal?.userId],
+    queryFn: () => permissionsModal?.userId
+      ? companyApi.getUserPermissions(permissionsModal.userId).then((res) => res.data)
+      : null,
+    enabled: !!permissionsModal?.userId,
+  });
+
+  // Initialize editing permissions when modal opens
+  useEffect(() => {
+    if (userPermissionsData) {
+      setEditingPermissions(userPermissionsData.effectivePermissions);
+    }
+  }, [userPermissionsData]);
+
+  const updatePermissionsMutation = useMutation({
+    mutationFn: ({ userId, permissions }: { userId: string; permissions: any }) =>
+      companyApi.updateUserPermissions(userId, permissions),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['company-users'] });
+      queryClient.invalidateQueries({ queryKey: ['user-permissions'] });
+      setPermissionsModal(null);
+      setEditingPermissions(null);
+    },
+  });
+
+  const resetPermissionsMutation = useMutation({
+    mutationFn: (userId: string) => companyApi.resetUserPermissions(userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['company-users'] });
+      queryClient.invalidateQueries({ queryKey: ['user-permissions'] });
+      setPermissionsModal(null);
+      setEditingPermissions(null);
+    },
   });
 
   const createUserMutation = useMutation({
@@ -102,7 +148,24 @@ export default function Settings() {
     createUserMutation.mutate(formData);
   };
 
-  const isAdmin = user?.role === 'COMPANY_ADMIN' || user?.role === 'SUPER_ADMIN';
+  const handlePermissionToggle = (category: string, action: string) => {
+    if (!editingPermissions) return;
+    setEditingPermissions({
+      ...editingPermissions,
+      [category]: {
+        ...editingPermissions[category],
+        [action]: !editingPermissions[category]?.[action],
+      },
+    });
+  };
+
+  const handleSavePermissions = () => {
+    if (!permissionsModal || !editingPermissions) return;
+    updatePermissionsMutation.mutate({
+      userId: permissionsModal.userId,
+      permissions: editingPermissions,
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -305,6 +368,7 @@ export default function Settings() {
                         <th className="text-left py-3 px-2 text-sm font-medium text-gray-500">Email</th>
                         <th className="text-left py-3 px-2 text-sm font-medium text-gray-500">Role</th>
                         <th className="text-left py-3 px-2 text-sm font-medium text-gray-500">Status</th>
+                        <th className="text-left py-3 px-2 text-sm font-medium text-gray-500">Permissions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -321,6 +385,19 @@ export default function Settings() {
                             <span className={`badge ${u.isActive ? 'badge-green' : 'badge-gray'}`}>
                               {u.isActive ? 'Active' : 'Inactive'}
                             </span>
+                          </td>
+                          <td className="py-3 px-2">
+                            {u.id !== user?.id && u.role !== 'SUPER_ADMIN' ? (
+                              <button
+                                onClick={() => setPermissionsModal({ userId: u.id, userName: `${u.firstName} ${u.lastName}` })}
+                                className="flex items-center gap-1 text-sm text-primary-600 hover:text-primary-700"
+                              >
+                                <Shield className="w-4 h-4" />
+                                {u.hasCustomPermissions ? 'Custom' : 'Default'}
+                              </button>
+                            ) : (
+                              <span className="text-sm text-gray-400">-</span>
+                            )}
                           </td>
                         </tr>
                       ))}
@@ -436,6 +513,103 @@ export default function Settings() {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Permissions Modal */}
+      {permissionsModal && (
+        <div className="fixed inset-0 bg-gray-800/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="p-6 border-b flex-shrink-0">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-semibold">Manage Permissions</h2>
+                  <p className="text-gray-600 text-sm mt-1">
+                    Customize access for {permissionsModal.userName}
+                  </p>
+                </div>
+                {userPermissionsData?.hasCustomPermissions && (
+                  <button
+                    onClick={() => resetPermissionsMutation.mutate(permissionsModal.userId)}
+                    disabled={resetPermissionsMutation.isPending}
+                    className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-800"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                    Reset to Default
+                  </button>
+                )}
+              </div>
+              {userPermissionsData && (
+                <div className="mt-3 flex items-center gap-2">
+                  <span className="text-sm text-gray-500">Base role:</span>
+                  <span className="badge badge-blue text-xs">{roleLabels[userPermissionsData.role]}</span>
+                  {userPermissionsData.hasCustomPermissions && (
+                    <span className="badge badge-purple text-xs">Custom Overrides</span>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="p-6 overflow-y-auto flex-1">
+              {permissionCategories && editingPermissions ? (
+                <div className="space-y-6">
+                  {permissionCategories.map((category: any) => (
+                    <div key={category.key} className="border rounded-lg p-4">
+                      <h3 className="font-medium text-gray-900 mb-3">{category.label}</h3>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        {category.actions.map((action: any) => {
+                          const isEnabled = editingPermissions[category.key]?.[action.key];
+                          const defaultValue = userPermissionsData?.roleDefaults?.[category.key]?.[action.key];
+                          const isOverridden = isEnabled !== defaultValue;
+
+                          return (
+                            <label
+                              key={action.key}
+                              className={`flex items-center gap-2 p-2 rounded cursor-pointer transition-colors ${
+                                isEnabled ? 'bg-green-50' : 'bg-gray-50'
+                              } ${isOverridden ? 'ring-2 ring-purple-300' : ''}`}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={isEnabled || false}
+                                onChange={() => handlePermissionToggle(category.key, action.key)}
+                                className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                              />
+                              <span className="text-sm">{action.label}</span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex items-center justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+                </div>
+              )}
+            </div>
+
+            <div className="p-6 border-t flex-shrink-0 flex gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setPermissionsModal(null);
+                  setEditingPermissions(null);
+                }}
+                className="btn-secondary flex-1"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSavePermissions}
+                disabled={updatePermissionsMutation.isPending}
+                className="btn-primary flex-1"
+              >
+                {updatePermissionsMutation.isPending ? 'Saving...' : 'Save Permissions'}
+              </button>
             </div>
           </div>
         </div>

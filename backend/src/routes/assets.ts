@@ -2,6 +2,7 @@ import { Router, Response, NextFunction } from 'express';
 import { prisma } from '../utils/prisma.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { authenticate, AuthRequest } from '../middleware/auth.js';
+import { checkUsageLimit } from '../middleware/usageLimits.js';
 
 const router = Router();
 
@@ -101,7 +102,7 @@ router.get('/:id/history', authenticate, async (req: AuthRequest, res: Response,
 });
 
 // Create asset
-router.post('/', authenticate, async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/', authenticate, checkUsageLimit('assets'), async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const {
       name, description, category, location, qrCode,

@@ -17,6 +17,7 @@ import assetRoutes from './routes/assets.js';
 import taskRoutes from './routes/tasks.js';
 import billingRoutes from './routes/billing.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import { apiLimiter } from './middleware/rateLimit.js';
 
 dotenv.config();
 
@@ -40,6 +41,9 @@ app.use(express.json());
 const isServerless = process.env.VERCEL === '1' || process.env.AWS_LAMBDA_FUNCTION_NAME;
 const uploadsPath = isServerless ? '/tmp/uploads' : path.join(process.cwd(), 'uploads');
 app.use('/uploads', express.static(uploadsPath));
+
+// Apply global rate limiting to all API routes
+app.use('/api', apiLimiter);
 
 // Routes
 app.use('/api/auth', authRoutes);

@@ -4,11 +4,13 @@ import jwt from 'jsonwebtoken';
 import { prisma } from '../utils/prisma.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { authenticate, AuthRequest } from '../middleware/auth.js';
+import { loginLimiter, registerLimiter } from '../middleware/rateLimit.js';
+import { getEffectivePermissions, UserPermissions } from '../utils/permissions.js';
 
 const router = Router();
 
 // Register company and admin user
-router.post('/register', async (req: Request, res: Response, next: NextFunction) => {
+router.post('/register', registerLimiter, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { companyName, email, password, firstName, lastName } = req.body;
 
@@ -73,7 +75,7 @@ router.post('/register', async (req: Request, res: Response, next: NextFunction)
 });
 
 // Login
-router.post('/login', async (req: Request, res: Response, next: NextFunction) => {
+router.post('/login', loginLimiter, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password } = req.body;
 
@@ -97,6 +99,11 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction) =>
       { expiresIn: '24h' }
     );
 
+    const permissions = getEffectivePermissions(
+      user.role,
+      user.permissions as Partial<UserPermissions> | null
+    );
+
     res.json({
       token,
       user: {
@@ -112,6 +119,7 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction) =>
           status: user.company.subscriptionStatus,
           trialEndsAt: user.company.trialEndsAt,
         },
+        permissions,
       }
     });
   } catch (error) {
@@ -131,6 +139,11 @@ router.get('/me', authenticate, async (req: AuthRequest, res: Response, next: Ne
       throw new AppError('User not found', 404);
     }
 
+    const permissions = getEffectivePermissions(
+      user.role,
+      user.permissions as Partial<UserPermissions> | null
+    );
+
     res.json({
       id: user.id,
       email: user.email,
@@ -144,6 +157,7 @@ router.get('/me', authenticate, async (req: AuthRequest, res: Response, next: Ne
         status: user.company.subscriptionStatus,
         trialEndsAt: user.company.trialEndsAt,
       },
+      permissions,
     });
   } catch (error) {
     next(error);

@@ -1,11 +1,12 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { prisma } from '../utils/prisma.js';
 import { AppError } from '../middleware/errorHandler.js';
+import { tenantPortalLimiter } from '../middleware/rateLimit.js';
 
 const router = Router();
 
 // Lookup tenant by email - returns their active leases/properties
-router.post('/lookup', async (req: Request, res: Response, next: NextFunction) => {
+router.post('/lookup', tenantPortalLimiter, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email } = req.body;
 
@@ -77,7 +78,7 @@ router.get('/tickets/:tenantId', async (req: Request, res: Response, next: NextF
 });
 
 // Submit a maintenance request (public endpoint for tenants)
-router.post('/submit-ticket', async (req: Request, res: Response, next: NextFunction) => {
+router.post('/submit-ticket', tenantPortalLimiter, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { tenantId, propertyId, title, description, category, priority, contactPhone } = req.body;
 

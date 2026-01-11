@@ -86,6 +86,13 @@ export const companyApi = {
   getUsers: () => api.get('/companies/users'),
   createUser: (data: any) => api.post('/companies/users', data),
   updateUser: (id: string, data: any) => api.patch(`/companies/users/${id}`, data),
+  // Permissions
+  getPermissionCategories: () => api.get('/companies/permissions/categories'),
+  getRoleDefaults: (role: string) => api.get(`/companies/permissions/defaults/${role}`),
+  getUserPermissions: (userId: string) => api.get(`/companies/users/${userId}/permissions`),
+  updateUserPermissions: (userId: string, permissions: any) =>
+    api.patch(`/companies/users/${userId}/permissions`, { permissions }),
+  resetUserPermissions: (userId: string) => api.delete(`/companies/users/${userId}/permissions`),
 };
 
 // Equipment API

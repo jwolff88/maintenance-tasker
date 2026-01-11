@@ -1,8 +1,16 @@
 import { Router, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
+import { Prisma } from '@prisma/client';
 import { prisma } from '../utils/prisma.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { authenticate, authorize, AuthRequest } from '../middleware/auth.js';
+import { checkUsageLimit } from '../middleware/usageLimits.js';
+import {
+  getEffectivePermissions,
+  getRoleDefaults,
+  getPermissionCategories,
+  UserPermissions
+} from '../utils/permissions.js';
 
 const router = Router();
 
@@ -28,7 +36,7 @@ router.get('/', authenticate, async (req: AuthRequest, res: Response, next: Next
   }
 });
 
-// Get company users
+// Get company users (with effective permissions)
 router.get('/users', authenticate, authorize('COMPANY_ADMIN', 'SUPER_ADMIN'), async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const users = await prisma.user.findMany({
@@ -41,19 +49,30 @@ router.get('/users', authenticate, authorize('COMPANY_ADMIN', 'SUPER_ADMIN'), as
         role: true,
         phone: true,
         isActive: true,
-        createdAt: true
+        createdAt: true,
+        permissions: true
       },
       orderBy: { createdAt: 'desc' }
     });
 
-    res.json(users);
+    // Add effective permissions to each user
+    const usersWithPermissions = users.map(user => ({
+      ...user,
+      effectivePermissions: getEffectivePermissions(
+        user.role,
+        user.permissions as Partial<UserPermissions> | null
+      ),
+      hasCustomPermissions: user.permissions !== null
+    }));
+
+    res.json(usersWithPermissions);
   } catch (error) {
     next(error);
   }
 });
 
 // Create user in company
-router.post('/users', authenticate, authorize('COMPANY_ADMIN', 'SUPER_ADMIN'), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/users', authenticate, authorize('COMPANY_ADMIN', 'SUPER_ADMIN'), checkUsageLimit('users'), async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const { email, password, firstName, lastName, role, phone } = req.body;
 
@@ -121,6 +140,161 @@ router.patch('/users/:userId', authenticate, authorize('COMPANY_ADMIN', 'SUPER_A
     });
 
     res.json(updated);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Get permission categories (for UI)
+router.get('/permissions/categories', authenticate, authorize('COMPANY_ADMIN', 'SUPER_ADMIN'), (req: AuthRequest, res: Response) => {
+  res.json(getPermissionCategories());
+});
+
+// Get role default permissions
+router.get('/permissions/defaults/:role', authenticate, authorize('COMPANY_ADMIN', 'SUPER_ADMIN'), (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const { role } = req.params;
+    const validRoles = ['SUPER_ADMIN', 'COMPANY_ADMIN', 'PROPERTY_MANAGER', 'MAINTENANCE_STAFF', 'VENDOR', 'READ_ONLY'];
+
+    if (!validRoles.includes(role)) {
+      throw new AppError('Invalid role', 400);
+    }
+
+    const defaults = getRoleDefaults(role as any);
+    res.json(defaults);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Get user's permissions
+router.get('/users/:userId/permissions', authenticate, authorize('COMPANY_ADMIN', 'SUPER_ADMIN'), async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await prisma.user.findFirst({
+      where: { id: userId, companyId: req.user!.companyId },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        permissions: true
+      }
+    });
+
+    if (!user) {
+      throw new AppError('User not found', 404);
+    }
+
+    const roleDefaults = getRoleDefaults(user.role);
+    const effectivePermissions = getEffectivePermissions(
+      user.role,
+      user.permissions as Partial<UserPermissions> | null
+    );
+
+    res.json({
+      userId: user.id,
+      email: user.email,
+      name: `${user.firstName} ${user.lastName}`,
+      role: user.role,
+      roleDefaults,
+      customPermissions: user.permissions,
+      effectivePermissions,
+      hasCustomPermissions: user.permissions !== null
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Update user's custom permissions
+router.patch('/users/:userId/permissions', authenticate, authorize('COMPANY_ADMIN', 'SUPER_ADMIN'), async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const { userId } = req.params;
+    const { permissions } = req.body;
+
+    const user = await prisma.user.findFirst({
+      where: { id: userId, companyId: req.user!.companyId }
+    });
+
+    if (!user) {
+      throw new AppError('User not found', 404);
+    }
+
+    // Prevent modifying own permissions (safety)
+    if (userId === req.user!.id) {
+      throw new AppError('Cannot modify your own permissions', 403);
+    }
+
+    // Prevent modifying SUPER_ADMIN permissions
+    if (user.role === 'SUPER_ADMIN') {
+      throw new AppError('Cannot modify super admin permissions', 403);
+    }
+
+    const updated = await prisma.user.update({
+      where: { id: userId },
+      data: { permissions },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        permissions: true
+      }
+    });
+
+    const effectivePermissions = getEffectivePermissions(
+      updated.role,
+      updated.permissions as Partial<UserPermissions> | null
+    );
+
+    res.json({
+      ...updated,
+      effectivePermissions,
+      hasCustomPermissions: updated.permissions !== null
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Reset user permissions to role defaults
+router.delete('/users/:userId/permissions', authenticate, authorize('COMPANY_ADMIN', 'SUPER_ADMIN'), async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await prisma.user.findFirst({
+      where: { id: userId, companyId: req.user!.companyId }
+    });
+
+    if (!user) {
+      throw new AppError('User not found', 404);
+    }
+
+    const updated = await prisma.user.update({
+      where: { id: userId },
+      data: { permissions: Prisma.DbNull },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        permissions: true
+      }
+    });
+
+    const effectivePermissions = getEffectivePermissions(updated.role, null);
+
+    res.json({
+      ...updated,
+      effectivePermissions,
+      hasCustomPermissions: false,
+      message: 'Permissions reset to role defaults'
+    });
   } catch (error) {
     next(error);
   }

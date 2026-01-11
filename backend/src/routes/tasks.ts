@@ -2,6 +2,8 @@ import { Router, Response, NextFunction } from 'express';
 import { prisma } from '../utils/prisma.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { authenticate, AuthRequest } from '../middleware/auth.js';
+import { uploadLimiter } from '../middleware/rateLimit.js';
+import { checkUsageLimit } from '../middleware/usageLimits.js';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
@@ -160,7 +162,7 @@ router.get('/:id', authenticate, async (req: AuthRequest, res: Response, next: N
 });
 
 // Create task
-router.post('/', authenticate, async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/', authenticate, checkUsageLimit('tasks'), async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const {
       title, description, assetId, assignedToId, priority,
@@ -330,7 +332,7 @@ router.put('/:id/status', authenticate, async (req: AuthRequest, res: Response, 
 });
 
 // Upload task photos (before/after)
-router.post('/:id/photos', authenticate, upload.single('photo'), async (req: AuthRequest, res: Response, next: NextFunction) => {
+router.post('/:id/photos', authenticate, uploadLimiter, upload.single('photo'), async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const { type } = req.body; // 'before' or 'after'
 
