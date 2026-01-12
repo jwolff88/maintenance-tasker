@@ -191,7 +191,8 @@ router.post('/create-checkout', authenticate, async (req: AuthRequest, res: Resp
       });
     }
 
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    // Take first URL if multiple are provided (comma-separated)
+    const frontendUrl = (process.env.FRONTEND_URL || 'http://localhost:5173').split(',')[0].trim();
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
@@ -226,7 +227,8 @@ router.post('/create-portal', authenticate, async (req: AuthRequest, res: Respon
       throw new AppError('No billing account found', 400);
     }
 
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    // Take first URL if multiple are provided (comma-separated)
+    const frontendUrl = (process.env.FRONTEND_URL || 'http://localhost:5173').split(',')[0].trim();
 
     const session = await stripe.billingPortal.sessions.create({
       customer: company.stripeCustomerId,
@@ -256,9 +258,10 @@ router.post('/webhook', async (req: Request, res: Response, next: NextFunction) 
     let event: Stripe.Event;
 
     try {
-      // Note: For raw body in Express, you may need middleware adjustment
+      // req.body is a Buffer when using express.raw() middleware
+      const payload = Buffer.isBuffer(req.body) ? req.body : JSON.stringify(req.body);
       event = stripe.webhooks.constructEvent(
-        JSON.stringify(req.body),
+        payload,
         sig,
         webhookSecret
       );
