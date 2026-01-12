@@ -200,3 +200,68 @@ export const turnoverApi = {
   deleteTask: (id: string, taskId: string) => api.delete(`/turnovers/${id}/tasks/${taskId}`),
   getStats: () => api.get('/turnovers/stats/summary'),
 };
+
+// Technicians API
+export const techniciansApi = {
+  getAll: () => api.get('/technicians'),
+  getOne: (id: string) => api.get(`/technicians/${id}`),
+  update: (id: string, data: any) => api.patch(`/technicians/${id}`, data),
+  getAvailability: (id: string, params?: Record<string, string>) => {
+    const queryString = params ? '?' + new URLSearchParams(params).toString() : '';
+    return api.get(`/technicians/${id}/availability${queryString}`);
+  },
+  smartAssign: (data: any) => api.post('/technicians/smart-assign', data),
+  getSkills: () => api.get('/technicians/config/skills'),
+};
+
+// Inventory API
+export const inventoryApi = {
+  getAll: (params?: Record<string, string>) => {
+    const queryString = params ? '?' + new URLSearchParams(params).toString() : '';
+    return api.get(`/inventory${queryString}`);
+  },
+  getOne: (id: string) => api.get(`/inventory/${id}`),
+  create: (data: any) => api.post('/inventory', data),
+  update: (id: string, data: any) => api.patch(`/inventory/${id}`, data),
+  delete: (id: string) => api.delete(`/inventory/${id}`),
+  addTransaction: (id: string, data: any) => api.post(`/inventory/${id}/transaction`, data),
+  useOnTask: (data: any) => api.post('/inventory/use-on-task', data),
+  getLowStock: () => api.get('/inventory/alerts/low-stock'),
+  getStats: () => api.get('/inventory/stats/overview'),
+};
+
+// Time Tracking API
+export const timeTrackingApi = {
+  getAll: (params?: Record<string, string>) => {
+    const queryString = params ? '?' + new URLSearchParams(params).toString() : '';
+    return api.get(`/time-tracking${queryString}`);
+  },
+  getCurrent: () => api.get('/time-tracking/current'),
+  clockIn: (data: any) => api.post('/time-tracking/clock-in', data),
+  clockOut: (data?: any) => api.post('/time-tracking/clock-out', data || {}),
+  create: (data: any) => api.post('/time-tracking', data),
+  update: (id: string, data: any) => api.patch(`/time-tracking/${id}`, data),
+  delete: (id: string) => api.delete(`/time-tracking/${id}`),
+  getSummary: (userId: string, params?: Record<string, string>) => {
+    const queryString = params ? '?' + new URLSearchParams(params).toString() : '';
+    return api.get(`/time-tracking/summary/${userId}${queryString}`);
+  },
+};
+
+// Team Analytics API
+export const teamAnalyticsApi = {
+  getOverview: (params?: Record<string, string>) => {
+    const queryString = params ? '?' + new URLSearchParams(params).toString() : '';
+    return api.get(`/team-analytics/overview${queryString}`);
+  },
+  getTechnicianStats: (id: string, params?: Record<string, string>) => {
+    const queryString = params ? '?' + new URLSearchParams(params).toString() : '';
+    return api.get(`/team-analytics/technician/${id}${queryString}`);
+  },
+  getLeaderboard: (params?: Record<string, string>) => {
+    const queryString = params ? '?' + new URLSearchParams(params).toString() : '';
+    return api.get(`/team-analytics/leaderboard${queryString}`);
+  },
+  getWorkload: () => api.get('/team-analytics/workload'),
+  getSkillsCoverage: () => api.get('/team-analytics/skills-coverage'),
+};

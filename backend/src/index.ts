@@ -18,6 +18,10 @@ import taskRoutes from './routes/tasks.js';
 import billingRoutes from './routes/billing.js';
 import capexRoutes from './routes/capex.js';
 import turnoverRoutes from './routes/turnovers.js';
+import technicianRoutes from './routes/technicians.js';
+import inventoryRoutes from './routes/inventory.js';
+import timeTrackingRoutes from './routes/time-tracking.js';
+import teamAnalyticsRoutes from './routes/team-analytics.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { apiLimiter } from './middleware/rateLimit.js';
 
@@ -83,6 +87,10 @@ app.use('/api/tasks', taskRoutes);
 app.use('/api/billing', billingRoutes);
 app.use('/api/capex', capexRoutes);
 app.use('/api/turnovers', turnoverRoutes);
+app.use('/api/technicians', technicianRoutes);
+app.use('/api/inventory', inventoryRoutes);
+app.use('/api/time-tracking', timeTrackingRoutes);
+app.use('/api/team-analytics', teamAnalyticsRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

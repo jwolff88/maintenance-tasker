@@ -49,6 +49,7 @@ model Company {
   tasks      Task[]
   capitalExpenditures CapitalExpenditure[]
   turnovers  Turnover[]
+  inventoryItems InventoryItem[]
 }
 
 enum UserRole {
@@ -76,6 +77,13 @@ model User {
   // Structure: { properties: { view, create, edit, delete }, tasks: {...}, etc. }
   permissions  Json?
 
+  // Technician Profile fields (for MAINTENANCE_STAFF role)
+  skills            String[]   // e.g., ["PLUMBING", "ELECTRICAL", "HVAC"]
+  certifications    Json?      // [{ name: "EPA 608", number: "123", expiryDate: "2025-12-01" }]
+  hourlyRate        Decimal?   @db.Decimal(10, 2)
+  maxDailyTasks     Int?       @default(8)
+  currentWorkload   Int        @default(0)  // Active tasks assigned
+
   companyId String
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
@@ -89,8 +97,10 @@ model User {
   assignedTasks     Task[]           @relation("TaskAssignee")
   createdTasks      Task[]           @relation("TaskCreator")
   taskComments      TaskComment[]    @relation("TaskCommentAuthor")
+  timeEntries       TimeEntry[]      @relation("TimeEntryUser")
 
   @@index([companyId])
+  @@index([role])
 }
 
 enum PropertyStatus {
@@ -309,6 +319,8 @@ model MaintenanceTicket {
 
   attachments Attachment[]
   comments    TicketComment[]
+  timeEntries TimeEntry[]
+  partsUsed   InventoryTransaction[]
 
   @@index([propertyId])
   @@index([status])
@@ -564,6 +576,8 @@ model Task {
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   comments TaskComment[]
+  timeEntries TimeEntry[]
+  partsUsed   InventoryTransaction[]
 
   @@index([companyId])
   @@index([assetId])
@@ -769,4 +783,134 @@ model TurnoverTask {
 
   @@index([turnoverId])
   @@index([status])
+}
+
+// ============================================
+// TIME TRACKING
+// ============================================
+
+model TimeEntry {
+  id          String    @id @default(uuid())
+  clockIn     DateTime
+  clockOut    DateTime?
+  duration    Int?      // in minutes, calculated on clock out
+  notes       String?
+  billable    Boolean   @default(true)
+
+  // GPS/location tracking (optional)
+  clockInLat  Decimal?  @db.Decimal(10, 8)
+  clockInLng  Decimal?  @db.Decimal(11, 8)
+  clockOutLat Decimal?  @db.Decimal(10, 8)
+  clockOutLng Decimal?  @db.Decimal(11, 8)
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  userId String
+  user   User   @relation("TimeEntryUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  taskId String?
+  task   Task?  @relation(fields: [taskId], references: [id])
+
+  ticketId String?
+  ticket   MaintenanceTicket? @relation(fields: [ticketId], references: [id])
+
+  @@index([userId])
+  @@index([taskId])
+  @@index([ticketId])
+  @@index([clockIn])
+}
+
+// ============================================
+// PARTS INVENTORY
+// ============================================
+
+enum InventoryCategory {
+  PLUMBING
+  ELECTRICAL
+  HVAC
+  HARDWARE
+  PAINT
+  FLOORING
+  APPLIANCE_PARTS
+  SAFETY
+  CLEANING
+  OTHER
+}
+
+model InventoryItem {
+  id              String            @id @default(uuid())
+  name            String
+  description     String?
+  sku             String?           // Stock keeping unit
+  category        InventoryCategory @default(OTHER)
+
+  // Stock levels
+  quantity        Int               @default(0)
+  minQuantity     Int               @default(0)  // Alert when below this
+  maxQuantity     Int?              // Max storage capacity
+  unit            String            @default("each") // each, box, roll, gallon, etc.
+
+  // Pricing
+  unitCost        Decimal?          @db.Decimal(10, 2)
+
+  // Location
+  storageLocation String?           // e.g., "Warehouse A, Shelf 3"
+
+  // Supplier info
+  supplierName    String?
+  supplierSku     String?
+  reorderUrl      String?
+
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  transactions InventoryTransaction[]
+
+  @@unique([companyId, sku])
+  @@index([companyId])
+  @@index([category])
+  @@index([quantity])
+}
+
+enum TransactionType {
+  RESTOCK      // Adding inventory
+  USED         // Used on a job
+  ADJUSTMENT   // Manual adjustment
+  RETURNED     // Returned unused
+  DAMAGED      // Written off
+  TRANSFERRED  // Moved to another location
+}
+
+model InventoryTransaction {
+  id            String          @id @default(uuid())
+  type          TransactionType
+  quantity      Int             // Positive for in, negative for out
+  previousQty   Int             // Quantity before transaction
+  newQty        Int             // Quantity after transaction
+  unitCost      Decimal?        @db.Decimal(10, 2)
+  notes         String?
+
+  createdAt     DateTime        @default(now())
+
+  itemId String
+  item   InventoryItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  // Link to what the part was used for
+  taskId String?
+  task   Task?  @relation(fields: [taskId], references: [id])
+
+  ticketId String?
+  ticket   MaintenanceTicket? @relation(fields: [ticketId], references: [id])
+
+  // Who performed the transaction
+  userId String?
+
+  @@index([itemId])
+  @@index([taskId])
+  @@index([ticketId])
+  @@index([createdAt])
 }

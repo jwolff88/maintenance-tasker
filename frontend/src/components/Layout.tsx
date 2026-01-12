@@ -16,15 +16,21 @@ import {
   ClipboardList,
   DollarSign,
   RefreshCw,
+  Package,
+  UserCircle,
+  BarChart3,
 } from 'lucide-react';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+  { name: 'My Work', href: '/my-work', icon: UserCircle },
   { name: 'Properties', href: '/properties', icon: Building2 },
   { name: 'Assets', href: '/assets', icon: Cog },
   { name: 'Tasks', href: '/maintenance-tasks', icon: ClipboardList },
   { name: 'Tickets', href: '/tickets', icon: Wrench },
   { name: 'Turnovers', href: '/turnovers', icon: RefreshCw },
+  { name: 'Inventory', href: '/inventory', icon: Package },
+  { name: 'Team', href: '/team', icon: BarChart3 },
   { name: 'CapEx', href: '/capex', icon: DollarSign },
   { name: 'Leases', href: '/leases', icon: FileText },
   { name: 'Vendors', href: '/vendors', icon: Users },

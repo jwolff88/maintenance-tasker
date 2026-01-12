@@ -20,6 +20,9 @@ import TaskDetail from './pages/TaskDetail';
 import Pricing from './pages/Pricing';
 import CapEx from './pages/CapEx';
 import Turnovers from './pages/Turnovers';
+import Team from './pages/Team';
+import Inventory from './pages/Inventory';
+import MyTasks from './pages/MyTasks';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
@@ -62,6 +65,9 @@ export default function App() {
                 <Route path="/maintenance-tasks/:id" element={<TaskDetail />} />
                 <Route path="/capex" element={<CapEx />} />
                 <Route path="/turnovers" element={<Turnovers />} />
+                <Route path="/team" element={<Team />} />
+                <Route path="/inventory" element={<Inventory />} />
+                <Route path="/my-work" element={<MyTasks />} />
                 <Route path="/settings" element={<Settings />} />
               </Routes>
             </Layout>
