@@ -10,21 +10,28 @@ const rateLimitHandler = (req: Request, res: Response) => {
   });
 };
 
+// Common options for all rate limiters (handles Vercel/proxy environments)
+const commonOptions = {
+  standardHeaders: true,
+  legacyHeaders: false,
+  // Disable validation for forwarded headers (handled by trust proxy)
+  validate: { xForwardedForHeader: false },
+};
+
 /**
  * Strict rate limiter for login attempts
  * 10 attempts per 15 minutes per IP
  * Prevents brute force attacks
  */
 export const loginLimiter = rateLimit({
+  ...commonOptions,
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 10, // 10 attempts per window
   message: {
     error: 'Too many login attempts',
     message: 'Too many login attempts. Please try again after 15 minutes.'
   },
-  standardHeaders: true, // Return rate limit info in headers
-  legacyHeaders: false, // Disable X-RateLimit-* headers
-    handler: rateLimitHandler,
+  handler: rateLimitHandler,
   skipSuccessfulRequests: false, // Count all requests
 });
 
@@ -34,15 +41,14 @@ export const loginLimiter = rateLimit({
  * Prevents spam account creation
  */
 export const registerLimiter = rateLimit({
+  ...commonOptions,
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 3, // 3 registrations per hour
   message: {
     error: 'Too many registrations',
     message: 'Too many registration attempts. Please try again later.'
   },
-  standardHeaders: true,
-  legacyHeaders: false,
-    handler: rateLimitHandler,
+  handler: rateLimitHandler,
 });
 
 /**
@@ -51,15 +57,14 @@ export const registerLimiter = rateLimit({
  * Prevents abuse of authenticated endpoints
  */
 export const apiLimiter = rateLimit({
+  ...commonOptions,
   windowMs: 60 * 1000, // 1 minute
   max: 300, // 300 requests per minute
   message: {
     error: 'Rate limit exceeded',
     message: 'Too many requests. Please slow down.'
   },
-  standardHeaders: true,
-  legacyHeaders: false,
-    handler: rateLimitHandler,
+  handler: rateLimitHandler,
   skip: (req: Request) => {
     // Skip rate limiting for health checks
     return req.path === '/api/health';
@@ -71,15 +76,14 @@ export const apiLimiter = rateLimit({
  * 3 attempts per hour per IP
  */
 export const passwordResetLimiter = rateLimit({
+  ...commonOptions,
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 3,
   message: {
     error: 'Too many password reset attempts',
     message: 'Too many password reset requests. Please try again later.'
   },
-  standardHeaders: true,
-  legacyHeaders: false,
-    handler: rateLimitHandler,
+  handler: rateLimitHandler,
 });
 
 /**
@@ -87,15 +91,14 @@ export const passwordResetLimiter = rateLimit({
  * 20 uploads per hour per IP
  */
 export const uploadLimiter = rateLimit({
+  ...commonOptions,
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 20,
   message: {
     error: 'Upload limit exceeded',
     message: 'Too many file uploads. Please try again later.'
   },
-  standardHeaders: true,
-  legacyHeaders: false,
-    handler: rateLimitHandler,
+  handler: rateLimitHandler,
 });
 
 /**
@@ -104,13 +107,12 @@ export const uploadLimiter = rateLimit({
  * Prevents spam ticket submissions
  */
 export const tenantPortalLimiter = rateLimit({
+  ...commonOptions,
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 10,
   message: {
     error: 'Too many requests',
     message: 'Too many requests from this IP. Please try again later.'
   },
-  standardHeaders: true,
-  legacyHeaders: false,
-    handler: rateLimitHandler,
+  handler: rateLimitHandler,
 });
