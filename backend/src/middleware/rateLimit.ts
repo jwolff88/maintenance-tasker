@@ -12,12 +12,12 @@ const rateLimitHandler = (req: Request, res: Response) => {
 
 /**
  * Strict rate limiter for login attempts
- * 5 attempts per 15 minutes per IP
+ * 10 attempts per 15 minutes per IP
  * Prevents brute force attacks
  */
 export const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // 5 attempts per window
+  max: 10, // 10 attempts per window
   message: {
     error: 'Too many login attempts',
     message: 'Too many login attempts. Please try again after 15 minutes.'
@@ -47,12 +47,12 @@ export const registerLimiter = rateLimit({
 
 /**
  * General API rate limiter
- * 100 requests per minute per IP
+ * 300 requests per minute per IP
  * Prevents abuse of authenticated endpoints
  */
 export const apiLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
-  max: 100, // 100 requests per minute
+  max: 300, // 300 requests per minute
   message: {
     error: 'Rate limit exceeded',
     message: 'Too many requests. Please slow down.'
