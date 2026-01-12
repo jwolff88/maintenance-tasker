@@ -39,6 +39,7 @@ export const ticketsApi = {
   create: (data: any) => api.post('/tickets', data),
   update: (id: string, data: any) => api.patch(`/tickets/${id}`, data),
   addComment: (id: string, data: any) => api.post(`/tickets/${id}/comments`, data),
+  retriage: (id: string) => api.post(`/tickets/${id}/retriage`),
 };
 
 // Leases API

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ticketsApi } from '../services/api';
-import { ChevronRight, Clock, User, Building2, Send } from 'lucide-react';
+import { ChevronRight, Clock, User, Building2, Send, Sparkles, RefreshCw } from 'lucide-react';
 import { format } from 'date-fns';
 
 const priorityColors = {
@@ -47,6 +47,13 @@ export default function TicketDetail() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['ticket', id] });
       setComment('');
+    },
+  });
+
+  const retriageMutation = useMutation({
+    mutationFn: () => ticketsApi.retriage(id!),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ticket', id] });
     },
   });
 
@@ -111,8 +118,11 @@ export default function TicketDetail() {
             </div>
 
             {ticket.suggestedFix && (
-              <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-                <p className="text-sm font-medium text-blue-800 mb-1">AI Suggested Fix</p>
+              <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100">
+                <div className="flex items-center gap-2 mb-2">
+                  <Sparkles className="w-4 h-4 text-blue-600" />
+                  <p className="text-sm font-medium text-blue-800">AI Suggested Fix</p>
+                </div>
                 <p className="text-sm text-blue-700">{ticket.suggestedFix}</p>
               </div>
             )}
@@ -166,6 +176,36 @@ export default function TicketDetail() {
 
         {/* Sidebar */}
         <div className="space-y-6">
+          {/* AI Triage */}
+          {!['COMPLETED', 'CANCELLED'].includes(ticket.status) && (
+            <div className="card bg-gradient-to-br from-blue-50 to-purple-50 border border-blue-100">
+              <div className="flex items-center gap-2 mb-3">
+                <Sparkles className="w-5 h-5 text-blue-600" />
+                <h3 className="font-semibold text-blue-900">AI Triage</h3>
+              </div>
+              <p className="text-sm text-blue-700 mb-4">
+                Re-analyze this ticket with AI to update category, priority, and get a fresh diagnosis.
+              </p>
+              <button
+                onClick={() => retriageMutation.mutate()}
+                disabled={retriageMutation.isPending}
+                className="btn-primary w-full flex items-center justify-center gap-2"
+              >
+                {retriageMutation.isPending ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    Analyzing...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="w-4 h-4" />
+                    Re-triage with AI
+                  </>
+                )}
+              </button>
+            </div>
+          )}
+
           {/* Status Update */}
           <div className="card">
             <h3 className="font-semibold mb-4">Update Status</h3>

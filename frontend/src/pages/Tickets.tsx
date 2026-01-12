@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ticketsApi, propertiesApi } from '../services/api';
-import { Plus, Search, Wrench, Clock, User, AlertCircle, CheckCircle2, Timer } from 'lucide-react';
+import { Plus, Search, Wrench, Clock, User, AlertCircle, CheckCircle2, Timer, Sparkles } from 'lucide-react';
 import { format } from 'date-fns';
 
 const priorityColors = {
@@ -92,6 +92,7 @@ export default function Tickets() {
     propertyId: searchParams.get('propertyId') || '',
     priority: 'MEDIUM',
     category: 'OTHER',
+    useAiTriage: true,
   });
 
   const { data: tickets, isLoading } = useQuery({
@@ -110,7 +111,10 @@ export default function Tickets() {
   });
 
   const createMutation = useMutation({
-    mutationFn: ticketsApi.create,
+    mutationFn: (data: any) => ticketsApi.create({
+      ...data,
+      skipAiTriage: !data.useAiTriage,
+    }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tickets'] });
       setShowModal(false);
@@ -120,6 +124,7 @@ export default function Tickets() {
         propertyId: '',
         priority: 'MEDIUM',
         category: 'OTHER',
+        useAiTriage: true,
       });
     },
   });
@@ -279,15 +284,37 @@ export default function Tickets() {
                     required
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
+                {/* AI Triage Toggle */}
+                <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100">
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.useAiTriage}
+                      onChange={(e) => setFormData({ ...formData, useAiTriage: e.target.checked })}
+                      className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                    />
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-blue-600" />
+                        <span className="font-medium text-blue-900">AI Smart Triage</span>
+                      </div>
+                      <p className="text-sm text-blue-700 mt-1">
+                        Let AI analyze the issue and suggest the best category, priority, and fix
+                      </p>
+                    </div>
+                  </label>
+                </div>
+
+                <div className={`grid grid-cols-2 gap-4 ${formData.useAiTriage ? 'opacity-50' : ''}`}>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Priority
+                      Priority {formData.useAiTriage && <span className="text-blue-600 text-xs">(AI will set)</span>}
                     </label>
                     <select
                       value={formData.priority}
                       onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
                       className="input"
+                      disabled={formData.useAiTriage}
                     >
                       <option value="LOW">Low</option>
                       <option value="MEDIUM">Medium</option>
@@ -297,12 +324,13 @@ export default function Tickets() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Category
+                      Category {formData.useAiTriage && <span className="text-blue-600 text-xs">(AI will set)</span>}
                     </label>
                     <select
                       value={formData.category}
                       onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                       className="input"
+                      disabled={formData.useAiTriage}
                     >
                       {categories.map((cat) => (
                         <option key={cat} value={cat}>{cat.replace(/_/g, ' ')}</option>
@@ -314,8 +342,15 @@ export default function Tickets() {
                   <button type="button" onClick={() => setShowModal(false)} className="btn-secondary flex-1">
                     Cancel
                   </button>
-                  <button type="submit" disabled={createMutation.isPending} className="btn-primary flex-1">
-                    {createMutation.isPending ? 'Creating...' : 'Create Ticket'}
+                  <button type="submit" disabled={createMutation.isPending} className="btn-primary flex-1 flex items-center justify-center gap-2">
+                    {createMutation.isPending ? (
+                      formData.useAiTriage ? 'AI Analyzing...' : 'Creating...'
+                    ) : (
+                      <>
+                        {formData.useAiTriage && <Sparkles className="w-4 h-4" />}
+                        {formData.useAiTriage ? 'Create with AI Triage' : 'Create Ticket'}
+                      </>
+                    )}
                   </button>
                 </div>
               </form>

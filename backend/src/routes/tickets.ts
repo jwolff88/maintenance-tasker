@@ -2,6 +2,7 @@ import { Router, Response, NextFunction } from 'express';
 import { prisma } from '../utils/prisma.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { authenticate, AuthRequest } from '../middleware/auth.js';
+import { triageTicket, retriageTicket } from '../services/aiTriage.js';
 
 const router = Router();
 
@@ -127,12 +128,12 @@ router.get('/:id', authenticate, async (req: AuthRequest, res: Response, next: N
   }
 });
 
-// Create ticket
+// Create ticket with AI triage
 router.post('/', authenticate, async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const {
       title, description, propertyId, priority, category,
-      assigneeId, tenantId, vendorId, slaDeadline
+      assigneeId, tenantId, vendorId, slaDeadline, skipAiTriage
     } = req.body;
 
     // Verify property belongs to company
@@ -144,13 +145,29 @@ router.post('/', authenticate, async (req: AuthRequest, res: Response, next: Nex
       throw new AppError('Property not found', 404);
     }
 
+    // AI Triage: auto-categorize and prioritize if not provided
+    let aiTriageResult = null;
+    let finalCategory = category || 'OTHER';
+    let finalPriority = priority || 'MEDIUM';
+    let suggestedFix = null;
+
+    if (!skipAiTriage && (!category || !priority)) {
+      aiTriageResult = await triageTicket(title, description, property.type);
+      if (aiTriageResult) {
+        finalCategory = category || aiTriageResult.category;
+        finalPriority = priority || aiTriageResult.priority;
+        suggestedFix = aiTriageResult.suggestedFix;
+      }
+    }
+
     const ticket = await prisma.maintenanceTicket.create({
       data: {
         title,
         description,
         propertyId,
-        priority: priority || 'MEDIUM',
-        category: category || 'OTHER',
+        priority: finalPriority as any,
+        category: finalCategory as any,
+        suggestedFix,
         creatorId: req.user!.id,
         assigneeId,
         tenantId,
@@ -167,13 +184,24 @@ router.post('/', authenticate, async (req: AuthRequest, res: Response, next: Nex
     await prisma.activityLog.create({
       data: {
         action: 'TICKET_CREATED',
-        details: `Ticket "${title}" created`,
+        details: `Ticket "${title}" created${aiTriageResult ? ' (AI-triaged)' : ''}`,
         userId: req.user!.id,
         propertyId
       }
     });
 
-    res.status(201).json(ticket);
+    // Return ticket with AI triage metadata
+    res.status(201).json({
+      ...ticket,
+      aiTriage: aiTriageResult ? {
+        wasApplied: true,
+        suggestedCategory: aiTriageResult.category,
+        suggestedPriority: aiTriageResult.priority,
+        suggestedFix: aiTriageResult.suggestedFix,
+        urgencyReason: aiTriageResult.estimatedUrgency,
+        confidence: aiTriageResult.confidence
+      } : null
+    });
   } catch (error) {
     next(error);
   }
@@ -246,6 +274,73 @@ router.post('/:id/comments', authenticate, async (req: AuthRequest, res: Respons
     });
 
     res.status(201).json(comment);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// AI Re-triage existing ticket
+router.post('/:id/retriage', authenticate, async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const ticket = await prisma.maintenanceTicket.findUnique({
+      where: { id: req.params.id },
+      include: {
+        property: { select: { companyId: true, type: true } },
+        comments: { select: { content: true }, orderBy: { createdAt: 'asc' } }
+      }
+    });
+
+    if (!ticket || ticket.property.companyId !== req.user!.companyId) {
+      throw new AppError('Ticket not found', 404);
+    }
+
+    const comments = ticket.comments.map(c => c.content);
+    const triageResult = await retriageTicket(
+      ticket.title,
+      ticket.description,
+      ticket.category,
+      ticket.priority,
+      comments
+    );
+
+    if (!triageResult) {
+      throw new AppError('AI triage unavailable', 503);
+    }
+
+    // Update ticket with new triage results
+    const updated = await prisma.maintenanceTicket.update({
+      where: { id: req.params.id },
+      data: {
+        category: triageResult.category as any,
+        priority: triageResult.priority as any,
+        suggestedFix: triageResult.suggestedFix,
+      },
+      include: {
+        property: { select: { id: true, name: true, address: true } },
+        assignee: { select: { id: true, firstName: true, lastName: true } }
+      }
+    });
+
+    await prisma.activityLog.create({
+      data: {
+        action: 'TICKET_RETRIAGED',
+        details: `Ticket re-triaged by AI: ${triageResult.priority} priority, ${triageResult.category}`,
+        userId: req.user!.id,
+        propertyId: ticket.propertyId
+      }
+    });
+
+    res.json({
+      ...updated,
+      aiTriage: {
+        wasApplied: true,
+        suggestedCategory: triageResult.category,
+        suggestedPriority: triageResult.priority,
+        suggestedFix: triageResult.suggestedFix,
+        urgencyReason: triageResult.estimatedUrgency,
+        confidence: triageResult.confidence
+      }
+    });
   } catch (error) {
     next(error);
   }
