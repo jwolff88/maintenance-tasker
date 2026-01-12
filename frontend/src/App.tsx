@@ -18,6 +18,8 @@ import AssetDetail from './pages/AssetDetail';
 import MaintenanceTasks from './pages/MaintenanceTasks';
 import TaskDetail from './pages/TaskDetail';
 import Pricing from './pages/Pricing';
+import CapEx from './pages/CapEx';
+import Turnovers from './pages/Turnovers';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
@@ -58,6 +60,8 @@ export default function App() {
                 <Route path="/assets/:id" element={<AssetDetail />} />
                 <Route path="/maintenance-tasks" element={<MaintenanceTasks />} />
                 <Route path="/maintenance-tasks/:id" element={<TaskDetail />} />
+                <Route path="/capex" element={<CapEx />} />
+                <Route path="/turnovers" element={<Turnovers />} />
                 <Route path="/settings" element={<Settings />} />
               </Routes>
             </Layout>

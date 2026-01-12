@@ -167,3 +167,35 @@ export const billingApi = {
   createCheckout: (plan: string) => api.post('/billing/create-checkout', { plan }),
   createPortal: () => api.post('/billing/create-portal'),
 };
+
+// Capital Expenditure API
+export const capexApi = {
+  getAll: (params?: Record<string, string>) => {
+    const queryString = params ? '?' + new URLSearchParams(params).toString() : '';
+    return api.get(`/capex${queryString}`);
+  },
+  getOne: (id: string) => api.get(`/capex/${id}`),
+  create: (data: any) => api.post('/capex', data),
+  update: (id: string, data: any) => api.patch(`/capex/${id}`, data),
+  delete: (id: string) => api.delete(`/capex/${id}`),
+  getStats: (budgetYear?: number) => {
+    const queryString = budgetYear ? `?budgetYear=${budgetYear}` : '';
+    return api.get(`/capex/stats/summary${queryString}`);
+  },
+};
+
+// Turnover API
+export const turnoverApi = {
+  getAll: (params?: Record<string, string>) => {
+    const queryString = params ? '?' + new URLSearchParams(params).toString() : '';
+    return api.get(`/turnovers${queryString}`);
+  },
+  getOne: (id: string) => api.get(`/turnovers/${id}`),
+  create: (data: any) => api.post('/turnovers', data),
+  update: (id: string, data: any) => api.patch(`/turnovers/${id}`, data),
+  delete: (id: string) => api.delete(`/turnovers/${id}`),
+  addTask: (id: string, data: any) => api.post(`/turnovers/${id}/tasks`, data),
+  updateTask: (id: string, taskId: string, data: any) => api.patch(`/turnovers/${id}/tasks/${taskId}`, data),
+  deleteTask: (id: string, taskId: string) => api.delete(`/turnovers/${id}/tasks/${taskId}`),
+  getStats: () => api.get('/turnovers/stats/summary'),
+};

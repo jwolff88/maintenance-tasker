@@ -47,6 +47,8 @@ model Company {
   vendors    Vendor[]
   assets     Asset[]
   tasks      Task[]
+  capitalExpenditures CapitalExpenditure[]
+  turnovers  Turnover[]
 }
 
 enum UserRole {
@@ -140,6 +142,8 @@ model Property {
   activityLogs   ActivityLog[]
   events         PropertyEvent[]
   assets         Asset[]
+  capitalExpenditures CapitalExpenditure[]
+  turnovers      Turnover[]
 
   @@index([companyId])
   @@index([managerId])
@@ -342,6 +346,7 @@ model Vendor {
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
   tickets MaintenanceTicket[]
+  capitalExpenditures CapitalExpenditure[]
 
   @@index([companyId])
 }
@@ -581,4 +586,187 @@ model TaskComment {
   author   User   @relation("TaskCommentAuthor", fields: [authorId], references: [id])
 
   @@index([taskId])
+}
+
+// ============================================
+// CAPITAL EXPENDITURES (CapEx)
+// ============================================
+
+enum CapExCategory {
+  ROOF
+  HVAC
+  PLUMBING
+  ELECTRICAL
+  STRUCTURAL
+  APPLIANCES
+  FLOORING
+  EXTERIOR
+  LANDSCAPING
+  RENOVATION
+  OTHER
+}
+
+enum CapExStatus {
+  PROPOSED
+  PENDING_APPROVAL
+  APPROVED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model CapitalExpenditure {
+  id              String        @id @default(uuid())
+  title           String
+  description     String?
+  category        CapExCategory @default(OTHER)
+  status          CapExStatus   @default(PROPOSED)
+
+  // Financial
+  estimatedCost   Decimal       @db.Decimal(12, 2)
+  actualCost      Decimal?      @db.Decimal(12, 2)
+  budgetYear      Int           // Fiscal year
+
+  // Approval
+  approvedById    String?
+  approvedAt      DateTime?
+
+  // Timeline
+  proposedDate    DateTime      @default(now())
+  startDate       DateTime?
+  completionDate  DateTime?
+
+  // Accounting
+  depreciationYears Int?        // Years to depreciate asset
+
+  // Notes & attachments
+  notes           String?
+  attachments     String[]      // URLs to documents/photos
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  vendorId String?
+  vendor   Vendor? @relation(fields: [vendorId], references: [id])
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([propertyId])
+  @@index([status])
+  @@index([budgetYear])
+}
+
+// ============================================
+// UNIT TURNOVERS
+// ============================================
+
+enum TurnoverStatus {
+  SCHEDULED
+  MOVE_OUT_COMPLETE
+  IN_PROGRESS
+  FINAL_INSPECTION
+  READY
+  OCCUPIED
+  CANCELLED
+}
+
+model Turnover {
+  id                  String         @id @default(uuid())
+  unit                String?        // Unit number for multi-unit properties
+  status              TurnoverStatus @default(SCHEDULED)
+
+  // Dates
+  moveOutDate         DateTime
+  targetReadyDate     DateTime       // Target date for make-ready
+  actualReadyDate     DateTime?
+  moveInDate          DateTime?      // New tenant move-in
+
+  // Vacancy tracking
+  daysVacant          Int?           // Auto-calculated or manual
+
+  // Costs
+  estimatedCost       Decimal?       @db.Decimal(10, 2)
+  actualCost          Decimal?       @db.Decimal(10, 2)
+
+  // Lease references
+  outgoingLeaseId     String?
+  incomingLeaseId     String?
+
+  // Inspection results
+  moveOutNotes        String?
+  moveOutPhotos       String[]       // URLs
+  moveInNotes         String?
+  moveInPhotos        String[]       // URLs
+
+  // Security deposit
+  depositDeductions   Decimal?       @db.Decimal(10, 2)
+  depositNotes        String?
+
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  turnoverTasks TurnoverTask[]
+
+  @@index([companyId])
+  @@index([propertyId])
+  @@index([status])
+  @@index([moveOutDate])
+}
+
+enum TurnoverTaskCategory {
+  CLEANING
+  PAINTING
+  REPAIRS
+  INSPECTION
+  APPLIANCES
+  FLOORING
+  LOCKS
+  LANDSCAPING
+  OTHER
+}
+
+enum TurnoverTaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  SKIPPED
+}
+
+model TurnoverTask {
+  id          String               @id @default(uuid())
+  title       String
+  description String?
+  category    TurnoverTaskCategory @default(OTHER)
+  status      TurnoverTaskStatus   @default(PENDING)
+
+  estimatedCost Decimal?           @db.Decimal(10, 2)
+  actualCost    Decimal?           @db.Decimal(10, 2)
+
+  completedAt DateTime?
+  notes       String?
+  photos      String[]             // Before/after photos
+
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+
+  turnoverId String
+  turnover   Turnover @relation(fields: [turnoverId], references: [id], onDelete: Cascade)
+
+  assigneeId String?
+
+  vendorId   String?
+
+  @@index([turnoverId])
+  @@index([status])
 }

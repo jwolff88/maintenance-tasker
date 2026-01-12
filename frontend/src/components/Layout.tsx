@@ -12,17 +12,20 @@ import {
   LogOut,
   Menu,
   X,
-  Bell,
   Cog,
   ClipboardList,
+  DollarSign,
+  RefreshCw,
 } from 'lucide-react';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+  { name: 'Properties', href: '/properties', icon: Building2 },
   { name: 'Assets', href: '/assets', icon: Cog },
   { name: 'Tasks', href: '/maintenance-tasks', icon: ClipboardList },
-  { name: 'Properties', href: '/properties', icon: Building2 },
   { name: 'Tickets', href: '/tickets', icon: Wrench },
+  { name: 'Turnovers', href: '/turnovers', icon: RefreshCw },
+  { name: 'CapEx', href: '/capex', icon: DollarSign },
   { name: 'Leases', href: '/leases', icon: FileText },
   { name: 'Vendors', href: '/vendors', icon: Users },
   { name: 'Inspections', href: '/inspections', icon: ClipboardCheck },
@@ -117,15 +120,6 @@ export default function Layout({ children }: { children: ReactNode }) {
           </button>
 
           <div className="flex-1" />
-
-          <div className="flex items-center gap-4">
-            <button className="relative text-gray-600 hover:text-gray-900">
-              <Bell className="w-5 h-5" />
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                3
-              </span>
-            </button>
-          </div>
         </header>
 
         {/* Page content */}

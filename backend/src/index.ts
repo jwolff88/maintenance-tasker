@@ -16,6 +16,8 @@ import tenantPortalRoutes from './routes/tenant-portal.js';
 import assetRoutes from './routes/assets.js';
 import taskRoutes from './routes/tasks.js';
 import billingRoutes from './routes/billing.js';
+import capexRoutes from './routes/capex.js';
+import turnoverRoutes from './routes/turnovers.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { apiLimiter } from './middleware/rateLimit.js';
 
@@ -74,6 +76,8 @@ app.use('/api/tenant-portal', tenantPortalRoutes);
 app.use('/api/assets', assetRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/billing', billingRoutes);
+app.use('/api/capex', capexRoutes);
+app.use('/api/turnovers', turnoverRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
