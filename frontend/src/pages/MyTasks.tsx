@@ -5,7 +5,7 @@ import { tasksApi, ticketsApi, timeTrackingApi } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import {
   Clock, Play, Square, CheckCircle, Wrench, ClipboardList,
-  MapPin, Calendar, AlertCircle, Timer
+  MapPin, Calendar, AlertCircle
 } from 'lucide-react';
 import { format } from 'date-fns';
 
