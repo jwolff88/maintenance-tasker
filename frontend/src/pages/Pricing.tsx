@@ -25,6 +25,11 @@ export default function Pricing() {
         window.location.href = data.data.url;
       }
     },
+    onError: (error: any) => {
+      const message = error.response?.data?.error || error.message || 'Checkout failed';
+      alert(`Error: ${message}`);
+      console.error('Checkout error:', error);
+    },
   });
 
   const handleUpgrade = (planId: string) => {
