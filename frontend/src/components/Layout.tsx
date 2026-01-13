@@ -56,11 +56,12 @@ export default function Layout({ children }: { children: ReactNode }) {
 
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 transform transition-transform lg:translate-x-0 lg:static lg:inset-auto ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 transform transition-transform lg:translate-x-0 lg:static lg:inset-auto flex flex-col ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="flex items-center justify-between h-16 px-6 border-b border-gray-800">
+        {/* Sidebar Header */}
+        <div className="flex items-center justify-between h-16 px-6 border-b border-gray-800 flex-shrink-0">
           <Link to="/" className="text-xl font-bold text-white">
             Maintenance Tasker
           </Link>
@@ -72,7 +73,8 @@ export default function Layout({ children }: { children: ReactNode }) {
           </button>
         </div>
 
-        <nav className="mt-6 px-3">
+        {/* Navigation - scrollable */}
+        <nav className="flex-1 overflow-y-auto py-4 px-3">
           {navigation.map((item) => {
             const isActive = location.pathname === item.href ||
               (item.href !== '/' && location.pathname.startsWith(item.href));
@@ -108,7 +110,8 @@ export default function Layout({ children }: { children: ReactNode }) {
           )}
         </nav>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-800">
+        {/* User Profile - fixed at bottom */}
+        <div className="flex-shrink-0 p-4 border-t border-gray-800 bg-gray-900">
           <div className="flex items-center gap-3 px-3 py-2">
             <div className="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center text-white font-medium">
               {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
