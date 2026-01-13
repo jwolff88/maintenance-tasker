@@ -23,6 +23,7 @@ import Turnovers from './pages/Turnovers';
 import Team from './pages/Team';
 import Inventory from './pages/Inventory';
 import MyTasks from './pages/MyTasks';
+import SuperAdmin from './pages/SuperAdmin';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
@@ -69,6 +70,7 @@ export default function App() {
                 <Route path="/inventory" element={<Inventory />} />
                 <Route path="/my-work" element={<MyTasks />} />
                 <Route path="/settings" element={<Settings />} />
+                <Route path="/admin" element={<SuperAdmin />} />
               </Routes>
             </Layout>
           </PrivateRoute>

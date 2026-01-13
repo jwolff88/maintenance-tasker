@@ -19,6 +19,7 @@ import {
   Package,
   UserCircle,
   BarChart3,
+  Shield,
 } from 'lucide-react';
 
 const navigation = [
@@ -90,6 +91,21 @@ export default function Layout({ children }: { children: ReactNode }) {
               </Link>
             );
           })}
+
+          {/* Super Admin Link - only visible to SUPER_ADMIN */}
+          {user?.role === 'SUPER_ADMIN' && (
+            <Link
+              to="/admin"
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg mb-1 mt-4 transition-colors ${
+                location.pathname === '/admin'
+                  ? 'bg-red-600 text-white'
+                  : 'text-red-400 hover:bg-red-900/50 hover:text-red-300 border border-red-800'
+              }`}
+            >
+              <Shield className="w-5 h-5" />
+              Admin Panel
+            </Link>
+          )}
         </nav>
 
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-800">

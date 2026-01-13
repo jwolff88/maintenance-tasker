@@ -22,6 +22,7 @@ import technicianRoutes from './routes/technicians.js';
 import inventoryRoutes from './routes/inventory.js';
 import timeTrackingRoutes from './routes/time-tracking.js';
 import teamAnalyticsRoutes from './routes/team-analytics.js';
+import superAdminRoutes from './routes/super-admin.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { apiLimiter } from './middleware/rateLimit.js';
 
@@ -91,6 +92,7 @@ app.use('/api/technicians', technicianRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/time-tracking', timeTrackingRoutes);
 app.use('/api/team-analytics', teamAnalyticsRoutes);
+app.use('/api/super-admin', superAdminRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

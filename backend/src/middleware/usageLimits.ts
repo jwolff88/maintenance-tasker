@@ -15,6 +15,11 @@ function getStartOfMonth(): Date {
 export function checkUsageLimit(resourceType: ResourceType) {
   return async (req: AuthRequest, res: Response, next: NextFunction) => {
     try {
+      // SUPER_ADMIN bypasses all limits
+      if (req.user?.role === 'SUPER_ADMIN') {
+        return next();
+      }
+
       const companyId = req.user?.companyId;
       if (!companyId) {
         throw new AppError('Unauthorized', 401);
