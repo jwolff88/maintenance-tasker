@@ -1,6 +1,6 @@
 import { Router, Response } from 'express';
-import { authenticateToken, AuthRequest } from '../middleware/auth.js';
-import prisma from '../utils/prisma.js';
+import { authenticate, AuthRequest } from '../middleware/auth.js';
+import { prisma } from '../utils/prisma.js';
 
 const router = Router();
 
@@ -12,7 +12,7 @@ const requireSuperAdmin = (req: AuthRequest, res: Response, next: Function) => {
   next();
 };
 
-router.use(authenticateToken);
+router.use(authenticate);
 router.use(requireSuperAdmin);
 
 // GET /super-admin/stats - Platform-wide statistics
@@ -58,7 +58,7 @@ router.get('/stats', async (req: AuthRequest, res: Response) => {
       ENTERPRISE: 349,
     };
 
-    const mrr = companiesByPlan.reduce((sum, item) => {
+    const mrr = companiesByPlan.reduce((sum: number, item: { plan: string; _count: { id: number } }) => {
       return sum + (planPrices[item.plan] || 0) * item._count.id;
     }, 0);
 
@@ -69,7 +69,7 @@ router.get('/stats', async (req: AuthRequest, res: Response) => {
       totalTickets,
       totalTasks,
       mrr,
-      companiesByPlan: companiesByPlan.map(p => ({
+      companiesByPlan: companiesByPlan.map((p: { plan: string; _count: { id: number } }) => ({
         plan: p.plan,
         count: p._count.id,
       })),
@@ -139,7 +139,6 @@ router.get('/companies/:id', async (req: AuthRequest, res: Response) => {
             role: true,
             isActive: true,
             createdAt: true,
-            lastLogin: true,
           },
         },
         _count: {
@@ -327,7 +326,7 @@ router.post('/users/:id/impersonate', async (req: AuthRequest, res: Response) =>
         userId: user.id,
         companyId: user.companyId,
         role: user.role,
-        impersonatedBy: req.user?.userId,
+        impersonatedBy: req.user?.id,
       },
       process.env.JWT_SECRET || 'your-secret-key',
       { expiresIn: '1h' }
