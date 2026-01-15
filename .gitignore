@@ -11,3 +11,6 @@ Thumbs.db
 .vercel
 .env*.local
 backend/build/
+
+.gemini/
+gha-creds-*.json

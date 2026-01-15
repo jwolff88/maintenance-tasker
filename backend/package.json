@@ -11,6 +11,9 @@
     "db:seed": "tsx prisma/seed.ts",
     "db:generate": "prisma generate"
   },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "@prisma/client": "^5.7.0",

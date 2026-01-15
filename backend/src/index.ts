@@ -84,6 +84,7 @@ app.use('/api/equipment', equipmentRoutes);
 app.use('/api/inspections', inspectionRoutes);
 app.use('/api/tenant-portal', tenantPortalRoutes);
 app.use('/api/assets', assetRoutes);
+import { prisma } from './utils/prisma.js';
 app.use('/api/tasks', taskRoutes);
 app.use('/api/billing', billingRoutes);
 app.use('/api/capex', capexRoutes);
@@ -104,8 +105,8 @@ app.use(errorHandler);
 
 // Only start server if not in serverless environment
 if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
-  app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+  app.listen(parseInt(PORT as string, 10), '0.0.0.0', () => {
+    console.log(`Server running on http://0.0.0.0:${PORT}`);
   });
 }
 
