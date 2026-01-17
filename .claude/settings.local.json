@@ -84,7 +84,12 @@
       "Bash(DATABASE_URL=\"postgresql://postgres:j3tdaeQme9nMvK7n@db.oywzkgthbedaxscvpzuz.supabase.co:5432/postgres\" npx prisma db push:*)",
       "Bash(xargs:*)",
       "Bash(ls:*)",
-      "Bash(npx tsx:*)"
+      "Bash(npx tsx:*)",
+      "Bash(wc:*)",
+      "Bash(find:*)",
+      "Bash(ssh-keygen:*)",
+      "Bash(ssh-add:*)",
+      "Bash(ssh:*)"
     ]
   }
 }
