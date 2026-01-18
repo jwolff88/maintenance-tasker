@@ -176,6 +176,25 @@ router.post('/create-checkout', authenticate, async (req: AuthRequest, res: Resp
 
     // Create or retrieve Stripe customer
     let customerId = company.stripeCustomerId;
+
+    // Verify existing customer exists in Stripe, create new one if not
+    if (customerId) {
+      try {
+        await stripe.customers.retrieve(customerId);
+      } catch (err: any) {
+        // Customer doesn't exist in current Stripe account, clear it
+        if (err.code === 'resource_missing') {
+          customerId = null;
+          await prisma.company.update({
+            where: { id: company.id },
+            data: { stripeCustomerId: null, stripeSubscriptionId: null },
+          });
+        } else {
+          throw err;
+        }
+      }
+    }
+
     if (!customerId) {
       const customer = await stripe.customers.create({
         email: company.email,
