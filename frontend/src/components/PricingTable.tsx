@@ -66,7 +66,7 @@ const features: Feature[] = [
 const plans = [
   {
     id: 'STARTER',
-    name: 'BASIC',
+    name: 'Starter',
     price: 49,
     headerBg: 'bg-slate-800',
     headerText: 'text-white',
@@ -75,7 +75,7 @@ const plans = [
   },
   {
     id: 'PRO',
-    name: 'PREMIUM',
+    name: 'Professional',
     price: 149,
     headerBg: 'bg-purple-200',
     headerText: 'text-purple-900',
@@ -85,7 +85,7 @@ const plans = [
   },
   {
     id: 'ENTERPRISE',
-    name: 'BUSINESS',
+    name: 'Enterprise',
     price: 349,
     headerBg: 'bg-amber-400',
     headerText: 'text-amber-900',
