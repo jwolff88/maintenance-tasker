@@ -13,37 +13,32 @@ interface Feature {
 
 const features: Feature[] = [
   // Core Features - All Tiers
-  { name: 'Clock in/out', basic: true, premium: true, business: true, category: 'Core Features' },
-  { name: 'Shifts and job scheduling', basic: true, premium: true, business: true },
-  { name: 'Absence Management', basic: true, premium: true, business: true },
-  { name: 'Geofencing/GPS tracking', basic: true, premium: true, business: true },
-  { name: 'Payroll Integration', basic: true, premium: true, business: true },
-  { name: 'Resource onboarding', basic: true, premium: true, business: true },
-  { name: 'Sales/Order collecting', basic: true, premium: true, business: true },
-  { name: 'PDF Report Designer', basic: true, premium: true, business: true },
+  { name: 'Property management', basic: true, premium: true, business: true, category: 'Core Features' },
   { name: 'Dashboard & Analytics', basic: true, premium: true, business: true },
-  { name: 'API Access', basic: true, premium: true, business: true },
+  { name: 'Maintenance tickets', basic: true, premium: true, business: true },
+  { name: 'Lease tracking', basic: true, premium: true, business: true },
+  { name: 'Property notes (4 categories)', basic: true, premium: true, business: true },
+  { name: 'Inspections scheduling', basic: true, premium: true, business: true },
+  { name: 'Equipment tracking', basic: true, premium: true, business: true },
+  { name: 'AI ticket triage', basic: true, premium: true, business: true },
 
-  // Premium Features
-  { name: 'Task management', basic: false, premium: true, business: true, category: 'Advanced Features' },
+  // Professional Features
+  { name: 'Asset management', basic: false, premium: true, business: true, category: 'Professional Features' },
+  { name: 'Task management', basic: false, premium: true, business: true },
   { name: 'Recurring tasks', basic: false, premium: true, business: true },
-  { name: 'Work approval process', basic: false, premium: true, business: true },
-  { name: 'Workflow generator', basic: false, premium: true, business: true },
+  { name: 'Task lifecycle workflow', basic: false, premium: true, business: true },
+  { name: 'Photo evidence uploads', basic: false, premium: true, business: true },
+  { name: 'Time tracking with GPS', basic: false, premium: true, business: true },
   { name: 'Inventory management', basic: false, premium: true, business: true },
-  { name: 'Document management', basic: false, premium: true, business: true },
-  { name: 'Video chat with customer', basic: false, premium: true, business: true },
-  { name: 'Customer surveys', basic: false, premium: true, business: true },
+  { name: 'Unit turnover tracking', basic: false, premium: true, business: true },
 
-  // Business Features
-  { name: 'Bidding Marketplace', basic: false, premium: false, business: true, category: 'Enterprise Features' },
-  { name: 'Employee Ranking', basic: false, premium: false, business: true },
-  { name: 'Work orders', basic: false, premium: false, business: true },
-  { name: 'Appointment/Self-booking', basic: false, premium: false, business: true },
-  { name: 'SLA management', basic: false, premium: false, business: true },
+  // Enterprise Features
+  { name: 'Team analytics & leaderboards', basic: false, premium: false, business: true, category: 'Enterprise Features' },
   { name: 'Vendor management', basic: false, premium: false, business: true },
-  { name: 'Smart routing', basic: false, premium: false, business: true },
-  { name: 'Project management', basic: false, premium: false, business: true },
-  { name: 'End-customer Ticketing', basic: false, premium: false, business: true },
+  { name: 'Capital expenditure planning', basic: false, premium: false, business: true },
+  { name: 'Tenant portal', basic: false, premium: false, business: true },
+  { name: 'Technician assignments', basic: false, premium: false, business: true },
+  { name: 'Advanced reporting', basic: false, premium: false, business: true },
 
   // Limits
   { name: 'Up to 10 properties', basic: true, premium: false, business: false, category: 'Limits' },
@@ -59,8 +54,6 @@ const features: Feature[] = [
   { name: 'Email support', basic: true, premium: true, business: true, category: 'Support' },
   { name: 'Priority support', basic: false, premium: true, business: true },
   { name: 'Dedicated account manager', basic: false, premium: false, business: true },
-  { name: 'Custom integrations', basic: false, premium: false, business: true },
-  { name: 'SLA guarantee', basic: false, premium: false, business: true },
 ];
 
 const plans = [
