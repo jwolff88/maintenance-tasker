@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { billingApi } from '../services/api';
 import { Check, Building2, Zap, Crown } from 'lucide-react';
+import PricingTable from '../components/PricingTable';
 
 export default function Pricing() {
   const { user } = useAuth();
@@ -175,6 +176,20 @@ export default function Pricing() {
             </div>
           </div>
         )}
+      </div>
+
+      {/* Feature Comparison Table */}
+      <div className="bg-white border-t">
+        <div className="max-w-6xl mx-auto px-4 py-16">
+          <h2 className="text-3xl font-bold text-gray-900 text-center mb-4">
+            Compare All Features
+          </h2>
+          <p className="text-gray-600 text-center mb-12 max-w-2xl mx-auto">
+            See exactly what's included in each plan. All plans include our core features
+            with additional capabilities as you scale.
+          </p>
+          <PricingTable />
+        </div>
       </div>
 
       {/* FAQ Section */}
