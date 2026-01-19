@@ -145,13 +145,27 @@ router.patch('/users/:userId', authenticate, authorize('COMPANY_ADMIN', 'SUPER_A
   }
 });
 
-// Delete user from company
+// Delete user from company (or deactivate if they have related records)
 router.delete('/users/:userId', authenticate, authorize('COMPANY_ADMIN', 'SUPER_ADMIN'), async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const { userId } = req.params;
 
     const userToDelete = await prisma.user.findFirst({
-      where: { id: userId, companyId: req.user!.companyId }
+      where: { id: userId, companyId: req.user!.companyId },
+      include: {
+        _count: {
+          select: {
+            notes: true,
+            tickets: true,
+            assignedTickets: true,
+            activityLogs: true,
+            assignedTasks: true,
+            createdTasks: true,
+            taskComments: true,
+            timeEntries: true
+          }
+        }
+      }
     });
 
     if (!userToDelete) {
@@ -173,11 +187,38 @@ router.delete('/users/:userId', authenticate, authorize('COMPANY_ADMIN', 'SUPER_
       throw new AppError('Only super admins can delete company admins', 403);
     }
 
-    await prisma.user.delete({
-      where: { id: userId }
-    });
+    // Check if user has any related records
+    const counts = userToDelete._count;
+    const hasRelatedRecords =
+      counts.notes > 0 ||
+      counts.tickets > 0 ||
+      counts.assignedTickets > 0 ||
+      counts.activityLogs > 0 ||
+      counts.assignedTasks > 0 ||
+      counts.createdTasks > 0 ||
+      counts.taskComments > 0 ||
+      counts.timeEntries > 0;
 
-    res.json({ message: 'User deleted successfully' });
+    if (hasRelatedRecords) {
+      // Deactivate instead of delete to preserve data integrity
+      await prisma.user.update({
+        where: { id: userId },
+        data: { isActive: false }
+      });
+
+      res.json({
+        message: 'User deactivated successfully',
+        deactivated: true,
+        reason: 'User has associated records (notes, tickets, tasks, etc.) that must be preserved'
+      });
+    } else {
+      // Safe to delete - no related records
+      await prisma.user.delete({
+        where: { id: userId }
+      });
+
+      res.json({ message: 'User deleted successfully', deactivated: false });
+    }
   } catch (error) {
     next(error);
   }

@@ -137,10 +137,16 @@ export default function Settings() {
 
   const deleteUserMutation = useMutation({
     mutationFn: (userId: string) => companyApi.deleteUser(userId),
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['company-users'] });
       queryClient.invalidateQueries({ queryKey: ['company'] });
       setDeleteConfirm(null);
+      // Show appropriate message based on whether user was deleted or deactivated
+      if (response.data.deactivated) {
+        setBillingMessage({ type: 'success', text: 'User deactivated. Their historical records have been preserved.' });
+      } else {
+        setBillingMessage({ type: 'success', text: 'User deleted successfully.' });
+      }
     },
   });
 
