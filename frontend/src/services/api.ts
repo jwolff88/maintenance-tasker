@@ -87,6 +87,7 @@ export const companyApi = {
   getUsers: () => api.get('/companies/users'),
   createUser: (data: any) => api.post('/companies/users', data),
   updateUser: (id: string, data: any) => api.patch(`/companies/users/${id}`, data),
+  deactivateUser: (id: string) => api.patch(`/companies/users/${id}/deactivate`),
   deleteUser: (id: string) => api.delete(`/companies/users/${id}`),
   // Permissions
   getPermissionCategories: () => api.get('/companies/permissions/categories'),

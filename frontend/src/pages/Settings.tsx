@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSearchParams, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { companyApi, billingApi } from '../services/api';
-import { Building2, Users, Plus, User, CreditCard, AlertTriangle, Check, ExternalLink, Shield, RotateCcw, Trash2 } from 'lucide-react';
+import { Building2, Users, Plus, User, CreditCard, AlertTriangle, Check, ExternalLink, Shield, RotateCcw, Trash2, UserMinus } from 'lucide-react';
 import { format } from 'date-fns';
 
 const roleLabels: Record<string, string> = {
@@ -46,6 +46,7 @@ export default function Settings() {
   });
   const [permissionsModal, setPermissionsModal] = useState<{ userId: string; userName: string } | null>(null);
   const [editingPermissions, setEditingPermissions] = useState<any>(null);
+  const [deactivateConfirm, setDeactivateConfirm] = useState<{ userId: string; userName: string } | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<{ userId: string; userName: string } | null>(null);
 
   const isAdmin = user?.role === 'COMPANY_ADMIN' || user?.role === 'SUPER_ADMIN';
@@ -135,18 +136,22 @@ export default function Settings() {
     },
   });
 
+  const deactivateUserMutation = useMutation({
+    mutationFn: (userId: string) => companyApi.deactivateUser(userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['company-users'] });
+      setDeactivateConfirm(null);
+      setBillingMessage({ type: 'success', text: 'User deactivated successfully.' });
+    },
+  });
+
   const deleteUserMutation = useMutation({
     mutationFn: (userId: string) => companyApi.deleteUser(userId),
-    onSuccess: (response) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['company-users'] });
       queryClient.invalidateQueries({ queryKey: ['company'] });
       setDeleteConfirm(null);
-      // Show appropriate message based on whether user was deleted or deactivated
-      if (response.data.deactivated) {
-        setBillingMessage({ type: 'success', text: 'User deactivated. Their historical records have been preserved.' });
-      } else {
-        setBillingMessage({ type: 'success', text: 'User deleted successfully.' });
-      }
+      setBillingMessage({ type: 'success', text: 'User deleted permanently.' });
     },
   });
 
@@ -418,13 +423,24 @@ export default function Settings() {
                           </td>
                           <td className="py-3 px-2">
                             {u.id !== user?.id && u.role !== 'SUPER_ADMIN' && (user?.role === 'SUPER_ADMIN' || u.role !== 'COMPANY_ADMIN') ? (
-                              <button
-                                onClick={() => setDeleteConfirm({ userId: u.id, userName: `${u.firstName} ${u.lastName}` })}
-                                className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded transition-colors"
-                                title="Delete user"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
+                              <div className="flex items-center gap-1">
+                                {u.isActive && (
+                                  <button
+                                    onClick={() => setDeactivateConfirm({ userId: u.id, userName: `${u.firstName} ${u.lastName}` })}
+                                    className="p-1.5 text-amber-400 hover:text-amber-300 hover:bg-amber-500/10 rounded transition-colors"
+                                    title="Deactivate user"
+                                  >
+                                    <UserMinus className="w-4 h-4" />
+                                  </button>
+                                )}
+                                <button
+                                  onClick={() => setDeleteConfirm({ userId: u.id, userName: `${u.firstName} ${u.lastName}` })}
+                                  className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded transition-colors"
+                                  title="Delete user permanently"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
                             ) : (
                               <span className="text-sm text-viridian/40">-</span>
                             )}
@@ -643,20 +659,59 @@ export default function Settings() {
         </div>
       )}
 
+      {/* Deactivate User Confirmation Modal */}
+      {deactivateConfirm && (
+        <div className="fixed inset-0 bg-forest/90 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="card-holo max-w-md w-full">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-amber-500/20 rounded-lg">
+                <UserMinus className="w-5 h-5 text-amber-400" />
+              </div>
+              <h2 className="text-xl font-semibold text-viridian font-orbitron">Deactivate User</h2>
+            </div>
+            <p className="text-viridian/80 mb-6">
+              Are you sure you want to deactivate <span className="font-semibold text-viridian">{deactivateConfirm.userName}</span>?
+              They will no longer be able to log in, but their historical data will be preserved.
+            </p>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setDeactivateConfirm(null)}
+                className="btn-secondary flex-1"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => deactivateUserMutation.mutate(deactivateConfirm.userId)}
+                disabled={deactivateUserMutation.isPending}
+                className="flex-1 px-4 py-2 bg-amber-500/20 border border-amber-500/50 text-amber-400 rounded-lg hover:bg-amber-500/30 transition-colors disabled:opacity-50"
+              >
+                {deactivateUserMutation.isPending ? 'Deactivating...' : 'Deactivate'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Delete User Confirmation Modal */}
       {deleteConfirm && (
         <div className="fixed inset-0 bg-forest/90 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="card-holo max-w-md w-full">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 bg-red-500/20 rounded-lg">
-                <AlertTriangle className="w-5 h-5 text-red-400" />
+                <Trash2 className="w-5 h-5 text-red-400" />
               </div>
-              <h2 className="text-xl font-semibold text-viridian font-orbitron">Delete User</h2>
+              <h2 className="text-xl font-semibold text-viridian font-orbitron">Delete User Permanently</h2>
             </div>
-            <p className="text-viridian/80 mb-6">
-              Are you sure you want to delete <span className="font-semibold text-viridian">{deleteConfirm.userName}</span>?
-              This action cannot be undone and will remove all associated data.
+            <p className="text-viridian/80 mb-4">
+              Are you sure you want to permanently delete <span className="font-semibold text-viridian">{deleteConfirm.userName}</span>?
             </p>
+            <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg mb-6">
+              <p className="text-sm text-red-400">
+                <strong>Warning:</strong> This will permanently delete the user and all their notes, comments, and time entries.
+                Tickets and tasks they created will be reassigned to you. This cannot be undone.
+              </p>
+            </div>
             <div className="flex gap-3">
               <button
                 type="button"
@@ -670,7 +725,7 @@ export default function Settings() {
                 disabled={deleteUserMutation.isPending}
                 className="flex-1 px-4 py-2 bg-red-500/20 border border-red-500/50 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors disabled:opacity-50"
               >
-                {deleteUserMutation.isPending ? 'Deleting...' : 'Delete User'}
+                {deleteUserMutation.isPending ? 'Deleting...' : 'Delete Permanently'}
               </button>
             </div>
           </div>

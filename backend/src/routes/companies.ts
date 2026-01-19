@@ -145,80 +145,118 @@ router.patch('/users/:userId', authenticate, authorize('COMPANY_ADMIN', 'SUPER_A
   }
 });
 
-// Delete user from company (or deactivate if they have related records)
+// Deactivate user (soft delete)
+router.patch('/users/:userId/deactivate', authenticate, authorize('COMPANY_ADMIN', 'SUPER_ADMIN'), async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await prisma.user.findFirst({
+      where: { id: userId, companyId: req.user!.companyId }
+    });
+
+    if (!user) {
+      throw new AppError('User not found', 404);
+    }
+
+    if (userId === req.user!.id) {
+      throw new AppError('Cannot deactivate your own account', 403);
+    }
+
+    if (user.role === 'SUPER_ADMIN') {
+      throw new AppError('Cannot deactivate super admin users', 403);
+    }
+
+    if (user.role === 'COMPANY_ADMIN' && req.user!.role !== 'SUPER_ADMIN') {
+      throw new AppError('Only super admins can deactivate company admins', 403);
+    }
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: { isActive: false }
+    });
+
+    res.json({ message: 'User deactivated successfully' });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Delete user permanently (hard delete with cascade)
 router.delete('/users/:userId', authenticate, authorize('COMPANY_ADMIN', 'SUPER_ADMIN'), async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const { userId } = req.params;
 
     const userToDelete = await prisma.user.findFirst({
-      where: { id: userId, companyId: req.user!.companyId },
-      include: {
-        _count: {
-          select: {
-            notes: true,
-            tickets: true,
-            assignedTickets: true,
-            activityLogs: true,
-            assignedTasks: true,
-            createdTasks: true,
-            taskComments: true,
-            timeEntries: true
-          }
-        }
-      }
+      where: { id: userId, companyId: req.user!.companyId }
     });
 
     if (!userToDelete) {
       throw new AppError('User not found', 404);
     }
 
-    // Prevent deleting yourself
     if (userId === req.user!.id) {
       throw new AppError('Cannot delete your own account', 403);
     }
 
-    // Prevent deleting SUPER_ADMIN users
     if (userToDelete.role === 'SUPER_ADMIN') {
       throw new AppError('Cannot delete super admin users', 403);
     }
 
-    // Prevent COMPANY_ADMIN from deleting other COMPANY_ADMINs (only SUPER_ADMIN can)
     if (userToDelete.role === 'COMPANY_ADMIN' && req.user!.role !== 'SUPER_ADMIN') {
       throw new AppError('Only super admins can delete company admins', 403);
     }
 
-    // Check if user has any related records
-    const counts = userToDelete._count;
-    const hasRelatedRecords =
-      counts.notes > 0 ||
-      counts.tickets > 0 ||
-      counts.assignedTickets > 0 ||
-      counts.activityLogs > 0 ||
-      counts.assignedTasks > 0 ||
-      counts.createdTasks > 0 ||
-      counts.taskComments > 0 ||
-      counts.timeEntries > 0;
+    // Delete all related records in a transaction
+    await prisma.$transaction(async (tx) => {
+      // Delete user's notes
+      await tx.note.deleteMany({ where: { authorId: userId } });
 
-    if (hasRelatedRecords) {
-      // Deactivate instead of delete to preserve data integrity
-      await prisma.user.update({
-        where: { id: userId },
-        data: { isActive: false }
+      // Delete user's activity logs
+      await tx.activityLog.deleteMany({ where: { userId } });
+
+      // Delete user's task comments
+      await tx.taskComment.deleteMany({ where: { authorId: userId } });
+
+      // Delete user's time entries
+      await tx.timeEntry.deleteMany({ where: { userId } });
+
+      // Unassign tickets assigned to this user (don't delete - they belong to properties)
+      await tx.maintenanceTicket.updateMany({
+        where: { assigneeId: userId },
+        data: { assigneeId: null }
       });
 
-      res.json({
-        message: 'User deactivated successfully',
-        deactivated: true,
-        reason: 'User has associated records (notes, tickets, tasks, etc.) that must be preserved'
-      });
-    } else {
-      // Safe to delete - no related records
-      await prisma.user.delete({
-        where: { id: userId }
+      // Unassign tasks assigned to this user
+      await tx.task.updateMany({
+        where: { assigneeId: userId },
+        data: { assigneeId: null }
       });
 
-      res.json({ message: 'User deleted successfully', deactivated: false });
-    }
+      // For tickets created by this user, keep them but they'll have a dangling reference
+      // We need to handle this - let's set creatorId to null or delete them
+      // Since tickets are important records, let's reassign to the admin performing the delete
+      await tx.maintenanceTicket.updateMany({
+        where: { creatorId: userId },
+        data: { creatorId: req.user!.id }
+      });
+
+      // Same for tasks created by this user
+      await tx.task.updateMany({
+        where: { creatorId: userId },
+        data: { creatorId: req.user!.id }
+      });
+
+      // Remove user from managed properties
+      await tx.property.updateMany({
+        where: { managerId: userId },
+        data: { managerId: null }
+      });
+
+      // Finally delete the user
+      await tx.user.delete({ where: { id: userId } });
+    });
+
+    res.json({ message: 'User deleted permanently' });
   } catch (error) {
     next(error);
   }
