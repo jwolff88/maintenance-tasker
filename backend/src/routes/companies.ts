@@ -145,6 +145,44 @@ router.patch('/users/:userId', authenticate, authorize('COMPANY_ADMIN', 'SUPER_A
   }
 });
 
+// Delete user from company
+router.delete('/users/:userId', authenticate, authorize('COMPANY_ADMIN', 'SUPER_ADMIN'), async (req: AuthRequest, res: Response, next: NextFunction) => {
+  try {
+    const { userId } = req.params;
+
+    const userToDelete = await prisma.user.findFirst({
+      where: { id: userId, companyId: req.user!.companyId }
+    });
+
+    if (!userToDelete) {
+      throw new AppError('User not found', 404);
+    }
+
+    // Prevent deleting yourself
+    if (userId === req.user!.id) {
+      throw new AppError('Cannot delete your own account', 403);
+    }
+
+    // Prevent deleting SUPER_ADMIN users
+    if (userToDelete.role === 'SUPER_ADMIN') {
+      throw new AppError('Cannot delete super admin users', 403);
+    }
+
+    // Prevent COMPANY_ADMIN from deleting other COMPANY_ADMINs (only SUPER_ADMIN can)
+    if (userToDelete.role === 'COMPANY_ADMIN' && req.user!.role !== 'SUPER_ADMIN') {
+      throw new AppError('Only super admins can delete company admins', 403);
+    }
+
+    await prisma.user.delete({
+      where: { id: userId }
+    });
+
+    res.json({ message: 'User deleted successfully' });
+  } catch (error) {
+    next(error);
+  }
+});
+
 // Get permission categories (for UI)
 router.get('/permissions/categories', authenticate, authorize('COMPANY_ADMIN', 'SUPER_ADMIN'), (req: AuthRequest, res: Response) => {
   res.json(getPermissionCategories());
