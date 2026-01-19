@@ -12,12 +12,12 @@ const STATUSES = [
 ];
 
 const STATUS_COLORS: Record<string, string> = {
-  PROPOSED: 'bg-gray-100 text-gray-800',
-  PENDING_APPROVAL: 'bg-yellow-100 text-yellow-800',
-  APPROVED: 'bg-blue-100 text-blue-800',
-  IN_PROGRESS: 'bg-purple-100 text-purple-800',
-  COMPLETED: 'bg-green-100 text-green-800',
-  CANCELLED: 'bg-red-100 text-red-800',
+  PROPOSED: 'badge-gray',
+  PENDING_APPROVAL: 'badge-yellow',
+  APPROVED: 'badge-blue',
+  IN_PROGRESS: 'badge-yellow',
+  COMPLETED: 'badge-green',
+  CANCELLED: 'badge-red',
 };
 
 export default function CapEx() {
@@ -103,12 +103,12 @@ export default function CapEx() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Capital Expenditures</h1>
-          <p className="text-gray-600">Track and manage major property investments</p>
+          <h1 className="text-2xl font-bold text-viridian">Capital Expenditures</h1>
+          <p className="text-viridian/60">Track and manage major property investments</p>
         </div>
         <button
           onClick={() => { setShowForm(true); setEditingId(null); }}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+          className="btn-primary"
         >
           + New CapEx
         </button>
@@ -117,21 +117,21 @@ export default function CapEx() {
       {/* Stats Cards */}
       {stats && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-white p-4 rounded-lg shadow">
-            <p className="text-sm text-gray-500">Total Items ({filterYear})</p>
-            <p className="text-2xl font-bold">{stats.totalItems}</p>
+          <div className="card-holo">
+            <p className="text-sm text-viridian/60 font-orbitron uppercase tracking-wide">Total Items ({filterYear})</p>
+            <p className="text-2xl font-bold text-viridian mt-1">{stats.totalItems}</p>
           </div>
-          <div className="bg-white p-4 rounded-lg shadow">
-            <p className="text-sm text-gray-500">Estimated Budget</p>
-            <p className="text-2xl font-bold text-blue-600">{formatCurrency(stats.totalEstimated)}</p>
+          <div className="card-holo">
+            <p className="text-sm text-viridian/60 font-orbitron uppercase tracking-wide">Estimated Budget</p>
+            <p className="text-2xl font-bold text-viridian mt-1">{formatCurrency(stats.totalEstimated)}</p>
           </div>
-          <div className="bg-white p-4 rounded-lg shadow">
-            <p className="text-sm text-gray-500">Actual Spent</p>
-            <p className="text-2xl font-bold text-green-600">{formatCurrency(stats.totalActual)}</p>
+          <div className="card-holo">
+            <p className="text-sm text-viridian/60 font-orbitron uppercase tracking-wide">Actual Spent</p>
+            <p className="text-2xl font-bold text-teal mt-1">{formatCurrency(stats.totalActual)}</p>
           </div>
-          <div className="bg-white p-4 rounded-lg shadow">
-            <p className="text-sm text-gray-500">Variance</p>
-            <p className={`text-2xl font-bold ${stats.variance > 0 ? 'text-red-600' : 'text-green-600'}`}>
+          <div className="card-holo">
+            <p className="text-sm text-viridian/60 font-orbitron uppercase tracking-wide">Variance</p>
+            <p className={`text-2xl font-bold mt-1 ${stats.variance > 0 ? 'text-red-400' : 'text-viridian'}`}>
               {formatCurrency(Math.abs(stats.variance))} {stats.variance > 0 ? 'over' : 'under'}
             </p>
           </div>
@@ -139,13 +139,13 @@ export default function CapEx() {
       )}
 
       {/* Filters */}
-      <div className="flex gap-4 bg-white p-4 rounded-lg shadow">
+      <div className="flex gap-4 card-holo">
         <div>
-          <label className="block text-sm font-medium text-gray-700">Budget Year</label>
+          <label className="block text-sm font-medium text-viridian/80 font-orbitron">Budget Year</label>
           <select
             value={filterYear}
             onChange={(e) => setFilterYear(e.target.value)}
-            className="mt-1 border rounded-md px-3 py-2"
+            className="input mt-1"
           >
             {[2024, 2025, 2026, 2027].map(year => (
               <option key={year} value={year}>{year}</option>
@@ -153,11 +153,11 @@ export default function CapEx() {
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Status</label>
+          <label className="block text-sm font-medium text-viridian/80 font-orbitron">Status</label>
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="mt-1 border rounded-md px-3 py-2"
+            className="input mt-1"
           >
             <option value="">All Statuses</option>
             {STATUSES.map(status => (
@@ -169,22 +169,22 @@ export default function CapEx() {
 
       {/* Form Modal */}
       {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-bold mb-4">{editingId ? 'Edit' : 'New'} Capital Expenditure</h2>
+        <div className="fixed inset-0 bg-forest/90 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="card-holo w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <h2 className="text-xl font-bold mb-4 text-viridian font-orbitron">{editingId ? 'Edit' : 'New'} Capital Expenditure</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Title *</label>
+                <label className="block text-sm font-medium text-viridian/80">Title *</label>
                 <input
                   name="title"
                   required
-                  className="mt-1 w-full border rounded-md px-3 py-2"
+                  className="input mt-1"
                   placeholder="e.g., Roof Replacement - Building A"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Property *</label>
-                <select name="propertyId" required className="mt-1 w-full border rounded-md px-3 py-2">
+                <label className="block text-sm font-medium text-viridian/80">Property *</label>
+                <select name="propertyId" required className="input mt-1">
                   <option value="">Select property</option>
                   {properties.map((p: any) => (
                     <option key={p.id} value={p.id}>{p.name} - {p.address}</option>
@@ -193,60 +193,60 @@ export default function CapEx() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Category</label>
-                  <select name="category" className="mt-1 w-full border rounded-md px-3 py-2">
+                  <label className="block text-sm font-medium text-viridian/80">Category</label>
+                  <select name="category" className="input mt-1">
                     {CATEGORIES.map(cat => (
                       <option key={cat} value={cat}>{cat}</option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Budget Year</label>
+                  <label className="block text-sm font-medium text-viridian/80">Budget Year</label>
                   <input
                     name="budgetYear"
                     type="number"
                     defaultValue={new Date().getFullYear()}
-                    className="mt-1 w-full border rounded-md px-3 py-2"
+                    className="input mt-1"
                   />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Estimated Cost *</label>
+                  <label className="block text-sm font-medium text-viridian/80">Estimated Cost *</label>
                   <input
                     name="estimatedCost"
                     type="number"
                     step="0.01"
                     required
-                    className="mt-1 w-full border rounded-md px-3 py-2"
+                    className="input mt-1"
                     placeholder="0.00"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Depreciation (years)</label>
+                  <label className="block text-sm font-medium text-viridian/80">Depreciation (years)</label>
                   <input
                     name="depreciationYears"
                     type="number"
-                    className="mt-1 w-full border rounded-md px-3 py-2"
+                    className="input mt-1"
                     placeholder="e.g., 15"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Description</label>
+                <label className="block text-sm font-medium text-viridian/80">Description</label>
                 <textarea
                   name="description"
                   rows={3}
-                  className="mt-1 w-full border rounded-md px-3 py-2"
+                  className="input mt-1"
                   placeholder="Detailed description of the expenditure..."
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Notes</label>
+                <label className="block text-sm font-medium text-viridian/80">Notes</label>
                 <textarea
                   name="notes"
                   rows={2}
-                  className="mt-1 w-full border rounded-md px-3 py-2"
+                  className="input mt-1"
                   placeholder="Internal notes..."
                 />
               </div>
@@ -254,13 +254,13 @@ export default function CapEx() {
                 <button
                   type="button"
                   onClick={() => { setShowForm(false); setEditingId(null); }}
-                  className="px-4 py-2 border rounded-md hover:bg-gray-50"
+                  className="btn-secondary"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  className="btn-primary"
                 >
                   {editingId ? 'Update' : 'Create'}
                 </button>
@@ -272,55 +272,55 @@ export default function CapEx() {
 
       {/* Table */}
       {isLoading ? (
-        <div className="text-center py-8">Loading...</div>
+        <div className="text-center py-8 text-viridian/60">Loading...</div>
       ) : capexItems.length === 0 ? (
-        <div className="text-center py-8 bg-white rounded-lg shadow">
-          <p className="text-gray-500">No capital expenditures found</p>
+        <div className="text-center py-8 card-holo">
+          <p className="text-viridian/60">No capital expenditures found</p>
           <button
             onClick={() => setShowForm(true)}
-            className="mt-2 text-blue-600 hover:underline"
+            className="mt-2 text-viridian hover:underline"
           >
             Create your first CapEx item
           </button>
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Property</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estimated</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actual</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+        <div className="card-holo overflow-hidden p-0">
+          <table className="min-w-full">
+            <thead>
+              <tr className="border-b border-viridian/20">
+                <th className="px-6 py-3 text-left">Title</th>
+                <th className="px-6 py-3 text-left">Property</th>
+                <th className="px-6 py-3 text-left">Category</th>
+                <th className="px-6 py-3 text-left">Status</th>
+                <th className="px-6 py-3 text-left">Estimated</th>
+                <th className="px-6 py-3 text-left">Actual</th>
+                <th className="px-6 py-3 text-left">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody>
               {capexItems.map((item: any) => (
-                <tr key={item.id} className="hover:bg-gray-50">
+                <tr key={item.id} className="border-b border-bronze/10 hover:bg-viridian/5">
                   <td className="px-6 py-4">
-                    <div className="font-medium text-gray-900">{item.title}</div>
+                    <div className="font-medium text-viridian">{item.title}</div>
                     {item.description && (
-                      <div className="text-sm text-gray-500 truncate max-w-xs">{item.description}</div>
+                      <div className="text-sm text-viridian/50 truncate max-w-xs">{item.description}</div>
                     )}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
+                  <td className="px-6 py-4 text-sm text-viridian/70">
                     {item.property?.name}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
+                  <td className="px-6 py-4 text-sm text-viridian/70">
                     {item.category}
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${STATUS_COLORS[item.status]}`}>
+                    <span className={`badge ${STATUS_COLORS[item.status]}`}>
                       {item.status.replace('_', ' ')}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-sm font-medium">
+                  <td className="px-6 py-4 text-sm font-medium text-viridian">
                     {formatCurrency(Number(item.estimatedCost))}
                   </td>
-                  <td className="px-6 py-4 text-sm font-medium">
+                  <td className="px-6 py-4 text-sm font-medium text-teal">
                     {item.actualCost ? formatCurrency(Number(item.actualCost)) : '-'}
                   </td>
                   <td className="px-6 py-4 text-sm">
@@ -328,14 +328,14 @@ export default function CapEx() {
                       {item.status === 'PROPOSED' && (
                         <button
                           onClick={() => updateMutation.mutate({ id: item.id, data: { status: 'APPROVED' } })}
-                          className="text-green-600 hover:underline"
+                          className="text-viridian hover:text-viridian/80"
                         >
                           Approve
                         </button>
                       )}
                       <button
                         onClick={() => deleteMutation.mutate(item.id)}
-                        className="text-red-600 hover:underline"
+                        className="text-red-400 hover:text-red-300"
                       >
                         Delete
                       </button>

@@ -138,8 +138,8 @@ export default function Inventory() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Parts Inventory</h1>
-          <p className="text-gray-600">Manage maintenance supplies and parts</p>
+          <h1 className="text-2xl font-bold text-viridian font-orbitron">Parts Inventory</h1>
+          <p className="text-viridian/60">Manage maintenance supplies and parts</p>
         </div>
         <button onClick={() => { resetForm(); setEditItem(null); setShowModal(true); }} className="btn-primary flex items-center gap-2">
           <Plus className="w-4 h-4" />
@@ -150,23 +150,23 @@ export default function Inventory() {
       {/* Stats */}
       {stats && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="card">
-            <p className="text-sm text-gray-500">Total Items</p>
-            <p className="text-2xl font-bold">{stats.totalItems}</p>
+          <div className="card-holo">
+            <p className="text-sm text-viridian/60">Total Items</p>
+            <p className="text-2xl font-bold text-viridian">{stats.totalItems}</p>
           </div>
-          <div className="card">
-            <p className="text-sm text-gray-500">Total Units</p>
-            <p className="text-2xl font-bold">{stats.totalUnits}</p>
+          <div className="card-holo">
+            <p className="text-sm text-viridian/60">Total Units</p>
+            <p className="text-2xl font-bold text-viridian">{stats.totalUnits}</p>
           </div>
-          <div className={`card ${stats.lowStockCount > 0 ? 'bg-red-50' : ''}`}>
-            <p className="text-sm text-gray-500">Low Stock</p>
-            <p className={`text-2xl font-bold ${stats.lowStockCount > 0 ? 'text-red-600' : ''}`}>
+          <div className={`card-holo ${stats.lowStockCount > 0 ? 'border-red-500/50 bg-red-500/10' : ''}`}>
+            <p className="text-sm text-viridian/60">Low Stock</p>
+            <p className={`text-2xl font-bold ${stats.lowStockCount > 0 ? 'text-red-400' : 'text-viridian'}`}>
               {stats.lowStockCount}
             </p>
           </div>
-          <div className="card">
-            <p className="text-sm text-gray-500">Inventory Value</p>
-            <p className="text-2xl font-bold">${stats.inventoryValue?.toLocaleString()}</p>
+          <div className="card-holo">
+            <p className="text-sm text-viridian/60">Inventory Value</p>
+            <p className="text-2xl font-bold text-viridian">${stats.inventoryValue?.toLocaleString()}</p>
           </div>
         </div>
       )}
@@ -174,7 +174,7 @@ export default function Inventory() {
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-viridian/40" />
           <input
             type="text"
             placeholder="Search items..."
@@ -198,36 +198,36 @@ export default function Inventory() {
             type="checkbox"
             checked={showLowStock}
             onChange={(e) => setShowLowStock(e.target.checked)}
-            className="w-4 h-4 text-primary-600 rounded"
+            className="w-4 h-4 text-viridian rounded border-viridian/30 bg-forest"
           />
-          <span className="text-sm text-gray-700">Low Stock Only</span>
+          <span className="text-sm text-viridian/70">Low Stock Only</span>
         </label>
       </div>
 
       {/* Items List */}
       {isLoading ? (
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-viridian"></div>
         </div>
       ) : items?.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {items.map((item: any) => (
-            <div key={item.id} className={`card ${item.isLowStock ? 'border-red-200 bg-red-50' : ''}`}>
+            <div key={item.id} className={`card-holo ${item.isLowStock ? 'border-red-500/50 bg-red-500/10' : ''}`}>
               <div className="flex justify-between items-start mb-2">
                 <div>
-                  <h3 className="font-semibold">{item.name}</h3>
-                  {item.sku && <p className="text-xs text-gray-500">SKU: {item.sku}</p>}
+                  <h3 className="font-semibold text-viridian">{item.name}</h3>
+                  {item.sku && <p className="text-xs text-viridian/50">SKU: {item.sku}</p>}
                 </div>
                 <span className="badge badge-gray text-xs">{item.category.replace(/_/g, ' ')}</span>
               </div>
 
               <div className="flex items-center justify-between my-3">
                 <div>
-                  <p className="text-3xl font-bold">{item.quantity}</p>
-                  <p className="text-xs text-gray-500">{item.unit}</p>
+                  <p className="text-3xl font-bold text-viridian">{item.quantity}</p>
+                  <p className="text-xs text-viridian/50">{item.unit}</p>
                 </div>
                 {item.isLowStock && (
-                  <div className="flex items-center gap-1 text-red-600">
+                  <div className="flex items-center gap-1 text-red-400">
                     <AlertTriangle className="w-4 h-4" />
                     <span className="text-xs font-medium">Low Stock</span>
                   </div>
@@ -235,7 +235,7 @@ export default function Inventory() {
               </div>
 
               {item.unitCost && (
-                <p className="text-sm text-gray-500 mb-3">
+                <p className="text-sm text-viridian/50 mb-3">
                   ${Number(item.unitCost).toFixed(2)} per {item.unit}
                 </p>
               )}
@@ -250,7 +250,7 @@ export default function Inventory() {
                 </button>
                 <button
                   onClick={() => openEditModal(item)}
-                  className="p-2 text-gray-500 hover:text-primary-600 hover:bg-gray-100 rounded"
+                  className="p-2 text-viridian/60 hover:text-viridian hover:bg-viridian/10 rounded"
                 >
                   <Edit2 className="w-4 h-4" />
                 </button>
@@ -260,7 +260,7 @@ export default function Inventory() {
                       deleteMutation.mutate(item.id);
                     }
                   }}
-                  className="p-2 text-gray-500 hover:text-red-600 hover:bg-gray-100 rounded"
+                  className="p-2 text-viridian/60 hover:text-red-400 hover:bg-red-500/10 rounded"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -269,10 +269,10 @@ export default function Inventory() {
           ))}
         </div>
       ) : (
-        <div className="text-center py-12">
-          <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No items found</h3>
-          <p className="text-gray-600 mb-4">Add your first inventory item.</p>
+        <div className="text-center py-12 card-holo">
+          <Package className="w-12 h-12 text-viridian/40 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-viridian mb-2">No items found</h3>
+          <p className="text-viridian/60 mb-4">Add your first inventory item.</p>
           <button onClick={() => setShowModal(true)} className="btn-primary">
             Add Item
           </button>
@@ -281,182 +281,178 @@ export default function Inventory() {
 
       {/* Create/Edit Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-gray-800/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold">{editItem ? 'Edit Item' : 'Add Inventory Item'}</h2>
-                <button onClick={() => { setShowModal(false); setEditItem(null); }} className="text-gray-400 hover:text-gray-600">
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
-                    <input
-                      type="text"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="input"
-                      required
-                    />
-                  </div>
+        <div className="fixed inset-0 bg-forest/90 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="card-holo max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-semibold text-viridian font-orbitron">{editItem ? 'Edit Item' : 'Add Inventory Item'}</h2>
+              <button onClick={() => { setShowModal(false); setEditItem(null); }} className="text-viridian/40 hover:text-viridian">
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-viridian/80 mb-1">Name *</label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="input"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-viridian/80 mb-1">SKU</label>
+                  <input
+                    type="text"
+                    value={formData.sku}
+                    onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+                    className="input"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-viridian/80 mb-1">Category</label>
+                  <select
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    className="input"
+                  >
+                    {categories.map(cat => (
+                      <option key={cat} value={cat}>{cat.replace(/_/g, ' ')}</option>
+                    ))}
+                  </select>
+                </div>
+                {!editItem && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">SKU</label>
-                    <input
-                      type="text"
-                      value={formData.sku}
-                      onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
-                      className="input"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                    <select
-                      value={formData.category}
-                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                      className="input"
-                    >
-                      {categories.map(cat => (
-                        <option key={cat} value={cat}>{cat.replace(/_/g, ' ')}</option>
-                      ))}
-                    </select>
-                  </div>
-                  {!editItem && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Initial Quantity</label>
-                      <input
-                        type="number"
-                        value={formData.quantity}
-                        onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) || 0 })}
-                        className="input"
-                        min="0"
-                      />
-                    </div>
-                  )}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Min Quantity (Alert)</label>
+                    <label className="block text-sm font-medium text-viridian/80 mb-1">Initial Quantity</label>
                     <input
                       type="number"
-                      value={formData.minQuantity}
-                      onChange={(e) => setFormData({ ...formData, minQuantity: parseInt(e.target.value) || 0 })}
+                      value={formData.quantity}
+                      onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) || 0 })}
                       className="input"
                       min="0"
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Unit</label>
-                    <input
-                      type="text"
-                      value={formData.unit}
-                      onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
-                      className="input"
-                      placeholder="each, box, roll..."
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Unit Cost ($)</label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={formData.unitCost}
-                      onChange={(e) => setFormData({ ...formData, unitCost: e.target.value })}
-                      className="input"
-                    />
-                  </div>
-                  <div className="col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Storage Location</label>
-                    <input
-                      type="text"
-                      value={formData.storageLocation}
-                      onChange={(e) => setFormData({ ...formData, storageLocation: e.target.value })}
-                      className="input"
-                      placeholder="Warehouse A, Shelf 3"
-                    />
-                  </div>
-                  <div className="col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Supplier</label>
-                    <input
-                      type="text"
-                      value={formData.supplierName}
-                      onChange={(e) => setFormData({ ...formData, supplierName: e.target.value })}
-                      className="input"
-                    />
-                  </div>
+                )}
+                <div>
+                  <label className="block text-sm font-medium text-viridian/80 mb-1">Min Quantity (Alert)</label>
+                  <input
+                    type="number"
+                    value={formData.minQuantity}
+                    onChange={(e) => setFormData({ ...formData, minQuantity: parseInt(e.target.value) || 0 })}
+                    className="input"
+                    min="0"
+                  />
                 </div>
-                <div className="flex gap-3 pt-4">
-                  <button type="button" onClick={() => { setShowModal(false); setEditItem(null); }} className="btn-secondary flex-1">
-                    Cancel
-                  </button>
-                  <button type="submit" disabled={createMutation.isPending || updateMutation.isPending} className="btn-primary flex-1">
-                    {editItem ? 'Save Changes' : 'Add Item'}
-                  </button>
+                <div>
+                  <label className="block text-sm font-medium text-viridian/80 mb-1">Unit</label>
+                  <input
+                    type="text"
+                    value={formData.unit}
+                    onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
+                    className="input"
+                    placeholder="each, box, roll..."
+                  />
                 </div>
-              </form>
-            </div>
+                <div>
+                  <label className="block text-sm font-medium text-viridian/80 mb-1">Unit Cost ($)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={formData.unitCost}
+                    onChange={(e) => setFormData({ ...formData, unitCost: e.target.value })}
+                    className="input"
+                  />
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-viridian/80 mb-1">Storage Location</label>
+                  <input
+                    type="text"
+                    value={formData.storageLocation}
+                    onChange={(e) => setFormData({ ...formData, storageLocation: e.target.value })}
+                    className="input"
+                    placeholder="Warehouse A, Shelf 3"
+                  />
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-viridian/80 mb-1">Supplier</label>
+                  <input
+                    type="text"
+                    value={formData.supplierName}
+                    onChange={(e) => setFormData({ ...formData, supplierName: e.target.value })}
+                    className="input"
+                  />
+                </div>
+              </div>
+              <div className="flex gap-3 pt-4">
+                <button type="button" onClick={() => { setShowModal(false); setEditItem(null); }} className="btn-secondary flex-1">
+                  Cancel
+                </button>
+                <button type="submit" disabled={createMutation.isPending || updateMutation.isPending} className="btn-primary flex-1">
+                  {editItem ? 'Save Changes' : 'Add Item'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
 
       {/* Transaction Modal */}
       {showTransactionModal && (
-        <div className="fixed inset-0 bg-gray-800/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-sm w-full">
-            <div className="p-6">
-              <h2 className="text-xl font-semibold mb-6">Adjust Stock</h2>
-              <form onSubmit={(e) => {
-                e.preventDefault();
-                transactionMutation.mutate({
-                  id: showTransactionModal,
-                  data: transactionData
-                });
-              }} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                  <select
-                    value={transactionData.type}
-                    onChange={(e) => setTransactionData({ ...transactionData, type: e.target.value })}
-                    className="input"
-                  >
-                    <option value="RESTOCK">Restock (Add)</option>
-                    <option value="USED">Used (Remove)</option>
-                    <option value="DAMAGED">Damaged (Remove)</option>
-                    <option value="ADJUSTMENT">Adjustment</option>
-                    <option value="RETURNED">Returned (Add)</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
-                  <input
-                    type="number"
-                    value={transactionData.quantity}
-                    onChange={(e) => setTransactionData({ ...transactionData, quantity: parseInt(e.target.value) || 1 })}
-                    className="input"
-                    min="1"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-                  <input
-                    type="text"
-                    value={transactionData.notes}
-                    onChange={(e) => setTransactionData({ ...transactionData, notes: e.target.value })}
-                    className="input"
-                    placeholder="Optional notes..."
-                  />
-                </div>
-                <div className="flex gap-3 pt-4">
-                  <button type="button" onClick={() => setShowTransactionModal(null)} className="btn-secondary flex-1">
-                    Cancel
-                  </button>
-                  <button type="submit" disabled={transactionMutation.isPending} className="btn-primary flex-1">
-                    {transactionMutation.isPending ? 'Saving...' : 'Save'}
-                  </button>
-                </div>
-              </form>
-            </div>
+        <div className="fixed inset-0 bg-forest/90 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="card-holo max-w-sm w-full">
+            <h2 className="text-xl font-semibold mb-6 text-viridian font-orbitron">Adjust Stock</h2>
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              transactionMutation.mutate({
+                id: showTransactionModal,
+                data: transactionData
+              });
+            }} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-viridian/80 mb-1">Type</label>
+                <select
+                  value={transactionData.type}
+                  onChange={(e) => setTransactionData({ ...transactionData, type: e.target.value })}
+                  className="input"
+                >
+                  <option value="RESTOCK">Restock (Add)</option>
+                  <option value="USED">Used (Remove)</option>
+                  <option value="DAMAGED">Damaged (Remove)</option>
+                  <option value="ADJUSTMENT">Adjustment</option>
+                  <option value="RETURNED">Returned (Add)</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-viridian/80 mb-1">Quantity</label>
+                <input
+                  type="number"
+                  value={transactionData.quantity}
+                  onChange={(e) => setTransactionData({ ...transactionData, quantity: parseInt(e.target.value) || 1 })}
+                  className="input"
+                  min="1"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-viridian/80 mb-1">Notes</label>
+                <input
+                  type="text"
+                  value={transactionData.notes}
+                  onChange={(e) => setTransactionData({ ...transactionData, notes: e.target.value })}
+                  className="input"
+                  placeholder="Optional notes..."
+                />
+              </div>
+              <div className="flex gap-3 pt-4">
+                <button type="button" onClick={() => setShowTransactionModal(null)} className="btn-secondary flex-1">
+                  Cancel
+                </button>
+                <button type="submit" disabled={transactionMutation.isPending} className="btn-primary flex-1">
+                  {transactionMutation.isPending ? 'Saving...' : 'Save'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

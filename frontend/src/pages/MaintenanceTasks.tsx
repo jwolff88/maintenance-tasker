@@ -9,18 +9,18 @@ import {
 import { format } from 'date-fns';
 
 const statusColors: Record<string, string> = {
-  OPEN: 'bg-yellow-100 text-yellow-800',
-  IN_PROGRESS: 'bg-blue-100 text-blue-800',
-  UNDER_REVIEW: 'bg-purple-100 text-purple-800',
-  COMPLETED: 'bg-green-100 text-green-800',
-  CANCELLED: 'bg-gray-100 text-gray-800',
+  OPEN: 'badge-yellow',
+  IN_PROGRESS: 'badge-blue',
+  UNDER_REVIEW: 'badge-yellow',
+  COMPLETED: 'badge-green',
+  CANCELLED: 'badge-gray',
 };
 
 const priorityColors: Record<string, string> = {
-  LOW: 'bg-gray-100 text-gray-800',
-  MEDIUM: 'bg-blue-100 text-blue-800',
-  HIGH: 'bg-orange-100 text-orange-800',
-  CRITICAL: 'bg-red-100 text-red-800',
+  LOW: 'badge-gray',
+  MEDIUM: 'badge-blue',
+  HIGH: 'badge-yellow',
+  CRITICAL: 'badge-red',
 };
 
 const priorityLabels: Record<string, string> = {
@@ -200,7 +200,7 @@ export default function MaintenanceTasks() {
         return (
           <button
             onClick={(e) => { e.preventDefault(); handleQuickAction(task.id, task.status); }}
-            className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 flex items-center gap-1"
+            className="px-3 py-1.5 bg-teal text-forest rounded-lg text-sm hover:bg-teal/80 flex items-center gap-1 font-orbitron"
           >
             <Play className="w-3 h-3" /> Start
           </button>
@@ -209,7 +209,7 @@ export default function MaintenanceTasks() {
         return (
           <button
             onClick={(e) => { e.preventDefault(); handleQuickAction(task.id, task.status); }}
-            className="px-3 py-1.5 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700 flex items-center gap-1"
+            className="px-3 py-1.5 bg-bronze text-forest rounded-lg text-sm hover:bg-bronze/80 flex items-center gap-1 font-orbitron"
           >
             <Eye className="w-3 h-3" /> Submit
           </button>
@@ -218,7 +218,7 @@ export default function MaintenanceTasks() {
         return (
           <button
             onClick={(e) => { e.preventDefault(); handleQuickAction(task.id, task.status); }}
-            className="px-3 py-1.5 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 flex items-center gap-1"
+            className="px-3 py-1.5 bg-viridian text-forest rounded-lg text-sm hover:bg-viridian/80 flex items-center gap-1 font-orbitron"
           >
             <CheckCircle className="w-3 h-3" /> Complete
           </button>
@@ -232,8 +232,8 @@ export default function MaintenanceTasks() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Maintenance Tasks</h1>
-          <p className="text-gray-600">Track and manage maintenance work</p>
+          <h1 className="text-2xl font-bold text-viridian">Maintenance Tasks</h1>
+          <p className="text-viridian/60">Track and manage maintenance work</p>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -253,43 +253,43 @@ export default function MaintenanceTasks() {
 
       {/* Bulk Actions Bar */}
       {selectedTasks.length > 0 && (
-        <div className="bg-primary-50 border border-primary-200 rounded-lg p-3 flex flex-wrap items-center gap-3">
-          <span className="text-sm font-medium text-primary-700">
+        <div className="bg-viridian/10 border border-viridian/30 rounded-lg p-3 flex flex-wrap items-center gap-3">
+          <span className="text-sm font-medium text-viridian">
             {selectedTasks.length} task{selectedTasks.length !== 1 ? 's' : ''} selected
           </span>
           <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={() => handleBulkAction('IN_PROGRESS')}
               disabled={bulkStatusMutation.isPending}
-              className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 flex items-center gap-1"
+              className="px-3 py-1.5 bg-teal text-forest rounded-lg text-sm hover:bg-teal/80 flex items-center gap-1"
             >
               <Play className="w-3 h-3" /> Start All
             </button>
             <button
               onClick={() => handleBulkAction('UNDER_REVIEW')}
               disabled={bulkStatusMutation.isPending}
-              className="px-3 py-1.5 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700 flex items-center gap-1"
+              className="px-3 py-1.5 bg-bronze text-forest rounded-lg text-sm hover:bg-bronze/80 flex items-center gap-1"
             >
               <Eye className="w-3 h-3" /> Submit All
             </button>
             <button
               onClick={() => handleBulkAction('COMPLETED')}
               disabled={bulkStatusMutation.isPending}
-              className="px-3 py-1.5 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 flex items-center gap-1"
+              className="px-3 py-1.5 bg-viridian text-forest rounded-lg text-sm hover:bg-viridian/80 flex items-center gap-1"
             >
               <CheckCircle className="w-3 h-3" /> Complete All
             </button>
             <button
               onClick={() => handleBulkAction('CANCELLED')}
               disabled={bulkStatusMutation.isPending}
-              className="px-3 py-1.5 bg-gray-600 text-white rounded-lg text-sm hover:bg-gray-700 flex items-center gap-1"
+              className="px-3 py-1.5 bg-viridian/20 text-viridian rounded-lg text-sm hover:bg-viridian/30 flex items-center gap-1"
             >
               <XCircle className="w-3 h-3" /> Cancel All
             </button>
           </div>
           <button
             onClick={() => setSelectedTasks([])}
-            className="ml-auto text-sm text-gray-600 hover:text-gray-800"
+            className="ml-auto text-sm text-viridian/60 hover:text-viridian"
           >
             Clear selection
           </button>
@@ -299,7 +299,7 @@ export default function MaintenanceTasks() {
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-viridian/40" />
           <input
             type="text"
             placeholder="Search tasks..."
@@ -335,38 +335,38 @@ export default function MaintenanceTasks() {
       {/* Tasks List */}
       {isLoading ? (
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-viridian"></div>
         </div>
       ) : tasks?.length > 0 ? (
         <div className="space-y-3">
           {/* Select All Header */}
-          <div className="flex items-center gap-3 px-4 py-2 bg-gray-50 rounded-lg">
+          <div className="flex items-center gap-3 px-4 py-2 bg-viridian/5 rounded-lg border border-viridian/20">
             <button
               onClick={toggleAllTasks}
-              className="p-1 hover:bg-gray-200 rounded"
+              className="p-1 hover:bg-viridian/10 rounded"
             >
               {selectedTasks.length === tasks.filter((t: any) => t.status !== 'COMPLETED' && t.status !== 'CANCELLED').length && selectedTasks.length > 0 ? (
-                <CheckSquare className="w-5 h-5 text-primary-600" />
+                <CheckSquare className="w-5 h-5 text-viridian" />
               ) : (
-                <Square className="w-5 h-5 text-gray-400" />
+                <Square className="w-5 h-5 text-viridian/40" />
               )}
             </button>
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-viridian/60">
               {selectedTasks.length > 0 ? `${selectedTasks.length} selected` : 'Select all'}
             </span>
           </div>
           {tasks.map((task: any) => (
-            <div key={task.id} className="card flex items-center gap-4 hover:shadow-md transition-shadow">
+            <div key={task.id} className="card-holo flex items-center gap-4 hover:shadow-viridian transition-all duration-300">
               {/* Checkbox - only show for non-completed tasks */}
               {task.status !== 'COMPLETED' && task.status !== 'CANCELLED' && (
                 <button
                   onClick={(e) => { e.stopPropagation(); toggleTaskSelection(task.id); }}
-                  className="p-1 hover:bg-gray-100 rounded flex-shrink-0"
+                  className="p-1 hover:bg-viridian/10 rounded flex-shrink-0"
                 >
                   {selectedTasks.includes(task.id) ? (
-                    <CheckSquare className="w-5 h-5 text-primary-600" />
+                    <CheckSquare className="w-5 h-5 text-viridian" />
                   ) : (
-                    <Square className="w-5 h-5 text-gray-400" />
+                    <Square className="w-5 h-5 text-viridian/40" />
                   )}
                 </button>
               )}
@@ -376,14 +376,14 @@ export default function MaintenanceTasks() {
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-semibold text-gray-900 truncate">{task.title}</h3>
+                    <h3 className="font-semibold text-viridian truncate">{task.title}</h3>
                     {task.isOverdue && (
-                      <span className="flex items-center gap-1 text-xs text-red-600 bg-red-50 px-2 py-0.5 rounded">
+                      <span className="flex items-center gap-1 text-xs text-red-400 bg-red-500/10 px-2 py-0.5 rounded border border-red-500/30">
                         <AlertTriangle className="w-3 h-3" /> Overdue
                       </span>
                     )}
                   </div>
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500">
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-viridian/50">
                     <span className="flex items-center gap-1">
                       <ClipboardList className="w-3.5 h-3.5" />
                       {task.asset?.name}
@@ -410,17 +410,17 @@ export default function MaintenanceTasks() {
                     {task.status.replace('_', ' ')}
                   </span>
                   {getQuickActionButton(task)}
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
+                  <ChevronRight className="w-5 h-5 text-viridian/40" />
                 </div>
               </Link>
             </div>
           ))}
         </div>
       ) : (
-        <div className="text-center py-12">
-          <ClipboardList className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No tasks found</h3>
-          <p className="text-gray-600 mb-4">Create your first maintenance task.</p>
+        <div className="text-center py-12 card-holo">
+          <ClipboardList className="w-12 h-12 text-viridian/40 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-viridian mb-2">No tasks found</h3>
+          <p className="text-viridian/60 mb-4">Create your first maintenance task.</p>
           <button onClick={() => setShowModal(true)} className="btn-primary">
             Create Task
           </button>
@@ -429,191 +429,189 @@ export default function MaintenanceTasks() {
 
       {/* Create Task Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-gray-800/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <h2 className="text-xl font-semibold mb-6">Create Maintenance Task</h2>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Template Selector */}
-                {templates && templates.length > 0 && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                    <label className="block text-sm font-medium text-blue-800 mb-2">
-                      Quick Start from Template
-                    </label>
-                    <select
-                      onChange={(e) => e.target.value && applyTemplate(e.target.value)}
-                      className="input text-sm"
-                      defaultValue=""
-                    >
-                      <option value="">Select a template to auto-fill...</option>
-                      {templates.map((template: any) => (
-                        <option key={template.id} value={template.id}>
-                          {template.title} ({template.priority})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Task Title *
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="input"
-                    placeholder="e.g., Replace air filter"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Description
-                  </label>
-                  <textarea
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="input"
-                    rows={3}
-                    placeholder="Describe the task..."
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Asset *
+        <div className="fixed inset-0 bg-forest/90 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="card-holo max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            <h2 className="text-xl font-semibold mb-6 text-viridian font-orbitron">Create Maintenance Task</h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Template Selector */}
+              {templates && templates.length > 0 && (
+                <div className="bg-viridian/10 border border-viridian/30 rounded-lg p-3">
+                  <label className="block text-sm font-medium text-viridian mb-2">
+                    Quick Start from Template
                   </label>
                   <select
-                    value={formData.assetId}
-                    onChange={(e) => setFormData({ ...formData, assetId: e.target.value })}
-                    className="input"
-                    required
+                    onChange={(e) => e.target.value && applyTemplate(e.target.value)}
+                    className="input text-sm"
+                    defaultValue=""
                   >
-                    <option value="">Select an asset</option>
-                    {assets?.map((asset: any) => (
-                      <option key={asset.id} value={asset.id}>
-                        {asset.name} - {asset.location || 'No location'}
+                    <option value="">Select a template to auto-fill...</option>
+                    {templates.map((template: any) => (
+                      <option key={template.id} value={template.id}>
+                        {template.title} ({template.priority})
                       </option>
                     ))}
                   </select>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Assign To
-                    </label>
-                    <select
-                      value={formData.assignedToId}
-                      onChange={(e) => setFormData({ ...formData, assignedToId: e.target.value })}
-                      className="input"
-                    >
-                      <option value="">Unassigned</option>
-                      {users?.map((user: any) => (
-                        <option key={user.id} value={user.id}>
-                          {user.firstName} {user.lastName}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Priority
-                    </label>
-                    <select
-                      value={formData.priority}
-                      onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-                      className="input"
-                    >
-                      <option value="LOW">Low</option>
-                      <option value="MEDIUM">Medium</option>
-                      <option value="HIGH">High</option>
-                      <option value="CRITICAL">Critical</option>
-                    </select>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Due Date
-                    </label>
-                    <input
-                      type="date"
-                      value={formData.dueDate}
-                      onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-                      className="input"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Est. Time (minutes)
-                    </label>
-                    <input
-                      type="number"
-                      value={formData.estimatedTime}
-                      onChange={(e) => setFormData({ ...formData, estimatedTime: e.target.value })}
-                      className="input"
-                      min="0"
-                    />
-                  </div>
-                </div>
-                <div className="border-t pt-4">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={formData.isRecurring}
-                      onChange={(e) => setFormData({ ...formData, isRecurring: e.target.checked })}
-                      className="rounded border-gray-300"
-                    />
-                    <span className="text-sm font-medium text-gray-700">Recurring Task</span>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium text-viridian/80 mb-1">
+                  Task Title *
+                </label>
+                <input
+                  type="text"
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  className="input"
+                  placeholder="e.g., Replace air filter"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-viridian/80 mb-1">
+                  Description
+                </label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  className="input"
+                  rows={3}
+                  placeholder="Describe the task..."
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-viridian/80 mb-1">
+                  Asset *
+                </label>
+                <select
+                  value={formData.assetId}
+                  onChange={(e) => setFormData({ ...formData, assetId: e.target.value })}
+                  className="input"
+                  required
+                >
+                  <option value="">Select an asset</option>
+                  {assets?.map((asset: any) => (
+                    <option key={asset.id} value={asset.id}>
+                      {asset.name} - {asset.location || 'No location'}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-viridian/80 mb-1">
+                    Assign To
                   </label>
-                  {formData.isRecurring && (
-                    <div className="grid grid-cols-2 gap-4 mt-3">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Frequency
-                        </label>
-                        <select
-                          value={formData.recurrenceType}
-                          onChange={(e) => setFormData({ ...formData, recurrenceType: e.target.value })}
-                          className="input"
-                        >
-                          <option value="DAILY">Daily</option>
-                          <option value="WEEKLY">Weekly</option>
-                          <option value="BIWEEKLY">Bi-weekly</option>
-                          <option value="MONTHLY">Monthly</option>
-                          <option value="QUARTERLY">Quarterly</option>
-                          <option value="YEARLY">Yearly</option>
-                          <option value="CUSTOM">Custom (days)</option>
-                        </select>
-                      </div>
-                      {formData.recurrenceType === 'CUSTOM' && (
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Every X Days
-                          </label>
-                          <input
-                            type="number"
-                            value={formData.recurrenceValue}
-                            onChange={(e) => setFormData({ ...formData, recurrenceValue: Number(e.target.value) })}
-                            className="input"
-                            min="1"
-                          />
-                        </div>
-                      )}
+                  <select
+                    value={formData.assignedToId}
+                    onChange={(e) => setFormData({ ...formData, assignedToId: e.target.value })}
+                    className="input"
+                  >
+                    <option value="">Unassigned</option>
+                    {users?.map((user: any) => (
+                      <option key={user.id} value={user.id}>
+                        {user.firstName} {user.lastName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-viridian/80 mb-1">
+                    Priority
+                  </label>
+                  <select
+                    value={formData.priority}
+                    onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
+                    className="input"
+                  >
+                    <option value="LOW">Low</option>
+                    <option value="MEDIUM">Medium</option>
+                    <option value="HIGH">High</option>
+                    <option value="CRITICAL">Critical</option>
+                  </select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-viridian/80 mb-1">
+                    Due Date
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.dueDate}
+                    onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
+                    className="input"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-viridian/80 mb-1">
+                    Est. Time (minutes)
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.estimatedTime}
+                    onChange={(e) => setFormData({ ...formData, estimatedTime: e.target.value })}
+                    className="input"
+                    min="0"
+                  />
+                </div>
+              </div>
+              <div className="border-t border-viridian/20 pt-4">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.isRecurring}
+                    onChange={(e) => setFormData({ ...formData, isRecurring: e.target.checked })}
+                    className="rounded border-viridian/30 accent-viridian"
+                  />
+                  <span className="text-sm font-medium text-viridian/80">Recurring Task</span>
+                </label>
+                {formData.isRecurring && (
+                  <div className="grid grid-cols-2 gap-4 mt-3">
+                    <div>
+                      <label className="block text-sm font-medium text-viridian/80 mb-1">
+                        Frequency
+                      </label>
+                      <select
+                        value={formData.recurrenceType}
+                        onChange={(e) => setFormData({ ...formData, recurrenceType: e.target.value })}
+                        className="input"
+                      >
+                        <option value="DAILY">Daily</option>
+                        <option value="WEEKLY">Weekly</option>
+                        <option value="BIWEEKLY">Bi-weekly</option>
+                        <option value="MONTHLY">Monthly</option>
+                        <option value="QUARTERLY">Quarterly</option>
+                        <option value="YEARLY">Yearly</option>
+                        <option value="CUSTOM">Custom (days)</option>
+                      </select>
                     </div>
-                  )}
-                </div>
-                <div className="flex gap-3 pt-4">
-                  <button type="button" onClick={() => setShowModal(false)} className="btn-secondary flex-1">
-                    Cancel
-                  </button>
-                  <button type="submit" disabled={createMutation.isPending} className="btn-primary flex-1">
-                    {createMutation.isPending ? 'Creating...' : 'Create Task'}
-                  </button>
-                </div>
-              </form>
-            </div>
+                    {formData.recurrenceType === 'CUSTOM' && (
+                      <div>
+                        <label className="block text-sm font-medium text-viridian/80 mb-1">
+                          Every X Days
+                        </label>
+                        <input
+                          type="number"
+                          value={formData.recurrenceValue}
+                          onChange={(e) => setFormData({ ...formData, recurrenceValue: Number(e.target.value) })}
+                          className="input"
+                          min="1"
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+              <div className="flex gap-3 pt-4">
+                <button type="button" onClick={() => setShowModal(false)} className="btn-secondary flex-1">
+                  Cancel
+                </button>
+                <button type="submit" disabled={createMutation.isPending} className="btn-primary flex-1">
+                  {createMutation.isPending ? 'Creating...' : 'Create Task'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

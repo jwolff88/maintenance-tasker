@@ -68,8 +68,8 @@ export default function Inspections() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Inspections</h1>
-          <p className="text-gray-600">Schedule and track property inspections</p>
+          <h1 className="text-2xl font-orbitron font-bold text-viridian">Inspections</h1>
+          <p className="text-viridian/60">Schedule and track property inspections</p>
         </div>
         <button onClick={() => setShowModal(true)} className="btn-primary flex items-center gap-2">
           <Plus className="w-4 h-4" />
@@ -105,7 +105,7 @@ export default function Inspections() {
       {/* Inspections List */}
       {isLoading ? (
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-viridian"></div>
         </div>
       ) : inspections?.length > 0 ? (
         <div className="space-y-3">
@@ -115,18 +115,18 @@ export default function Inspections() {
             const isScheduled = inspection.status === 'SCHEDULED';
 
             return (
-              <div key={inspection.id} className="card">
+              <div key={inspection.id} className="card-holo hover:shadow-viridian transition-shadow">
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-4">
                     <div className={`p-2 rounded-lg ${
-                      inspection.status === 'COMPLETED' ? 'bg-green-100' :
-                      inspection.status === 'FAILED' ? 'bg-red-100' :
-                      'bg-blue-100'
+                      inspection.status === 'COMPLETED' ? 'bg-green-500/20' :
+                      inspection.status === 'FAILED' ? 'bg-red-500/20' :
+                      'bg-blue-500/20'
                     }`}>
                       <StatusIcon className={`w-5 h-5 ${
-                        inspection.status === 'COMPLETED' ? 'text-green-600' :
-                        inspection.status === 'FAILED' ? 'text-red-600' :
-                        'text-blue-600'
+                        inspection.status === 'COMPLETED' ? 'text-green-400' :
+                        inspection.status === 'FAILED' ? 'text-red-400' :
+                        'text-blue-400'
                       }`} />
                     </div>
                     <div>
@@ -138,20 +138,20 @@ export default function Inspections() {
                       </div>
                       <Link
                         to={`/properties/${inspection.property.id}`}
-                        className="font-semibold text-gray-900 hover:text-primary-600"
+                        className="font-semibold text-viridian hover:text-viridian/80"
                       >
                         {inspection.property.name}
                       </Link>
-                      <p className="text-sm text-gray-600">{inspection.property.address}</p>
-                      <div className="flex items-center gap-1 mt-2 text-sm text-gray-500">
+                      <p className="text-sm text-viridian/60">{inspection.property.address}</p>
+                      <div className="flex items-center gap-1 mt-2 text-sm text-viridian/50">
                         <Calendar className="w-4 h-4" />
                         {format(new Date(inspection.scheduledAt), 'EEEE, MMMM d, yyyy h:mm a')}
                         {isPast && isScheduled && (
-                          <span className="text-red-600 ml-2">(Overdue)</span>
+                          <span className="text-red-400 ml-2">(Overdue)</span>
                         )}
                       </div>
                       {inspection.notes && (
-                        <p className="text-sm text-gray-600 mt-2">{inspection.notes}</p>
+                        <p className="text-sm text-viridian/60 mt-2">{inspection.notes}</p>
                       )}
                     </div>
                   </div>
@@ -181,20 +181,20 @@ export default function Inspections() {
                 </div>
 
                 {inspection.status === 'COMPLETED' && inspection.completedAt && (
-                  <div className="mt-3 pt-3 border-t text-sm text-gray-500">
+                  <div className="mt-3 pt-3 border-t border-viridian/20 text-sm text-viridian/50">
                     Completed on {format(new Date(inspection.completedAt), 'MMM d, yyyy h:mm a')}
                   </div>
                 )}
 
                 {(inspection.passedItems?.length > 0 || inspection.failedItems?.length > 0) && (
-                  <div className="mt-3 pt-3 border-t grid grid-cols-2 gap-4">
+                  <div className="mt-3 pt-3 border-t border-viridian/20 grid grid-cols-2 gap-4">
                     {inspection.passedItems?.length > 0 && (
                       <div>
-                        <p className="text-sm font-medium text-green-700 mb-1">Passed Items</p>
-                        <ul className="text-sm text-gray-600">
+                        <p className="text-sm font-medium text-green-400 mb-1">Passed Items</p>
+                        <ul className="text-sm text-viridian/60">
                           {inspection.passedItems.map((item: string, i: number) => (
                             <li key={i} className="flex items-center gap-1">
-                              <CheckCircle className="w-3 h-3 text-green-500" />
+                              <CheckCircle className="w-3 h-3 text-green-400" />
                               {item}
                             </li>
                           ))}
@@ -203,11 +203,11 @@ export default function Inspections() {
                     )}
                     {inspection.failedItems?.length > 0 && (
                       <div>
-                        <p className="text-sm font-medium text-red-700 mb-1">Failed Items</p>
-                        <ul className="text-sm text-gray-600">
+                        <p className="text-sm font-medium text-red-400 mb-1">Failed Items</p>
+                        <ul className="text-sm text-viridian/60">
                           {inspection.failedItems.map((item: string, i: number) => (
                             <li key={i} className="flex items-center gap-1">
-                              <XCircle className="w-3 h-3 text-red-500" />
+                              <XCircle className="w-3 h-3 text-red-400" />
                               {item}
                             </li>
                           ))}
@@ -222,9 +222,9 @@ export default function Inspections() {
         </div>
       ) : (
         <div className="text-center py-12">
-          <ClipboardCheck className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No inspections found</h3>
-          <p className="text-gray-600 mb-4">Schedule your first property inspection.</p>
+          <ClipboardCheck className="w-12 h-12 text-viridian/40 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-viridian mb-2">No inspections found</h3>
+          <p className="text-viridian/60 mb-4">Schedule your first property inspection.</p>
           <button onClick={() => setShowModal(true)} className="btn-primary">
             Schedule Inspection
           </button>
@@ -233,13 +233,13 @@ export default function Inspections() {
 
       {/* Schedule Inspection Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-gray-800/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full">
+        <div className="fixed inset-0 bg-forest/90 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="card-holo max-w-lg w-full">
             <div className="p-6">
-              <h2 className="text-xl font-semibold mb-6">Schedule Inspection</h2>
+              <h2 className="text-xl font-orbitron font-semibold text-viridian mb-6">Schedule Inspection</h2>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-viridian/70 mb-1">
                     Property *
                   </label>
                   <select
@@ -256,7 +256,7 @@ export default function Inspections() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-viridian/70 mb-1">
                       Type *
                     </label>
                     <select
@@ -270,7 +270,7 @@ export default function Inspections() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-viridian/70 mb-1">
                       Date & Time *
                     </label>
                     <input
@@ -283,7 +283,7 @@ export default function Inspections() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-viridian/70 mb-1">
                     Notes
                   </label>
                   <textarea

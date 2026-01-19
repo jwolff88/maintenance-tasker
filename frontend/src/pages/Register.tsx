@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Building2 } from 'lucide-react';
+import { Hexagon, Wrench } from 'lucide-react';
 
 export default function Register() {
   const navigate = useNavigate();
@@ -54,28 +54,34 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
-      <div className="max-w-md w-full">
+    <div className="min-h-screen flex items-center justify-center bg-forest bg-glow-spotlight py-12 px-4">
+      {/* Circuitry background overlay */}
+      <div className="fixed inset-0 bg-circuitry bg-parallax-slow pointer-events-none opacity-50" />
+
+      <div className="max-w-md w-full relative z-10">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-100 mb-4">
-            <Building2 className="w-8 h-8 text-primary-600" />
+          <div className="inline-flex items-center justify-center w-16 h-16 relative mb-4">
+            <Hexagon className="w-16 h-16 text-viridian animate-pulse-glow" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Wrench className="w-8 h-8 text-forest" />
+            </div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">Maintenance Tasker</h1>
-          <p className="mt-2 text-gray-600">Property Management Platform</p>
+          <h1 className="text-3xl font-bold text-viridian font-orbitron glow-viridian-text">MAINT HUB</h1>
+          <p className="mt-2 text-viridian/60">Property Management Platform</p>
         </div>
 
-        <div className="card">
-          <h2 className="text-xl font-semibold mb-6">Register your company</h2>
+        <div className="card-holo">
+          <h2 className="text-xl font-semibold mb-6 text-viridian font-orbitron">Register your company</h2>
 
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg text-sm">
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-viridian/80 mb-1">
                 Company Name
               </label>
               <input
@@ -90,7 +96,7 @@ export default function Register() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-viridian/80 mb-1">
                   First Name
                 </label>
                 <input
@@ -103,7 +109,7 @@ export default function Register() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-viridian/80 mb-1">
                   Last Name
                 </label>
                 <input
@@ -118,7 +124,7 @@ export default function Register() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-viridian/80 mb-1">
                 Email
               </label>
               <input
@@ -132,7 +138,7 @@ export default function Register() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-viridian/80 mb-1">
                 Password
               </label>
               <input
@@ -147,7 +153,7 @@ export default function Register() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-viridian/80 mb-1">
                 Confirm Password
               </label>
               <input
@@ -169,9 +175,9 @@ export default function Register() {
             </button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-gray-600">
+          <p className="mt-6 text-center text-sm text-viridian/60">
             Already have an account?{' '}
-            <Link to="/login" className="text-primary-600 hover:text-primary-700 font-medium">
+            <Link to="/login" className="text-viridian hover:text-viridian/80 font-medium">
               Sign in
             </Link>
           </p>

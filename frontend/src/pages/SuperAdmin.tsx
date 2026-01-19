@@ -44,8 +44,8 @@ export default function SuperAdmin() {
       <div className="flex items-center justify-center h-96">
         <div className="text-center">
           <Shield className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900">Access Denied</h2>
-          <p className="text-gray-600 mt-2">Super Admin privileges required</p>
+          <h2 className="text-2xl font-bold text-viridian font-orbitron">Access Denied</h2>
+          <p className="text-viridian/60 mt-2">Super Admin privileges required</p>
         </div>
       </div>
     );
@@ -110,18 +110,18 @@ export default function SuperAdmin() {
   });
 
   const planColors: Record<string, string> = {
-    TRIAL: 'bg-gray-100 text-gray-800',
-    STARTER: 'bg-blue-100 text-blue-800',
-    PRO: 'bg-purple-100 text-purple-800',
-    ENTERPRISE: 'bg-green-100 text-green-800',
+    TRIAL: 'badge-gray',
+    STARTER: 'badge-blue',
+    PRO: 'badge-yellow',
+    ENTERPRISE: 'badge-green',
   };
 
   const statusColors: Record<string, string> = {
-    TRIALING: 'bg-yellow-100 text-yellow-800',
-    ACTIVE: 'bg-green-100 text-green-800',
-    PAST_DUE: 'bg-red-100 text-red-800',
-    CANCELED: 'bg-gray-100 text-gray-800',
-    UNPAID: 'bg-red-100 text-red-800',
+    TRIALING: 'badge-yellow',
+    ACTIVE: 'badge-green',
+    PAST_DUE: 'badge-red',
+    CANCELED: 'badge-gray',
+    UNPAID: 'badge-red',
   };
 
   return (
@@ -129,59 +129,59 @@ export default function SuperAdmin() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <Shield className="w-7 h-7 text-primary-600" />
+          <h1 className="text-2xl font-bold text-viridian font-orbitron flex items-center gap-2">
+            <Shield className="w-7 h-7 text-viridian" />
             Super Admin Dashboard
           </h1>
-          <p className="text-gray-600">Platform-wide management and control</p>
+          <p className="text-viridian/60">Platform-wide management and control</p>
         </div>
       </div>
 
       {/* Stats Cards */}
       {!statsLoading && stats && (
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          <div className="card bg-gradient-to-br from-blue-500 to-blue-600 text-white">
-            <Building2 className="w-8 h-8 opacity-80" />
-            <p className="text-3xl font-bold mt-2">{stats.totalCompanies}</p>
-            <p className="text-sm opacity-80">Companies</p>
+          <div className="card-holo bg-gradient-to-br from-blue-500/20 to-blue-600/20 border-blue-500/30">
+            <Building2 className="w-8 h-8 text-blue-400" />
+            <p className="text-3xl font-bold mt-2 text-viridian">{stats.totalCompanies}</p>
+            <p className="text-sm text-viridian/60">Companies</p>
           </div>
-          <div className="card bg-gradient-to-br from-green-500 to-green-600 text-white">
-            <Users className="w-8 h-8 opacity-80" />
-            <p className="text-3xl font-bold mt-2">{stats.totalUsers}</p>
-            <p className="text-sm opacity-80">Users</p>
+          <div className="card-holo bg-gradient-to-br from-green-500/20 to-green-600/20 border-green-500/30">
+            <Users className="w-8 h-8 text-green-400" />
+            <p className="text-3xl font-bold mt-2 text-viridian">{stats.totalUsers}</p>
+            <p className="text-sm text-viridian/60">Users</p>
           </div>
-          <div className="card bg-gradient-to-br from-purple-500 to-purple-600 text-white">
-            <Building2 className="w-8 h-8 opacity-80" />
-            <p className="text-3xl font-bold mt-2">{stats.totalProperties}</p>
-            <p className="text-sm opacity-80">Properties</p>
+          <div className="card-holo bg-gradient-to-br from-purple-500/20 to-purple-600/20 border-purple-500/30">
+            <Building2 className="w-8 h-8 text-purple-400" />
+            <p className="text-3xl font-bold mt-2 text-viridian">{stats.totalProperties}</p>
+            <p className="text-sm text-viridian/60">Properties</p>
           </div>
-          <div className="card bg-gradient-to-br from-orange-500 to-orange-600 text-white">
-            <Activity className="w-8 h-8 opacity-80" />
-            <p className="text-3xl font-bold mt-2">{stats.totalTickets}</p>
-            <p className="text-sm opacity-80">Tickets</p>
+          <div className="card-holo bg-gradient-to-br from-orange-500/20 to-orange-600/20 border-orange-500/30">
+            <Activity className="w-8 h-8 text-orange-400" />
+            <p className="text-3xl font-bold mt-2 text-viridian">{stats.totalTickets}</p>
+            <p className="text-sm text-viridian/60">Tickets</p>
           </div>
-          <div className="card bg-gradient-to-br from-teal-500 to-teal-600 text-white">
-            <CheckCircle className="w-8 h-8 opacity-80" />
-            <p className="text-3xl font-bold mt-2">{stats.totalTasks}</p>
-            <p className="text-sm opacity-80">Tasks</p>
+          <div className="card-holo bg-gradient-to-br from-teal-500/20 to-teal-600/20 border-teal-500/30">
+            <CheckCircle className="w-8 h-8 text-teal-400" />
+            <p className="text-3xl font-bold mt-2 text-viridian">{stats.totalTasks}</p>
+            <p className="text-sm text-viridian/60">Tasks</p>
           </div>
-          <div className="card bg-gradient-to-br from-emerald-500 to-emerald-600 text-white">
-            <DollarSign className="w-8 h-8 opacity-80" />
-            <p className="text-3xl font-bold mt-2">${stats.mrr}</p>
-            <p className="text-sm opacity-80">MRR</p>
+          <div className="card-holo bg-gradient-to-br from-emerald-500/20 to-emerald-600/20 border-emerald-500/30">
+            <DollarSign className="w-8 h-8 text-emerald-400" />
+            <p className="text-3xl font-bold mt-2 text-viridian">${stats.mrr}</p>
+            <p className="text-sm text-viridian/60">MRR</p>
           </div>
         </div>
       )}
 
       {/* Plan Distribution */}
       {stats?.companiesByPlan && (
-        <div className="card">
-          <h3 className="font-semibold mb-4">Subscription Distribution</h3>
+        <div className="card-holo">
+          <h3 className="font-semibold mb-4 text-viridian font-orbitron">Subscription Distribution</h3>
           <div className="flex gap-4 flex-wrap">
             {stats.companiesByPlan.map((item: any) => (
               <div key={item.plan} className="flex items-center gap-2">
                 <span className={`badge ${planColors[item.plan]}`}>{item.plan}</span>
-                <span className="font-bold">{item.count}</span>
+                <span className="font-bold text-viridian">{item.count}</span>
               </div>
             ))}
           </div>
@@ -189,7 +189,7 @@ export default function SuperAdmin() {
       )}
 
       {/* Tabs */}
-      <div className="border-b border-gray-200">
+      <div className="border-b border-viridian/20">
         <div className="flex gap-4">
           {(['overview', 'companies', 'users', 'activity'] as const).map((tab) => (
             <button
@@ -197,8 +197,8 @@ export default function SuperAdmin() {
               onClick={() => setActiveTab(tab)}
               className={`px-4 py-3 border-b-2 font-medium text-sm capitalize ${
                 activeTab === tab
-                  ? 'border-primary-600 text-primary-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  ? 'border-viridian text-viridian'
+                  : 'border-transparent text-viridian/50 hover:text-viridian/70'
               }`}
             >
               {tab}
@@ -210,7 +210,7 @@ export default function SuperAdmin() {
       {/* Search */}
       {(activeTab === 'companies' || activeTab === 'users') && (
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-viridian/40 w-5 h-5" />
           <input
             type="text"
             placeholder={`Search ${activeTab}...`}
@@ -225,21 +225,21 @@ export default function SuperAdmin() {
       {activeTab === 'overview' && stats && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Recent Signups */}
-          <div className="card">
-            <h3 className="font-semibold mb-4 flex items-center gap-2">
+          <div className="card-holo">
+            <h3 className="font-semibold mb-4 flex items-center gap-2 text-viridian font-orbitron">
               <TrendingUp className="w-5 h-5 text-green-500" />
               Recent Signups
             </h3>
             <div className="space-y-3">
               {stats.recentSignups?.map((company: any) => (
-                <div key={company.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div key={company.id} className="flex items-center justify-between p-3 bg-viridian/5 border border-viridian/20 rounded-lg">
                   <div>
-                    <p className="font-medium">{company.name}</p>
-                    <p className="text-sm text-gray-500">{company.email}</p>
+                    <p className="font-medium text-viridian">{company.name}</p>
+                    <p className="text-sm text-viridian/50">{company.email}</p>
                   </div>
                   <div className="text-right">
                     <span className={`badge ${planColors[company.plan]}`}>{company.plan}</span>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-viridian/50 mt-1">
                       {format(new Date(company.createdAt), 'MMM d, yyyy')}
                     </p>
                   </div>
@@ -249,40 +249,40 @@ export default function SuperAdmin() {
           </div>
 
           {/* Quick Actions */}
-          <div className="card">
-            <h3 className="font-semibold mb-4">Quick Actions</h3>
+          <div className="card-holo">
+            <h3 className="font-semibold mb-4 text-viridian font-orbitron">Quick Actions</h3>
             <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => setActiveTab('companies')}
-                className="p-4 bg-blue-50 rounded-lg text-left hover:bg-blue-100 transition-colors"
+                className="p-4 bg-viridian/10 border border-viridian/30 rounded-lg text-left hover:bg-viridian/20 transition-colors"
               >
-                <Building2 className="w-6 h-6 text-blue-600 mb-2" />
-                <p className="font-medium">Manage Companies</p>
-                <p className="text-sm text-gray-500">View and edit all companies</p>
+                <Building2 className="w-6 h-6 text-viridian mb-2" />
+                <p className="font-medium text-viridian">Manage Companies</p>
+                <p className="text-sm text-viridian/50">View and edit all companies</p>
               </button>
               <button
                 onClick={() => setActiveTab('users')}
-                className="p-4 bg-green-50 rounded-lg text-left hover:bg-green-100 transition-colors"
+                className="p-4 bg-viridian/10 border border-viridian/30 rounded-lg text-left hover:bg-viridian/20 transition-colors"
               >
-                <Users className="w-6 h-6 text-green-600 mb-2" />
-                <p className="font-medium">Manage Users</p>
-                <p className="text-sm text-gray-500">View and edit all users</p>
+                <Users className="w-6 h-6 text-viridian mb-2" />
+                <p className="font-medium text-viridian">Manage Users</p>
+                <p className="text-sm text-viridian/50">View and edit all users</p>
               </button>
               <button
                 onClick={() => queryClient.invalidateQueries()}
-                className="p-4 bg-purple-50 rounded-lg text-left hover:bg-purple-100 transition-colors"
+                className="p-4 bg-viridian/10 border border-viridian/30 rounded-lg text-left hover:bg-viridian/20 transition-colors"
               >
-                <RefreshCw className="w-6 h-6 text-purple-600 mb-2" />
-                <p className="font-medium">Refresh Data</p>
-                <p className="text-sm text-gray-500">Reload all statistics</p>
+                <RefreshCw className="w-6 h-6 text-viridian mb-2" />
+                <p className="font-medium text-viridian">Refresh Data</p>
+                <p className="text-sm text-viridian/50">Reload all statistics</p>
               </button>
               <button
                 onClick={() => setActiveTab('activity')}
-                className="p-4 bg-orange-50 rounded-lg text-left hover:bg-orange-100 transition-colors"
+                className="p-4 bg-viridian/10 border border-viridian/30 rounded-lg text-left hover:bg-viridian/20 transition-colors"
               >
-                <Activity className="w-6 h-6 text-orange-600 mb-2" />
-                <p className="font-medium">View Activity</p>
-                <p className="text-sm text-gray-500">Recent platform activity</p>
+                <Activity className="w-6 h-6 text-viridian mb-2" />
+                <p className="font-medium text-viridian">View Activity</p>
+                <p className="text-sm text-viridian/50">Recent platform activity</p>
               </button>
             </div>
           </div>
@@ -291,28 +291,28 @@ export default function SuperAdmin() {
 
       {/* Companies Tab */}
       {activeTab === 'companies' && (
-        <div className="card overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+        <div className="card-holo overflow-hidden p-0">
+          <table className="min-w-full">
+            <thead className="bg-viridian/10 border-b border-viridian/20">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Company</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Plan</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Usage</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Created</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-viridian/70 uppercase font-orbitron">Company</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-viridian/70 uppercase font-orbitron">Plan</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-viridian/70 uppercase font-orbitron">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-viridian/70 uppercase font-orbitron">Usage</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-viridian/70 uppercase font-orbitron">Created</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-viridian/70 uppercase font-orbitron">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-viridian/10">
               {companiesLoading ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-4 text-center">Loading...</td>
+                  <td colSpan={6} className="px-6 py-4 text-center text-viridian/60">Loading...</td>
                 </tr>
               ) : companies?.map((company: any) => (
-                <tr key={company.id} className="hover:bg-gray-50">
+                <tr key={company.id} className="hover:bg-viridian/5">
                   <td className="px-6 py-4">
-                    <p className="font-medium">{company.name}</p>
-                    <p className="text-sm text-gray-500">{company.email}</p>
+                    <p className="font-medium text-viridian">{company.name}</p>
+                    <p className="text-sm text-viridian/50">{company.email}</p>
                   </td>
                   <td className="px-6 py-4">
                     <span className={`badge ${planColors[company.plan]}`}>{company.plan}</span>
@@ -322,10 +322,10 @@ export default function SuperAdmin() {
                       {company.subscriptionStatus}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
+                  <td className="px-6 py-4 text-sm text-viridian/60">
                     {company._count.users} users, {company._count.properties} properties
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
+                  <td className="px-6 py-4 text-sm text-viridian/60">
                     {format(new Date(company.createdAt), 'MMM d, yyyy')}
                   </td>
                   <td className="px-6 py-4 text-right">
@@ -335,7 +335,7 @@ export default function SuperAdmin() {
                           setSelectedCompany(company);
                           setShowGrantModal(true);
                         }}
-                        className="p-2 text-green-600 hover:bg-green-50 rounded"
+                        className="p-2 text-viridian hover:bg-viridian/20 rounded"
                         title="Grant Access"
                       >
                         <Gift className="w-4 h-4" />
@@ -346,7 +346,7 @@ export default function SuperAdmin() {
                             deleteCompanyMutation.mutate(company.id);
                           }
                         }}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded"
+                        className="p-2 text-red-400 hover:bg-red-500/20 rounded"
                         title="Delete Company"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -362,57 +362,57 @@ export default function SuperAdmin() {
 
       {/* Users Tab */}
       {activeTab === 'users' && (
-        <div className="card overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+        <div className="card-holo overflow-hidden p-0">
+          <table className="min-w-full">
+            <thead className="bg-viridian/10 border-b border-viridian/20">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Company</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Created</th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-viridian/70 uppercase font-orbitron">User</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-viridian/70 uppercase font-orbitron">Company</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-viridian/70 uppercase font-orbitron">Role</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-viridian/70 uppercase font-orbitron">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-viridian/70 uppercase font-orbitron">Created</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-viridian/70 uppercase font-orbitron">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-viridian/10">
               {usersLoading ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-4 text-center">Loading...</td>
+                  <td colSpan={6} className="px-6 py-4 text-center text-viridian/60">Loading...</td>
                 </tr>
               ) : users?.map((u: any) => (
-                <tr key={u.id} className="hover:bg-gray-50">
+                <tr key={u.id} className="hover:bg-viridian/5">
                   <td className="px-6 py-4">
-                    <p className="font-medium">{u.firstName} {u.lastName}</p>
-                    <p className="text-sm text-gray-500">{u.email}</p>
+                    <p className="font-medium text-viridian">{u.firstName} {u.lastName}</p>
+                    <p className="text-sm text-viridian/50">{u.email}</p>
                   </td>
                   <td className="px-6 py-4">
-                    <p className="text-sm">{u.company?.name}</p>
+                    <p className="text-sm text-viridian">{u.company?.name}</p>
                     <span className={`badge text-xs ${planColors[u.company?.plan]}`}>
                       {u.company?.plan}
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="badge bg-gray-100 text-gray-800">{u.role}</span>
+                    <span className="badge badge-gray">{u.role}</span>
                   </td>
                   <td className="px-6 py-4">
                     {u.isActive ? (
-                      <span className="flex items-center gap-1 text-green-600 text-sm">
+                      <span className="flex items-center gap-1 text-green-400 text-sm">
                         <CheckCircle className="w-4 h-4" /> Active
                       </span>
                     ) : (
-                      <span className="flex items-center gap-1 text-red-600 text-sm">
+                      <span className="flex items-center gap-1 text-red-400 text-sm">
                         <XCircle className="w-4 h-4" /> Inactive
                       </span>
                     )}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
+                  <td className="px-6 py-4 text-sm text-viridian/60">
                     {format(new Date(u.createdAt), 'MMM d, yyyy')}
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
                       <button
                         onClick={() => impersonateMutation.mutate(u.id)}
-                        className="p-2 text-blue-600 hover:bg-blue-50 rounded"
+                        className="p-2 text-viridian hover:bg-viridian/20 rounded"
                         title="Impersonate User"
                       >
                         <UserCheck className="w-4 h-4" />
@@ -430,19 +430,19 @@ export default function SuperAdmin() {
       {activeTab === 'activity' && activity && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Recent Users */}
-          <div className="card">
-            <h3 className="font-semibold mb-4">Recent Users</h3>
+          <div className="card-holo">
+            <h3 className="font-semibold mb-4 text-viridian font-orbitron">Recent Users</h3>
             <div className="space-y-3">
               {activity.recentUsers?.map((u: any) => (
-                <div key={u.id} className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded">
-                  <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-600 font-medium">
+                <div key={u.id} className="flex items-center gap-3 p-2 hover:bg-viridian/5 rounded">
+                  <div className="w-8 h-8 rounded-full bg-viridian/20 flex items-center justify-center text-viridian font-medium">
                     {u.firstName?.[0]}{u.lastName?.[0]}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm truncate">{u.firstName} {u.lastName}</p>
-                    <p className="text-xs text-gray-500">{u.company?.name}</p>
+                    <p className="font-medium text-sm truncate text-viridian">{u.firstName} {u.lastName}</p>
+                    <p className="text-xs text-viridian/50">{u.company?.name}</p>
                   </div>
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-viridian/40">
                     {format(new Date(u.createdAt), 'MMM d')}
                   </span>
                 </div>
@@ -451,18 +451,18 @@ export default function SuperAdmin() {
           </div>
 
           {/* Recent Tickets */}
-          <div className="card">
-            <h3 className="font-semibold mb-4">Recent Tickets</h3>
+          <div className="card-holo">
+            <h3 className="font-semibold mb-4 text-viridian font-orbitron">Recent Tickets</h3>
             <div className="space-y-3">
               {activity.recentTickets?.map((t: any) => (
-                <div key={t.id} className="p-2 hover:bg-gray-50 rounded">
-                  <p className="font-medium text-sm truncate">{t.title}</p>
+                <div key={t.id} className="p-2 hover:bg-viridian/5 rounded">
+                  <p className="font-medium text-sm truncate text-viridian">{t.title}</p>
                   <div className="flex items-center gap-2 mt-1">
                     <span className={`badge text-xs ${
                       t.priority === 'URGENT' ? 'badge-red' :
                       t.priority === 'HIGH' ? 'badge-yellow' : 'badge-gray'
                     }`}>{t.priority}</span>
-                    <span className="text-xs text-gray-500">{t.property?.company?.name}</span>
+                    <span className="text-xs text-viridian/50">{t.property?.company?.name}</span>
                   </div>
                 </div>
               ))}
@@ -470,18 +470,18 @@ export default function SuperAdmin() {
           </div>
 
           {/* Recent Tasks */}
-          <div className="card">
-            <h3 className="font-semibold mb-4">Recent Tasks</h3>
+          <div className="card-holo">
+            <h3 className="font-semibold mb-4 text-viridian font-orbitron">Recent Tasks</h3>
             <div className="space-y-3">
               {activity.recentTasks?.map((t: any) => (
-                <div key={t.id} className="p-2 hover:bg-gray-50 rounded">
-                  <p className="font-medium text-sm truncate">{t.title}</p>
+                <div key={t.id} className="p-2 hover:bg-viridian/5 rounded">
+                  <p className="font-medium text-sm truncate text-viridian">{t.title}</p>
                   <div className="flex items-center gap-2 mt-1">
                     <span className={`badge text-xs ${
                       t.status === 'COMPLETED' ? 'badge-green' :
                       t.status === 'IN_PROGRESS' ? 'badge-yellow' : 'badge-gray'
                     }`}>{t.status}</span>
-                    <span className="text-xs text-gray-500">{t.company?.name}</span>
+                    <span className="text-xs text-viridian/50">{t.company?.name}</span>
                   </div>
                 </div>
               ))}
@@ -492,13 +492,13 @@ export default function SuperAdmin() {
 
       {/* Grant Access Modal */}
       {showGrantModal && selectedCompany && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h3 className="text-lg font-semibold mb-4">Grant Access to {selectedCompany.name}</h3>
+        <div className="fixed inset-0 bg-forest/90 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="card-holo w-full max-w-md">
+            <h3 className="text-lg font-semibold mb-4 text-viridian font-orbitron">Grant Access to {selectedCompany.name}</h3>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Plan</label>
+                <label className="block text-sm font-medium text-viridian/80 mb-1">Plan</label>
                 <select
                   value={grantForm.plan}
                   onChange={(e) => setGrantForm({ ...grantForm, plan: e.target.value })}
@@ -511,7 +511,7 @@ export default function SuperAdmin() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Duration (months)</label>
+                <label className="block text-sm font-medium text-viridian/80 mb-1">Duration (months)</label>
                 <input
                   type="number"
                   value={grantForm.months}

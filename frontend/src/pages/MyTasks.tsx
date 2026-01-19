@@ -70,39 +70,39 @@ export default function MyTasks() {
   };
 
   const statusColors: Record<string, string> = {
-    OPEN: 'bg-blue-100 text-blue-800',
-    IN_PROGRESS: 'bg-yellow-100 text-yellow-800',
-    UNDER_REVIEW: 'bg-purple-100 text-purple-800',
-    COMPLETED: 'bg-green-100 text-green-800',
-    NEW: 'bg-blue-100 text-blue-800',
+    OPEN: 'badge-blue',
+    IN_PROGRESS: 'badge-yellow',
+    UNDER_REVIEW: 'badge-yellow',
+    COMPLETED: 'badge-green',
+    NEW: 'badge-blue',
   };
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">My Work</h1>
-        <p className="text-gray-600">Tasks and tickets assigned to you</p>
+        <h1 className="text-2xl font-bold text-viridian font-orbitron">My Work</h1>
+        <p className="text-viridian/60">Tasks and tickets assigned to you</p>
       </div>
 
       {/* Time Clock Card */}
-      <div className={`card ${isClockedIn ? 'bg-green-50 border-green-200' : 'bg-gray-50'}`}>
+      <div className={`card-holo ${isClockedIn ? 'border-green-500/50 bg-green-500/10' : ''}`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className={`p-3 rounded-full ${isClockedIn ? 'bg-green-100' : 'bg-gray-200'}`}>
-              <Clock className={`w-6 h-6 ${isClockedIn ? 'text-green-600' : 'text-gray-500'}`} />
+            <div className={`p-3 rounded-full ${isClockedIn ? 'bg-green-500/20' : 'bg-viridian/20'}`}>
+              <Clock className={`w-6 h-6 ${isClockedIn ? 'text-green-400' : 'text-viridian/60'}`} />
             </div>
             <div>
-              <p className="font-semibold text-lg">
+              <p className="font-semibold text-lg text-viridian">
                 {isClockedIn ? 'Currently Working' : 'Not Clocked In'}
               </p>
               {isClockedIn && (
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-viridian/60">
                   <p>Started: {format(new Date(currentTimeEntry.clockIn), 'h:mm a')}</p>
-                  <p className="font-medium text-green-700">
+                  <p className="font-medium text-green-400">
                     Duration: {Math.floor(clockedInDuration / 60)}h {clockedInDuration % 60}m
                   </p>
                   {currentTimeEntry.task && (
-                    <p className="text-primary-600">Task: {currentTimeEntry.task.title}</p>
+                    <p className="text-viridian">Task: {currentTimeEntry.task.title}</p>
                   )}
                 </div>
               )}
@@ -113,7 +113,7 @@ export default function MyTasks() {
               <button
                 onClick={() => clockOutMutation.mutate({})}
                 disabled={clockOutMutation.isPending}
-                className="btn-secondary flex items-center gap-2 bg-red-100 text-red-700 hover:bg-red-200 border-red-200"
+                className="btn-secondary flex items-center gap-2 border-red-500/50 text-red-400 hover:bg-red-500/20"
               >
                 <Square className="w-4 h-4" />
                 {clockOutMutation.isPending ? 'Stopping...' : 'Clock Out'}
@@ -134,27 +134,27 @@ export default function MyTasks() {
 
       {/* Quick Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="card">
-          <p className="text-sm text-gray-500">Open Tasks</p>
-          <p className="text-2xl font-bold">
+        <div className="card-holo">
+          <p className="text-sm text-viridian/60">Open Tasks</p>
+          <p className="text-2xl font-bold text-viridian">
             {myTasks?.filter((t: any) => t.status === 'OPEN').length || 0}
           </p>
         </div>
-        <div className="card">
-          <p className="text-sm text-gray-500">In Progress</p>
-          <p className="text-2xl font-bold text-yellow-600">
+        <div className="card-holo">
+          <p className="text-sm text-viridian/60">In Progress</p>
+          <p className="text-2xl font-bold text-yellow-400">
             {myTasks?.filter((t: any) => t.status === 'IN_PROGRESS').length || 0}
           </p>
         </div>
-        <div className="card">
-          <p className="text-sm text-gray-500">Open Tickets</p>
-          <p className="text-2xl font-bold">
+        <div className="card-holo">
+          <p className="text-sm text-viridian/60">Open Tickets</p>
+          <p className="text-2xl font-bold text-viridian">
             {myTickets?.filter((t: any) => ['NEW', 'IN_PROGRESS'].includes(t.status)).length || 0}
           </p>
         </div>
-        <div className="card">
-          <p className="text-sm text-gray-500">Due Today</p>
-          <p className="text-2xl font-bold text-red-600">
+        <div className="card-holo">
+          <p className="text-sm text-viridian/60">Due Today</p>
+          <p className="text-2xl font-bold text-red-400">
             {myTasks?.filter((t: any) => {
               if (!t.dueDate) return false;
               const due = new Date(t.dueDate);
@@ -166,14 +166,14 @@ export default function MyTasks() {
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-gray-200">
+      <div className="border-b border-viridian/20">
         <div className="flex gap-4">
           <button
             onClick={() => setActiveTab('tasks')}
             className={`flex items-center gap-2 px-4 py-3 border-b-2 font-medium text-sm ${
               activeTab === 'tasks'
-                ? 'border-primary-600 text-primary-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                ? 'border-viridian text-viridian'
+                : 'border-transparent text-viridian/50 hover:text-viridian/70'
             }`}
           >
             <ClipboardList className="w-4 h-4" />
@@ -183,8 +183,8 @@ export default function MyTasks() {
             onClick={() => setActiveTab('tickets')}
             className={`flex items-center gap-2 px-4 py-3 border-b-2 font-medium text-sm ${
               activeTab === 'tickets'
-                ? 'border-primary-600 text-primary-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                ? 'border-viridian text-viridian'
+                : 'border-transparent text-viridian/50 hover:text-viridian/70'
             }`}
           >
             <Wrench className="w-4 h-4" />
@@ -198,29 +198,29 @@ export default function MyTasks() {
         <div className="space-y-3">
           {tasksLoading ? (
             <div className="flex items-center justify-center h-32">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-viridian"></div>
             </div>
           ) : myTasks?.length > 0 ? (
             myTasks.map((task: any) => (
-              <div key={task.id} className="card hover:shadow-md transition-shadow">
+              <div key={task.id} className="card-holo hover:shadow-viridian transition-shadow">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       <span className={`badge ${priorityColors[task.priority]}`}>{task.priority}</span>
                       <span className={`badge ${statusColors[task.status]}`}>{task.status.replace(/_/g, ' ')}</span>
                     </div>
-                    <Link to={`/maintenance-tasks/${task.id}`} className="font-semibold hover:text-primary-600">
+                    <Link to={`/maintenance-tasks/${task.id}`} className="font-semibold hover:text-viridian text-viridian">
                       {task.title}
                     </Link>
                     {task.asset && (
-                      <p className="text-sm text-gray-500 mt-1">
+                      <p className="text-sm text-viridian/50 mt-1">
                         <MapPin className="w-3 h-3 inline mr-1" />
                         {task.asset.name} {task.asset.location && `- ${task.asset.location}`}
                       </p>
                     )}
                     {task.dueDate && (
                       <p className={`text-sm mt-1 flex items-center gap-1 ${
-                        new Date(task.dueDate) < new Date() ? 'text-red-600' : 'text-gray-500'
+                        new Date(task.dueDate) < new Date() ? 'text-red-400' : 'text-viridian/50'
                       }`}>
                         <Calendar className="w-3 h-3" />
                         Due: {format(new Date(task.dueDate), 'MMM d, h:mm a')}
@@ -259,7 +259,7 @@ export default function MyTasks() {
               </div>
             ))
           ) : (
-            <div className="text-center py-12 text-gray-500">
+            <div className="text-center py-12 text-viridian/50">
               <ClipboardList className="w-12 h-12 mx-auto mb-4 opacity-50" />
               <p>No tasks assigned to you</p>
             </div>
@@ -272,7 +272,7 @@ export default function MyTasks() {
         <div className="space-y-3">
           {ticketsLoading ? (
             <div className="flex items-center justify-center h-32">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-viridian"></div>
             </div>
           ) : myTickets?.filter((t: any) => !['COMPLETED', 'CANCELLED'].includes(t.status)).length > 0 ? (
             myTickets
@@ -281,7 +281,7 @@ export default function MyTasks() {
                 <Link
                   key={ticket.id}
                   to={`/tickets/${ticket.id}`}
-                  className="card block hover:shadow-md transition-shadow"
+                  className="card-holo block hover:shadow-viridian transition-shadow"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -292,22 +292,22 @@ export default function MyTasks() {
                         </span>
                         <span className="badge badge-gray">{ticket.category.replace(/_/g, ' ')}</span>
                       </div>
-                      <h3 className="font-semibold">{ticket.title}</h3>
+                      <h3 className="font-semibold text-viridian">{ticket.title}</h3>
                       {ticket.property && (
-                        <p className="text-sm text-gray-500 mt-1">
+                        <p className="text-sm text-viridian/50 mt-1">
                           <MapPin className="w-3 h-3 inline mr-1" />
                           {ticket.property.name} - {ticket.property.address}
                         </p>
                       )}
                     </div>
-                    <div className="text-right text-sm text-gray-500">
+                    <div className="text-right text-sm text-viridian/50">
                       {format(new Date(ticket.createdAt), 'MMM d')}
                     </div>
                   </div>
                 </Link>
               ))
           ) : (
-            <div className="text-center py-12 text-gray-500">
+            <div className="text-center py-12 text-viridian/50">
               <Wrench className="w-12 h-12 mx-auto mb-4 opacity-50" />
               <p>No open tickets assigned to you</p>
             </div>

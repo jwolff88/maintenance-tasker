@@ -13,12 +13,12 @@ const priorityColors = {
 };
 
 const statusColors = {
-  NEW: 'bg-blue-100 text-blue-800',
-  IN_PROGRESS: 'bg-yellow-100 text-yellow-800',
-  WAITING_ON_TENANT: 'bg-orange-100 text-orange-800',
-  WAITING_ON_VENDOR: 'bg-purple-100 text-purple-800',
-  COMPLETED: 'bg-green-100 text-green-800',
-  CANCELLED: 'bg-gray-100 text-gray-800',
+  NEW: 'badge-blue',
+  IN_PROGRESS: 'badge-yellow',
+  WAITING_ON_TENANT: 'badge-yellow',
+  WAITING_ON_VENDOR: 'badge-yellow',
+  COMPLETED: 'badge-green',
+  CANCELLED: 'badge-gray',
 };
 
 const categories = [
@@ -42,11 +42,11 @@ function SlaCountdown({ ticket }: { ticket: any }) {
 
   if (isCompleted) {
     return ticket.slaStatus === 'MET' ? (
-      <span className="flex items-center gap-1 text-xs text-green-600 bg-green-50 px-2 py-1 rounded">
+      <span className="flex items-center gap-1 text-xs text-viridian bg-viridian/10 px-2 py-1 rounded border border-viridian/30">
         <CheckCircle2 className="w-3 h-3" /> SLA Met
       </span>
     ) : (
-      <span className="flex items-center gap-1 text-xs text-red-600 bg-red-50 px-2 py-1 rounded">
+      <span className="flex items-center gap-1 text-xs text-red-400 bg-red-500/10 px-2 py-1 rounded border border-red-500/30">
         <AlertCircle className="w-3 h-3" /> SLA Breached
       </span>
     );
@@ -60,7 +60,7 @@ function SlaCountdown({ ticket }: { ticket: any }) {
     const breachedHours = Math.abs(Math.floor(remainingMs / (1000 * 60 * 60)));
     const breachedMins = Math.abs(Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60)));
     return (
-      <span className="flex items-center gap-1 text-xs text-red-600 bg-red-50 px-2 py-1 rounded animate-pulse">
+      <span className="flex items-center gap-1 text-xs text-red-400 bg-red-500/10 px-2 py-1 rounded border border-red-500/30 animate-pulse">
         <AlertCircle className="w-3 h-3" />
         SLA Breached ({breachedHours}h {breachedMins}m ago)
       </span>
@@ -71,8 +71,8 @@ function SlaCountdown({ ticket }: { ticket: any }) {
   const minutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
 
   return (
-    <span className={`flex items-center gap-1 text-xs px-2 py-1 rounded ${
-      isWarning ? 'text-orange-600 bg-orange-50 animate-pulse' : 'text-blue-600 bg-blue-50'
+    <span className={`flex items-center gap-1 text-xs px-2 py-1 rounded border ${
+      isWarning ? 'text-bronze bg-bronze/10 border-bronze/30 animate-pulse' : 'text-teal bg-teal/10 border-teal/30'
     }`}>
       <Timer className="w-3 h-3" />
       {hours}h {minutes}m left
@@ -138,8 +138,8 @@ export default function Tickets() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Maintenance Tickets</h1>
-          <p className="text-gray-600">Track and manage maintenance requests</p>
+          <h1 className="text-2xl font-bold text-viridian">Maintenance Tickets</h1>
+          <p className="text-viridian/60">Track and manage maintenance requests</p>
         </div>
         <button onClick={() => setShowModal(true)} className="btn-primary flex items-center gap-2">
           <Plus className="w-4 h-4" />
@@ -177,7 +177,7 @@ export default function Tickets() {
       {/* Tickets List */}
       {isLoading ? (
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-viridian"></div>
         </div>
       ) : tickets?.length > 0 ? (
         <div className="space-y-3">
@@ -185,7 +185,7 @@ export default function Tickets() {
             <Link
               key={ticket.id}
               to={`/tickets/${ticket.id}`}
-              className="card block hover:shadow-md transition-shadow"
+              className="card-holo block hover:shadow-viridian transition-all duration-300"
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
@@ -199,9 +199,9 @@ export default function Tickets() {
                     <span className="badge badge-gray">{ticket.category.replace(/_/g, ' ')}</span>
                     <SlaCountdown ticket={ticket} />
                   </div>
-                  <h3 className="font-semibold text-gray-900">{ticket.title}</h3>
-                  <p className="text-sm text-gray-600 mt-1 line-clamp-2">{ticket.description}</p>
-                  <div className="flex items-center gap-4 mt-3 text-sm text-gray-500">
+                  <h3 className="font-semibold text-viridian">{ticket.title}</h3>
+                  <p className="text-sm text-viridian/60 mt-1 line-clamp-2">{ticket.description}</p>
+                  <div className="flex items-center gap-4 mt-3 text-sm text-viridian/50">
                     <div className="flex items-center gap-1">
                       <Wrench className="w-3.5 h-3.5" />
                       {ticket.property.name}
@@ -219,7 +219,7 @@ export default function Tickets() {
                   </div>
                 </div>
                 {ticket._count.comments > 0 && (
-                  <div className="text-sm text-gray-500">
+                  <div className="text-sm text-viridian/50">
                     {ticket._count.comments} comment{ticket._count.comments !== 1 ? 's' : ''}
                   </div>
                 )}
@@ -228,10 +228,10 @@ export default function Tickets() {
           ))}
         </div>
       ) : (
-        <div className="text-center py-12">
-          <Wrench className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No tickets found</h3>
-          <p className="text-gray-600 mb-4">Create your first maintenance ticket.</p>
+        <div className="text-center py-12 card-holo">
+          <Wrench className="w-12 h-12 text-viridian/40 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-viridian mb-2">No tickets found</h3>
+          <p className="text-viridian/60 mb-4">Create your first maintenance ticket.</p>
           <button onClick={() => setShowModal(true)} className="btn-primary">
             New Ticket
           </button>
@@ -240,121 +240,119 @@ export default function Tickets() {
 
       {/* Create Ticket Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-gray-800/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <h2 className="text-xl font-semibold mb-6">Create Maintenance Ticket</h2>
-              <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="fixed inset-0 bg-forest/90 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="card-holo max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            <h2 className="text-xl font-semibold mb-6 text-viridian font-orbitron">Create Maintenance Ticket</h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-viridian/80 mb-1">
+                  Property *
+                </label>
+                <select
+                  value={formData.propertyId}
+                  onChange={(e) => setFormData({ ...formData, propertyId: e.target.value })}
+                  className="input"
+                  required
+                >
+                  <option value="">Select property</option>
+                  {properties?.map((p: any) => (
+                    <option key={p.id} value={p.id}>{p.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-viridian/80 mb-1">
+                  Title *
+                </label>
+                <input
+                  type="text"
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  className="input"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-viridian/80 mb-1">
+                  Description *
+                </label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  className="input min-h-[100px]"
+                  required
+                />
+              </div>
+              {/* AI Triage Toggle */}
+              <div className="p-4 bg-viridian/10 rounded-lg border border-viridian/30">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.useAiTriage}
+                    onChange={(e) => setFormData({ ...formData, useAiTriage: e.target.checked })}
+                    className="mt-1 w-4 h-4 accent-viridian rounded"
+                  />
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-viridian" />
+                      <span className="font-medium text-viridian">AI Smart Triage</span>
+                    </div>
+                    <p className="text-sm text-viridian/60 mt-1">
+                      Let AI analyze the issue and suggest the best category, priority, and fix
+                    </p>
+                  </div>
+                </label>
+              </div>
+
+              <div className={`grid grid-cols-2 gap-4 ${formData.useAiTriage ? 'opacity-50' : ''}`}>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Property *
+                  <label className="block text-sm font-medium text-viridian/80 mb-1">
+                    Priority {formData.useAiTriage && <span className="text-viridian text-xs">(AI will set)</span>}
                   </label>
                   <select
-                    value={formData.propertyId}
-                    onChange={(e) => setFormData({ ...formData, propertyId: e.target.value })}
+                    value={formData.priority}
+                    onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
                     className="input"
-                    required
+                    disabled={formData.useAiTriage}
                   >
-                    <option value="">Select property</option>
-                    {properties?.map((p: any) => (
-                      <option key={p.id} value={p.id}>{p.name}</option>
-                    ))}
+                    <option value="LOW">Low</option>
+                    <option value="MEDIUM">Medium</option>
+                    <option value="HIGH">High</option>
+                    <option value="URGENT">Urgent</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Title *
+                  <label className="block text-sm font-medium text-viridian/80 mb-1">
+                    Category {formData.useAiTriage && <span className="text-viridian text-xs">(AI will set)</span>}
                   </label>
-                  <input
-                    type="text"
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  <select
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                     className="input"
-                    required
-                  />
+                    disabled={formData.useAiTriage}
+                  >
+                    {categories.map((cat) => (
+                      <option key={cat} value={cat}>{cat.replace(/_/g, ' ')}</option>
+                    ))}
+                  </select>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Description *
-                  </label>
-                  <textarea
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    className="input min-h-[100px]"
-                    required
-                  />
-                </div>
-                {/* AI Triage Toggle */}
-                <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100">
-                  <label className="flex items-start gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={formData.useAiTriage}
-                      onChange={(e) => setFormData({ ...formData, useAiTriage: e.target.checked })}
-                      className="mt-1 w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                    />
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <Sparkles className="w-4 h-4 text-blue-600" />
-                        <span className="font-medium text-blue-900">AI Smart Triage</span>
-                      </div>
-                      <p className="text-sm text-blue-700 mt-1">
-                        Let AI analyze the issue and suggest the best category, priority, and fix
-                      </p>
-                    </div>
-                  </label>
-                </div>
-
-                <div className={`grid grid-cols-2 gap-4 ${formData.useAiTriage ? 'opacity-50' : ''}`}>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Priority {formData.useAiTriage && <span className="text-blue-600 text-xs">(AI will set)</span>}
-                    </label>
-                    <select
-                      value={formData.priority}
-                      onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-                      className="input"
-                      disabled={formData.useAiTriage}
-                    >
-                      <option value="LOW">Low</option>
-                      <option value="MEDIUM">Medium</option>
-                      <option value="HIGH">High</option>
-                      <option value="URGENT">Urgent</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Category {formData.useAiTriage && <span className="text-blue-600 text-xs">(AI will set)</span>}
-                    </label>
-                    <select
-                      value={formData.category}
-                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                      className="input"
-                      disabled={formData.useAiTriage}
-                    >
-                      {categories.map((cat) => (
-                        <option key={cat} value={cat}>{cat.replace(/_/g, ' ')}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-                <div className="flex gap-3 pt-4">
-                  <button type="button" onClick={() => setShowModal(false)} className="btn-secondary flex-1">
-                    Cancel
-                  </button>
-                  <button type="submit" disabled={createMutation.isPending} className="btn-primary flex-1 flex items-center justify-center gap-2">
-                    {createMutation.isPending ? (
-                      formData.useAiTriage ? 'AI Analyzing...' : 'Creating...'
-                    ) : (
-                      <>
-                        {formData.useAiTriage && <Sparkles className="w-4 h-4" />}
-                        {formData.useAiTriage ? 'Create with AI Triage' : 'Create Ticket'}
-                      </>
-                    )}
-                  </button>
-                </div>
-              </form>
-            </div>
+              </div>
+              <div className="flex gap-3 pt-4">
+                <button type="button" onClick={() => setShowModal(false)} className="btn-secondary flex-1">
+                  Cancel
+                </button>
+                <button type="submit" disabled={createMutation.isPending} className="btn-primary flex-1 flex items-center justify-center gap-2">
+                  {createMutation.isPending ? (
+                    formData.useAiTriage ? 'AI Analyzing...' : 'Creating...'
+                  ) : (
+                    <>
+                      {formData.useAiTriage && <Sparkles className="w-4 h-4" />}
+                      {formData.useAiTriage ? 'Create with AI Triage' : 'Create Ticket'}
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

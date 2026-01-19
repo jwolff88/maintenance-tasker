@@ -9,18 +9,18 @@ import {
 import { format } from 'date-fns';
 
 const statusColors: Record<string, string> = {
-  OPEN: 'bg-yellow-100 text-yellow-800',
-  IN_PROGRESS: 'bg-blue-100 text-blue-800',
-  UNDER_REVIEW: 'bg-purple-100 text-purple-800',
-  COMPLETED: 'bg-green-100 text-green-800',
-  CANCELLED: 'bg-gray-100 text-gray-800',
+  OPEN: 'badge-yellow',
+  IN_PROGRESS: 'badge-blue',
+  UNDER_REVIEW: 'badge-yellow',
+  COMPLETED: 'badge-green',
+  CANCELLED: 'badge-gray',
 };
 
 const priorityColors: Record<string, string> = {
-  LOW: 'bg-gray-100 text-gray-800',
-  MEDIUM: 'bg-blue-100 text-blue-800',
-  HIGH: 'bg-orange-100 text-orange-800',
-  CRITICAL: 'bg-red-100 text-red-800',
+  LOW: 'badge-gray',
+  MEDIUM: 'badge-blue',
+  HIGH: 'badge-yellow',
+  CRITICAL: 'badge-red',
 };
 
 export default function TaskDetail() {
@@ -87,7 +87,7 @@ export default function TaskDetail() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-viridian"></div>
       </div>
     );
   }
@@ -95,8 +95,8 @@ export default function TaskDetail() {
   if (!task) {
     return (
       <div className="text-center py-12">
-        <h2 className="text-xl font-semibold text-gray-900">Task not found</h2>
-        <Link to="/maintenance-tasks" className="text-primary-600 hover:underline mt-2 inline-block">
+        <h2 className="text-xl font-semibold text-viridian">Task not found</h2>
+        <Link to="/maintenance-tasks" className="text-viridian hover:underline mt-2 inline-block">
           Back to Tasks
         </Link>
       </div>
@@ -109,19 +109,19 @@ export default function TaskDetail() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <button onClick={() => navigate('/maintenance-tasks')} className="p-2 hover:bg-gray-100 rounded-lg">
+        <button onClick={() => navigate('/maintenance-tasks')} className="p-2 hover:bg-viridian/10 rounded-lg text-viridian">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div className="flex-1">
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-gray-900">{task.title}</h1>
+            <h1 className="text-2xl font-bold text-viridian font-orbitron">{task.title}</h1>
             {isOverdue && (
-              <span className="flex items-center gap-1 text-sm text-red-600 bg-red-50 px-2 py-1 rounded">
+              <span className="flex items-center gap-1 text-sm text-red-400 bg-red-500/20 px-2 py-1 rounded">
                 <AlertTriangle className="w-4 h-4" /> Overdue
               </span>
             )}
           </div>
-          <p className="text-gray-600">
+          <p className="text-viridian/60">
             <Link to={`/assets/${task.asset?.id}`} className="hover:underline">
               {task.asset?.name}
             </Link>
@@ -140,27 +140,27 @@ export default function TaskDetail() {
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Task Details */}
-          <div className="card">
-            <h3 className="font-semibold text-gray-900 mb-4">Task Details</h3>
+          <div className="card-holo">
+            <h3 className="font-semibold text-viridian mb-4 font-orbitron">Task Details</h3>
             {task.description && (
-              <p className="text-gray-700 mb-4">{task.description}</p>
+              <p className="text-viridian/70 mb-4">{task.description}</p>
             )}
             <div className="grid grid-cols-2 gap-4">
               {task.assignedTo && (
                 <div className="flex items-center gap-2">
-                  <User className="w-4 h-4 text-gray-400" />
+                  <User className="w-4 h-4 text-viridian/40" />
                   <div>
-                    <p className="text-sm text-gray-500">Assigned To</p>
-                    <p className="font-medium">{task.assignedTo.firstName} {task.assignedTo.lastName}</p>
+                    <p className="text-sm text-viridian/50">Assigned To</p>
+                    <p className="font-medium text-viridian">{task.assignedTo.firstName} {task.assignedTo.lastName}</p>
                   </div>
                 </div>
               )}
               {task.dueDate && (
                 <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-gray-400" />
+                  <Calendar className="w-4 h-4 text-viridian/40" />
                   <div>
-                    <p className="text-sm text-gray-500">Due Date</p>
-                    <p className={`font-medium ${isOverdue ? 'text-red-600' : ''}`}>
+                    <p className="text-sm text-viridian/50">Due Date</p>
+                    <p className={`font-medium ${isOverdue ? 'text-red-400' : 'text-viridian'}`}>
                       {format(new Date(task.dueDate), 'MMM d, yyyy')}
                     </p>
                   </div>
@@ -168,26 +168,26 @@ export default function TaskDetail() {
               )}
               {task.estimatedTime && (
                 <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-gray-400" />
+                  <Clock className="w-4 h-4 text-viridian/40" />
                   <div>
-                    <p className="text-sm text-gray-500">Estimated Time</p>
-                    <p className="font-medium">{task.estimatedTime} min</p>
+                    <p className="text-sm text-viridian/50">Estimated Time</p>
+                    <p className="font-medium text-viridian">{task.estimatedTime} min</p>
                   </div>
                 </div>
               )}
               {task.actualTime && (
                 <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-gray-400" />
+                  <Clock className="w-4 h-4 text-viridian/40" />
                   <div>
-                    <p className="text-sm text-gray-500">Actual Time</p>
-                    <p className="font-medium">{task.actualTime} min</p>
+                    <p className="text-sm text-viridian/50">Actual Time</p>
+                    <p className="font-medium text-viridian">{task.actualTime} min</p>
                   </div>
                 </div>
               )}
             </div>
             {task.isRecurring && (
-              <div className="mt-4 pt-4 border-t">
-                <p className="text-sm text-gray-500">
+              <div className="mt-4 pt-4 border-t border-viridian/20">
+                <p className="text-sm text-viridian/50">
                   Recurring: {task.recurrenceType?.replace('_', ' ')}
                   {task.recurrenceValue && task.recurrenceType === 'CUSTOM' && ` (every ${task.recurrenceValue} days)`}
                 </p>
@@ -196,16 +196,16 @@ export default function TaskDetail() {
           </div>
 
           {/* Photo Evidence */}
-          <div className="card">
-            <h3 className="font-semibold text-gray-900 mb-4">Photo Evidence</h3>
+          <div className="card-holo">
+            <h3 className="font-semibold text-viridian mb-4 font-orbitron">Photo Evidence</h3>
             {task.priority === 'CRITICAL' && (
-              <p className="text-sm text-orange-600 bg-orange-50 p-2 rounded mb-4">
+              <p className="text-sm text-orange-400 bg-orange-500/20 p-2 rounded mb-4">
                 Before and after photos are required for critical tasks
               </p>
             )}
             <div className="grid grid-cols-2 gap-4">
-              <div className="border-2 border-dashed border-gray-200 rounded-lg p-4">
-                <p className="text-sm font-medium text-gray-700 mb-2">Before</p>
+              <div className="border-2 border-dashed border-viridian/20 rounded-lg p-4">
+                <p className="text-sm font-medium text-viridian/70 mb-2">Before</p>
                 {task.photoBefore ? (
                   <div className="relative">
                     <img
@@ -215,24 +215,24 @@ export default function TaskDetail() {
                     />
                     <button
                       onClick={() => { setPhotoType('before'); fileInputRef.current?.click(); }}
-                      className="absolute bottom-2 right-2 p-2 bg-white rounded-lg shadow hover:bg-gray-50"
+                      className="absolute bottom-2 right-2 p-2 bg-forest rounded-lg shadow hover:bg-viridian/20"
                     >
-                      <Camera className="w-4 h-4" />
+                      <Camera className="w-4 h-4 text-viridian" />
                     </button>
                   </div>
                 ) : (
                   <button
                     onClick={() => { setPhotoType('before'); fileInputRef.current?.click(); }}
                     disabled={photoMutation.isPending}
-                    className="w-full h-40 flex flex-col items-center justify-center bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    className="w-full h-40 flex flex-col items-center justify-center bg-viridian/5 rounded-lg hover:bg-viridian/10 transition-colors"
                   >
-                    <Image className="w-8 h-8 text-gray-400 mb-2" />
-                    <span className="text-sm text-gray-500">Upload before photo</span>
+                    <Image className="w-8 h-8 text-viridian/40 mb-2" />
+                    <span className="text-sm text-viridian/50">Upload before photo</span>
                   </button>
                 )}
               </div>
-              <div className="border-2 border-dashed border-gray-200 rounded-lg p-4">
-                <p className="text-sm font-medium text-gray-700 mb-2">After</p>
+              <div className="border-2 border-dashed border-viridian/20 rounded-lg p-4">
+                <p className="text-sm font-medium text-viridian/70 mb-2">After</p>
                 {task.photoAfter ? (
                   <div className="relative">
                     <img
@@ -242,19 +242,19 @@ export default function TaskDetail() {
                     />
                     <button
                       onClick={() => { setPhotoType('after'); fileInputRef.current?.click(); }}
-                      className="absolute bottom-2 right-2 p-2 bg-white rounded-lg shadow hover:bg-gray-50"
+                      className="absolute bottom-2 right-2 p-2 bg-forest rounded-lg shadow hover:bg-viridian/20"
                     >
-                      <Camera className="w-4 h-4" />
+                      <Camera className="w-4 h-4 text-viridian" />
                     </button>
                   </div>
                 ) : (
                   <button
                     onClick={() => { setPhotoType('after'); fileInputRef.current?.click(); }}
                     disabled={photoMutation.isPending}
-                    className="w-full h-40 flex flex-col items-center justify-center bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    className="w-full h-40 flex flex-col items-center justify-center bg-viridian/5 rounded-lg hover:bg-viridian/10 transition-colors"
                   >
-                    <Image className="w-8 h-8 text-gray-400 mb-2" />
-                    <span className="text-sm text-gray-500">Upload after photo</span>
+                    <Image className="w-8 h-8 text-viridian/40 mb-2" />
+                    <span className="text-sm text-viridian/50">Upload after photo</span>
                   </button>
                 )}
               </div>
@@ -269,28 +269,28 @@ export default function TaskDetail() {
           </div>
 
           {/* Comments */}
-          <div className="card">
-            <h3 className="font-semibold text-gray-900 mb-4">
+          <div className="card-holo">
+            <h3 className="font-semibold text-viridian mb-4 font-orbitron">
               <MessageSquare className="w-5 h-5 inline mr-2" />
               Comments
             </h3>
             <div className="space-y-4 mb-4">
               {task.comments?.length > 0 ? (
                 task.comments.map((comment: any) => (
-                  <div key={comment.id} className="p-3 bg-gray-50 rounded-lg">
+                  <div key={comment.id} className="p-3 bg-viridian/5 border border-viridian/20 rounded-lg">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium text-gray-900">
+                      <span className="font-medium text-viridian">
                         {comment.author?.firstName} {comment.author?.lastName}
                       </span>
-                      <span className="text-sm text-gray-500">
+                      <span className="text-sm text-viridian/50">
                         {format(new Date(comment.createdAt), 'MMM d, h:mm a')}
                       </span>
                     </div>
-                    <p className="text-gray-700">{comment.content}</p>
+                    <p className="text-viridian/70">{comment.content}</p>
                   </div>
                 ))
               ) : (
-                <p className="text-gray-500 text-center py-4">No comments yet</p>
+                <p className="text-viridian/50 text-center py-4">No comments yet</p>
               )}
             </div>
             <form
@@ -323,8 +323,8 @@ export default function TaskDetail() {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Status Actions */}
-          <div className="card">
-            <h3 className="font-semibold text-gray-900 mb-4">Actions</h3>
+          <div className="card-holo">
+            <h3 className="font-semibold text-viridian mb-4 font-orbitron">Actions</h3>
             <div className="space-y-2">
               {task.status === 'OPEN' && (
                 <button
@@ -357,7 +357,7 @@ export default function TaskDetail() {
                 <button
                   onClick={() => handleStatusChange('CANCELLED')}
                   disabled={statusMutation.isPending}
-                  className="w-full btn-secondary flex items-center justify-center gap-2 text-red-600"
+                  className="w-full btn-secondary flex items-center justify-center gap-2 text-red-400"
                 >
                   <XCircle className="w-4 h-4" /> Cancel Task
                 </button>
@@ -366,21 +366,21 @@ export default function TaskDetail() {
           </div>
 
           {/* Timeline */}
-          <div className="card">
-            <h3 className="font-semibold text-gray-900 mb-4">Timeline</h3>
+          <div className="card-holo">
+            <h3 className="font-semibold text-viridian mb-4 font-orbitron">Timeline</h3>
             <div className="space-y-3 text-sm">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+              <div className="flex items-center gap-2 text-viridian/60">
+                <div className="w-2 h-2 bg-viridian/40 rounded-full"></div>
                 <span>Created {format(new Date(task.createdAt), 'MMM d, yyyy')}</span>
               </div>
               {task.startedAt && (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 text-viridian/60">
                   <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                   <span>Started {format(new Date(task.startedAt), 'MMM d, yyyy')}</span>
                 </div>
               )}
               {task.completedAt && (
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 text-viridian/60">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                   <span>Completed {format(new Date(task.completedAt), 'MMM d, yyyy')}</span>
                 </div>
@@ -390,17 +390,17 @@ export default function TaskDetail() {
 
           {/* Created By */}
           {task.createdBy && (
-            <div className="card">
-              <h3 className="font-semibold text-gray-900 mb-4">Created By</h3>
+            <div className="card-holo">
+              <h3 className="font-semibold text-viridian mb-4 font-orbitron">Created By</h3>
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
-                  <span className="text-primary-600 font-medium">
+                <div className="w-10 h-10 bg-viridian/20 rounded-full flex items-center justify-center">
+                  <span className="text-viridian font-medium">
                     {task.createdBy.firstName[0]}{task.createdBy.lastName[0]}
                   </span>
                 </div>
                 <div>
-                  <p className="font-medium">{task.createdBy.firstName} {task.createdBy.lastName}</p>
-                  <p className="text-sm text-gray-500">{task.createdBy.email}</p>
+                  <p className="font-medium text-viridian">{task.createdBy.firstName} {task.createdBy.lastName}</p>
+                  <p className="text-sm text-viridian/50">{task.createdBy.email}</p>
                 </div>
               </div>
             </div>

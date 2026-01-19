@@ -12,7 +12,7 @@ const statusColors = {
   OPERATIONAL: 'badge-green',
   NEEDS_MAINTENANCE: 'badge-yellow',
   OUT_OF_SERVICE: 'badge-red',
-  RETIRED: 'bg-gray-100 text-gray-800',
+  RETIRED: 'badge-gray',
 };
 
 const statusLabels = {
@@ -36,10 +36,10 @@ const categoryLabels: Record<string, string> = {
 
 const taskStatusColors: Record<string, string> = {
   OPEN: 'badge-yellow',
-  IN_PROGRESS: 'bg-blue-100 text-blue-800',
-  UNDER_REVIEW: 'bg-purple-100 text-purple-800',
+  IN_PROGRESS: 'badge-blue',
+  UNDER_REVIEW: 'bg-purple-500/20 text-purple-400 border border-purple-500/30',
   COMPLETED: 'badge-green',
-  CANCELLED: 'bg-gray-100 text-gray-800',
+  CANCELLED: 'badge-gray',
 };
 
 export default function AssetDetail() {
@@ -81,7 +81,7 @@ export default function AssetDetail() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-viridian"></div>
       </div>
     );
   }
@@ -89,8 +89,8 @@ export default function AssetDetail() {
   if (!asset) {
     return (
       <div className="text-center py-12">
-        <h2 className="text-xl font-semibold text-gray-900">Asset not found</h2>
-        <Link to="/assets" className="text-primary-600 hover:underline mt-2 inline-block">
+        <h2 className="text-xl font-semibold text-viridian">Asset not found</h2>
+        <Link to="/assets" className="text-viridian hover:underline mt-2 inline-block">
           Back to Assets
         </Link>
       </div>
@@ -101,17 +101,17 @@ export default function AssetDetail() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <button onClick={() => navigate('/assets')} className="p-2 hover:bg-gray-100 rounded-lg">
+        <button onClick={() => navigate('/assets')} className="p-2 hover:bg-viridian/10 rounded-lg text-viridian">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div className="flex-1">
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-gray-900">{asset.name}</h1>
+            <h1 className="text-2xl font-bold text-viridian font-orbitron">{asset.name}</h1>
             <span className={`badge ${statusColors[asset.status as keyof typeof statusColors]}`}>
               {statusLabels[asset.status as keyof typeof statusLabels]}
             </span>
           </div>
-          <p className="text-gray-600">{categoryLabels[asset.category]}</p>
+          <p className="text-viridian/60">{categoryLabels[asset.category]}</p>
         </div>
         <div className="flex gap-2">
           <button onClick={() => setShowEditModal(true)} className="btn-secondary flex items-center gap-2">
@@ -120,7 +120,7 @@ export default function AssetDetail() {
           </button>
           <button
             onClick={() => setShowDeleteConfirm(true)}
-            className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+            className="p-2 text-red-400 hover:bg-red-500/10 rounded-lg"
           >
             <Trash2 className="w-5 h-5" />
           </button>
@@ -131,63 +131,63 @@ export default function AssetDetail() {
         {/* Main Info */}
         <div className="lg:col-span-2 space-y-6">
           {/* Details Card */}
-          <div className="card">
-            <h3 className="font-semibold text-gray-900 mb-4">Asset Details</h3>
+          <div className="card-holo">
+            <h3 className="font-semibold text-viridian mb-4 font-orbitron">Asset Details</h3>
             <div className="grid grid-cols-2 gap-4">
               {asset.location && (
                 <div className="flex items-start gap-2">
-                  <MapPin className="w-4 h-4 text-gray-400 mt-0.5" />
+                  <MapPin className="w-4 h-4 text-viridian/40 mt-0.5" />
                   <div>
-                    <p className="text-sm text-gray-500">Location</p>
-                    <p className="font-medium">{asset.location}</p>
+                    <p className="text-sm text-viridian/50">Location</p>
+                    <p className="font-medium text-viridian">{asset.location}</p>
                   </div>
                 </div>
               )}
               {asset.qrCode && (
                 <div className="flex items-start gap-2">
-                  <QrCode className="w-4 h-4 text-gray-400 mt-0.5" />
+                  <QrCode className="w-4 h-4 text-viridian/40 mt-0.5" />
                   <div>
-                    <p className="text-sm text-gray-500">QR/ID Code</p>
-                    <p className="font-medium font-mono text-sm">{asset.qrCode}</p>
+                    <p className="text-sm text-viridian/50">QR/ID Code</p>
+                    <p className="font-medium font-mono text-sm text-viridian">{asset.qrCode}</p>
                   </div>
                 </div>
               )}
               {asset.manufacturer && (
                 <div className="flex items-start gap-2">
-                  <Cog className="w-4 h-4 text-gray-400 mt-0.5" />
+                  <Cog className="w-4 h-4 text-viridian/40 mt-0.5" />
                   <div>
-                    <p className="text-sm text-gray-500">Manufacturer</p>
-                    <p className="font-medium">{asset.manufacturer}</p>
+                    <p className="text-sm text-viridian/50">Manufacturer</p>
+                    <p className="font-medium text-viridian">{asset.manufacturer}</p>
                   </div>
                 </div>
               )}
               {asset.model && (
                 <div>
-                  <p className="text-sm text-gray-500">Model</p>
-                  <p className="font-medium">{asset.model}</p>
+                  <p className="text-sm text-viridian/50">Model</p>
+                  <p className="font-medium text-viridian">{asset.model}</p>
                 </div>
               )}
               {asset.serialNumber && (
                 <div>
-                  <p className="text-sm text-gray-500">Serial Number</p>
-                  <p className="font-medium font-mono">{asset.serialNumber}</p>
+                  <p className="text-sm text-viridian/50">Serial Number</p>
+                  <p className="font-medium font-mono text-viridian">{asset.serialNumber}</p>
                 </div>
               )}
               {asset.purchaseDate && (
                 <div className="flex items-start gap-2">
-                  <Calendar className="w-4 h-4 text-gray-400 mt-0.5" />
+                  <Calendar className="w-4 h-4 text-viridian/40 mt-0.5" />
                   <div>
-                    <p className="text-sm text-gray-500">Purchase Date</p>
-                    <p className="font-medium">{format(new Date(asset.purchaseDate), 'MMM d, yyyy')}</p>
+                    <p className="text-sm text-viridian/50">Purchase Date</p>
+                    <p className="font-medium text-viridian">{format(new Date(asset.purchaseDate), 'MMM d, yyyy')}</p>
                   </div>
                 </div>
               )}
               {asset.warrantyExpiry && (
                 <div className="flex items-start gap-2">
-                  <Shield className="w-4 h-4 text-gray-400 mt-0.5" />
+                  <Shield className="w-4 h-4 text-viridian/40 mt-0.5" />
                   <div>
-                    <p className="text-sm text-gray-500">Warranty Expires</p>
-                    <p className={`font-medium ${new Date(asset.warrantyExpiry) < new Date() ? 'text-red-600' : ''}`}>
+                    <p className="text-sm text-viridian/50">Warranty Expires</p>
+                    <p className={`font-medium ${new Date(asset.warrantyExpiry) < new Date() ? 'text-red-400' : 'text-viridian'}`}>
                       {format(new Date(asset.warrantyExpiry), 'MMM d, yyyy')}
                     </p>
                   </div>
@@ -195,28 +195,28 @@ export default function AssetDetail() {
               )}
             </div>
             {asset.description && (
-              <div className="mt-4 pt-4 border-t">
-                <p className="text-sm text-gray-500 mb-1">Description</p>
-                <p className="text-gray-700">{asset.description}</p>
+              <div className="mt-4 pt-4 border-t border-viridian/20">
+                <p className="text-sm text-viridian/50 mb-1">Description</p>
+                <p className="text-viridian/70">{asset.description}</p>
               </div>
             )}
             {asset.notes && (
-              <div className="mt-4 pt-4 border-t">
-                <p className="text-sm text-gray-500 mb-1">Notes</p>
-                <p className="text-gray-700">{asset.notes}</p>
+              <div className="mt-4 pt-4 border-t border-viridian/20">
+                <p className="text-sm text-viridian/50 mb-1">Notes</p>
+                <p className="text-viridian/70">{asset.notes}</p>
               </div>
             )}
           </div>
 
           {/* Tasks/History Tabs */}
-          <div className="card">
-            <div className="flex gap-4 border-b mb-4">
+          <div className="card-holo">
+            <div className="flex gap-4 border-b border-viridian/20 mb-4">
               <button
                 onClick={() => setActiveTab('tasks')}
                 className={`pb-2 px-1 border-b-2 font-medium transition-colors ${
                   activeTab === 'tasks'
-                    ? 'border-primary-600 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                    ? 'border-viridian text-viridian'
+                    : 'border-transparent text-viridian/50 hover:text-viridian/70'
                 }`}
               >
                 Active Tasks
@@ -225,8 +225,8 @@ export default function AssetDetail() {
                 onClick={() => setActiveTab('history')}
                 className={`pb-2 px-1 border-b-2 font-medium transition-colors flex items-center gap-1 ${
                   activeTab === 'history'
-                    ? 'border-primary-600 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                    ? 'border-viridian text-viridian'
+                    : 'border-transparent text-viridian/50 hover:text-viridian/70'
                 }`}
               >
                 <History className="w-4 h-4" />
@@ -241,13 +241,13 @@ export default function AssetDetail() {
                     <Link
                       key={task.id}
                       to={`/maintenance-tasks/${task.id}`}
-                      className="block p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                      className="block p-3 bg-viridian/5 border border-viridian/20 rounded-lg hover:bg-viridian/10 transition-colors"
                     >
                       <div className="flex items-start justify-between">
                         <div>
-                          <h4 className="font-medium text-gray-900">{task.title}</h4>
+                          <h4 className="font-medium text-viridian">{task.title}</h4>
                           {task.assignedTo && (
-                            <p className="text-sm text-gray-500">
+                            <p className="text-sm text-viridian/50">
                               Assigned to {task.assignedTo.firstName} {task.assignedTo.lastName}
                             </p>
                           )}
@@ -257,7 +257,7 @@ export default function AssetDetail() {
                         </span>
                       </div>
                       {task.dueDate && (
-                        <div className="flex items-center gap-1 text-sm text-gray-500 mt-2">
+                        <div className="flex items-center gap-1 text-sm text-viridian/50 mt-2">
                           <Clock className="w-3.5 h-3.5" />
                           Due {format(new Date(task.dueDate), 'MMM d, yyyy')}
                         </div>
@@ -266,25 +266,25 @@ export default function AssetDetail() {
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-500 text-center py-4">No active tasks</p>
+                <p className="text-viridian/50 text-center py-4">No active tasks</p>
               )
             ) : history?.length > 0 ? (
               <div className="space-y-3">
                 {history.map((task: any) => (
-                  <div key={task.id} className="p-3 bg-gray-50 rounded-lg">
+                  <div key={task.id} className="p-3 bg-viridian/5 border border-viridian/20 rounded-lg">
                     <div className="flex items-start justify-between">
                       <div>
-                        <h4 className="font-medium text-gray-900">{task.title}</h4>
+                        <h4 className="font-medium text-viridian">{task.title}</h4>
                         {task.assignedTo && (
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm text-viridian/50">
                             Completed by {task.assignedTo.firstName} {task.assignedTo.lastName}
                           </p>
                         )}
                       </div>
-                      <CheckCircle className="w-5 h-5 text-green-600" />
+                      <CheckCircle className="w-5 h-5 text-green-500" />
                     </div>
                     {task.completedAt && (
-                      <p className="text-sm text-gray-500 mt-2">
+                      <p className="text-sm text-viridian/50 mt-2">
                         {format(new Date(task.completedAt), 'MMM d, yyyy')}
                       </p>
                     )}
@@ -292,7 +292,7 @@ export default function AssetDetail() {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 text-center py-4">No service history</p>
+              <p className="text-viridian/50 text-center py-4">No service history</p>
             )}
           </div>
         </div>
@@ -300,22 +300,22 @@ export default function AssetDetail() {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Quick Stats */}
-          <div className="card">
-            <h3 className="font-semibold text-gray-900 mb-4">Quick Stats</h3>
+          <div className="card-holo">
+            <h3 className="font-semibold text-viridian mb-4 font-orbitron">Quick Stats</h3>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-gray-600">Total Tasks</span>
-                <span className="font-semibold">{asset.tasks?.length || 0}</span>
+                <span className="text-viridian/60">Total Tasks</span>
+                <span className="font-semibold text-viridian">{asset.tasks?.length || 0}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-gray-600">Open Tasks</span>
-                <span className="font-semibold">
+                <span className="text-viridian/60">Open Tasks</span>
+                <span className="font-semibold text-viridian">
                   {asset.tasks?.filter((t: any) => t.status === 'OPEN').length || 0}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-gray-600">In Progress</span>
-                <span className="font-semibold">
+                <span className="text-viridian/60">In Progress</span>
+                <span className="font-semibold text-viridian">
                   {asset.tasks?.filter((t: any) => t.status === 'IN_PROGRESS').length || 0}
                 </span>
               </div>
@@ -324,23 +324,23 @@ export default function AssetDetail() {
 
           {/* Property Link */}
           {asset.property && (
-            <div className="card">
-              <h3 className="font-semibold text-gray-900 mb-4">Property</h3>
+            <div className="card-holo">
+              <h3 className="font-semibold text-viridian mb-4 font-orbitron">Property</h3>
               <Link
                 to={`/properties/${asset.property.id}`}
-                className="block p-3 bg-gray-50 rounded-lg hover:bg-gray-100"
+                className="block p-3 bg-viridian/5 border border-viridian/20 rounded-lg hover:bg-viridian/10"
               >
-                <p className="font-medium text-gray-900">{asset.property.name}</p>
+                <p className="font-medium text-viridian">{asset.property.name}</p>
                 {asset.property.address && (
-                  <p className="text-sm text-gray-500">{asset.property.address}</p>
+                  <p className="text-sm text-viridian/50">{asset.property.address}</p>
                 )}
               </Link>
             </div>
           )}
 
           {/* Quick Actions */}
-          <div className="card">
-            <h3 className="font-semibold text-gray-900 mb-4">Quick Actions</h3>
+          <div className="card-holo">
+            <h3 className="font-semibold text-viridian mb-4 font-orbitron">Quick Actions</h3>
             <div className="space-y-2">
               <Link
                 to={`/maintenance-tasks?assetId=${asset.id}`}
@@ -363,10 +363,10 @@ export default function AssetDetail() {
 
       {/* Delete Confirmation */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-gray-800/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Delete Asset?</h3>
-            <p className="text-gray-600 mb-6">
+        <div className="fixed inset-0 bg-forest/90 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="card-holo max-w-md w-full">
+            <h3 className="text-lg font-semibold text-viridian mb-2 font-orbitron">Delete Asset?</h3>
+            <p className="text-viridian/60 mb-6">
               This will permanently delete "{asset.name}" and all associated tasks. This action cannot be undone.
             </p>
             <div className="flex gap-3">

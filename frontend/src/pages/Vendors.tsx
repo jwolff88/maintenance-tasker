@@ -60,8 +60,8 @@ export default function Vendors() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Vendors</h1>
-          <p className="text-gray-600">Manage contractors and service providers</p>
+          <h1 className="text-2xl font-orbitron font-bold text-viridian">Vendors</h1>
+          <p className="text-viridian/60">Manage contractors and service providers</p>
         </div>
         <button onClick={() => setShowModal(true)} className="btn-primary flex items-center gap-2">
           <Plus className="w-4 h-4" />
@@ -72,26 +72,26 @@ export default function Vendors() {
       {/* Vendors Grid */}
       {isLoading ? (
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-viridian"></div>
         </div>
       ) : vendors?.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {vendors.map((vendor: any) => (
-            <div key={vendor.id} className="card">
+            <div key={vendor.id} className="card-holo hover:shadow-viridian transition-shadow">
               <div className="flex items-start justify-between mb-3">
-                <div className="p-2 bg-primary-100 rounded-lg">
-                  <Users className="w-5 h-5 text-primary-600" />
+                <div className="p-2 bg-viridian/10 rounded-lg">
+                  <Users className="w-5 h-5 text-viridian" />
                 </div>
                 <div className="flex items-center gap-1">
                   <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                  <span className="font-medium">{Number(vendor.rating).toFixed(1)}</span>
-                  <span className="text-sm text-gray-500">({vendor.totalJobs})</span>
+                  <span className="font-medium text-viridian">{Number(vendor.rating).toFixed(1)}</span>
+                  <span className="text-sm text-viridian/50">({vendor.totalJobs})</span>
                 </div>
               </div>
 
-              <h3 className="font-semibold text-gray-900 mb-2">{vendor.name}</h3>
+              <h3 className="font-semibold text-viridian mb-2">{vendor.name}</h3>
 
-              <div className="space-y-2 text-sm text-gray-600 mb-4">
+              <div className="space-y-2 text-sm text-viridian/60 mb-4">
                 <div className="flex items-center gap-2">
                   <Mail className="w-4 h-4" />
                   {vendor.email}
@@ -120,11 +120,11 @@ export default function Vendors() {
                 </div>
               )}
 
-              <div className="pt-3 border-t text-sm text-gray-500">
+              <div className="pt-3 border-t border-viridian/20 text-sm text-viridian/50">
                 {vendor._count.tickets} job{vendor._count.tickets !== 1 ? 's' : ''} completed
                 {vendor.insuranceExpiry && (
                   <span className="ml-2">
-                    • Insurance expires {format(new Date(vendor.insuranceExpiry), 'MMM yyyy')}
+                    - Insurance expires {format(new Date(vendor.insuranceExpiry), 'MMM yyyy')}
                   </span>
                 )}
               </div>
@@ -133,9 +133,9 @@ export default function Vendors() {
         </div>
       ) : (
         <div className="text-center py-12">
-          <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No vendors yet</h3>
-          <p className="text-gray-600 mb-4">Add your first vendor or contractor.</p>
+          <Users className="w-12 h-12 text-viridian/40 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-viridian mb-2">No vendors yet</h3>
+          <p className="text-viridian/60 mb-4">Add your first vendor or contractor.</p>
           <button onClick={() => setShowModal(true)} className="btn-primary">
             Add Vendor
           </button>
@@ -144,13 +144,13 @@ export default function Vendors() {
 
       {/* Add Vendor Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-gray-800/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-forest/90 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="card-holo max-w-lg w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
-              <h2 className="text-xl font-semibold mb-6">Add New Vendor</h2>
+              <h2 className="text-xl font-orbitron font-semibold text-viridian mb-6">Add New Vendor</h2>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-viridian/70 mb-1">
                     Company/Contractor Name *
                   </label>
                   <input
@@ -164,7 +164,7 @@ export default function Vendors() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-viridian/70 mb-1">
                       Email *
                     </label>
                     <input
@@ -176,7 +176,7 @@ export default function Vendors() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-viridian/70 mb-1">
                       Phone
                     </label>
                     <input
@@ -189,7 +189,7 @@ export default function Vendors() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-viridian/70 mb-2">
                     Specialties
                   </label>
                   <div className="flex flex-wrap gap-2">
@@ -200,8 +200,8 @@ export default function Vendors() {
                         onClick={() => toggleSpecialty(s)}
                         className={`px-3 py-1.5 rounded-lg text-sm transition-colors ${
                           formData.specialties.includes(s)
-                            ? 'bg-primary-100 text-primary-700 border-2 border-primary-300'
-                            : 'bg-gray-100 text-gray-600 border-2 border-transparent hover:bg-gray-200'
+                            ? 'bg-viridian/20 text-viridian border-2 border-viridian/50'
+                            : 'bg-viridian/5 text-viridian/60 border-2 border-transparent hover:bg-viridian/10'
                         }`}
                       >
                         {s.replace('_', ' ')}
@@ -212,7 +212,7 @@ export default function Vendors() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-viridian/70 mb-1">
                       License Number
                     </label>
                     <input
@@ -223,7 +223,7 @@ export default function Vendors() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-viridian/70 mb-1">
                       Insurance Expiry
                     </label>
                     <input

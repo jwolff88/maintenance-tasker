@@ -7,20 +7,20 @@ const STATUSES = [
 ];
 
 const STATUS_COLORS: Record<string, string> = {
-  SCHEDULED: 'bg-gray-100 text-gray-800',
-  MOVE_OUT_COMPLETE: 'bg-yellow-100 text-yellow-800',
-  IN_PROGRESS: 'bg-blue-100 text-blue-800',
-  FINAL_INSPECTION: 'bg-purple-100 text-purple-800',
-  READY: 'bg-green-100 text-green-800',
-  OCCUPIED: 'bg-emerald-100 text-emerald-800',
-  CANCELLED: 'bg-red-100 text-red-800',
+  SCHEDULED: 'badge-gray',
+  MOVE_OUT_COMPLETE: 'badge-yellow',
+  IN_PROGRESS: 'badge-blue',
+  FINAL_INSPECTION: 'badge-yellow',
+  READY: 'badge-green',
+  OCCUPIED: 'badge-green',
+  CANCELLED: 'badge-red',
 };
 
 const TASK_STATUS_COLORS: Record<string, string> = {
-  PENDING: 'bg-gray-100 text-gray-800',
-  IN_PROGRESS: 'bg-blue-100 text-blue-800',
-  COMPLETED: 'bg-green-100 text-green-800',
-  SKIPPED: 'bg-yellow-100 text-yellow-800',
+  PENDING: 'badge-gray',
+  IN_PROGRESS: 'badge-blue',
+  COMPLETED: 'badge-green',
+  SKIPPED: 'badge-yellow',
 };
 
 export default function Turnovers() {
@@ -117,12 +117,12 @@ export default function Turnovers() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Unit Turnovers</h1>
-          <p className="text-gray-600">Manage make-ready workflow between tenants</p>
+          <h1 className="text-2xl font-bold text-viridian">Unit Turnovers</h1>
+          <p className="text-viridian/60">Manage make-ready workflow between tenants</p>
         </div>
         <button
           onClick={() => setShowForm(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+          className="btn-primary"
         >
           + New Turnover
         </button>
@@ -131,33 +131,33 @@ export default function Turnovers() {
       {/* Stats Cards */}
       {stats && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-white p-4 rounded-lg shadow">
-            <p className="text-sm text-gray-500">Active Turnovers</p>
-            <p className="text-2xl font-bold text-blue-600">{stats.activeTurnovers}</p>
+          <div className="card-holo">
+            <p className="text-sm text-viridian/60 font-orbitron uppercase tracking-wide">Active Turnovers</p>
+            <p className="text-2xl font-bold text-viridian mt-1">{stats.activeTurnovers}</p>
           </div>
-          <div className="bg-white p-4 rounded-lg shadow">
-            <p className="text-sm text-gray-500">Completed</p>
-            <p className="text-2xl font-bold text-green-600">{stats.completedTurnovers}</p>
+          <div className="card-holo">
+            <p className="text-sm text-viridian/60 font-orbitron uppercase tracking-wide">Completed</p>
+            <p className="text-2xl font-bold text-teal mt-1">{stats.completedTurnovers}</p>
           </div>
-          <div className="bg-white p-4 rounded-lg shadow">
-            <p className="text-sm text-gray-500">Avg Days Vacant</p>
-            <p className="text-2xl font-bold">{stats.avgDaysVacant} days</p>
+          <div className="card-holo">
+            <p className="text-sm text-viridian/60 font-orbitron uppercase tracking-wide">Avg Days Vacant</p>
+            <p className="text-2xl font-bold text-bronze mt-1">{stats.avgDaysVacant} days</p>
           </div>
-          <div className="bg-white p-4 rounded-lg shadow">
-            <p className="text-sm text-gray-500">Total Cost (Completed)</p>
-            <p className="text-2xl font-bold">{formatCurrency(Number(stats.totalCost))}</p>
+          <div className="card-holo">
+            <p className="text-sm text-viridian/60 font-orbitron uppercase tracking-wide">Total Cost (Completed)</p>
+            <p className="text-2xl font-bold text-viridian mt-1">{formatCurrency(Number(stats.totalCost))}</p>
           </div>
         </div>
       )}
 
       {/* Filter */}
-      <div className="flex gap-4 bg-white p-4 rounded-lg shadow">
+      <div className="flex gap-4 card-holo">
         <div>
-          <label className="block text-sm font-medium text-gray-700">Status</label>
+          <label className="block text-sm font-medium text-viridian/80 font-orbitron">Status</label>
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="mt-1 border rounded-md px-3 py-2"
+            className="input mt-1"
           >
             <option value="">All Statuses</option>
             {STATUSES.map(status => (
@@ -169,13 +169,13 @@ export default function Turnovers() {
 
       {/* New Turnover Modal */}
       {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-lg">
-            <h2 className="text-xl font-bold mb-4">Schedule New Turnover</h2>
+        <div className="fixed inset-0 bg-forest/90 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="card-holo w-full max-w-lg">
+            <h2 className="text-xl font-bold mb-4 text-viridian font-orbitron">Schedule New Turnover</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Property *</label>
-                <select name="propertyId" required className="mt-1 w-full border rounded-md px-3 py-2">
+                <label className="block text-sm font-medium text-viridian/80">Property *</label>
+                <select name="propertyId" required className="input mt-1">
                   <option value="">Select property</option>
                   {properties.map((p: any) => (
                     <option key={p.id} value={p.id}>{p.name} - {p.address}</option>
@@ -183,57 +183,57 @@ export default function Turnovers() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Unit Number</label>
+                <label className="block text-sm font-medium text-viridian/80">Unit Number</label>
                 <input
                   name="unit"
-                  className="mt-1 w-full border rounded-md px-3 py-2"
+                  className="input mt-1"
                   placeholder="e.g., Unit 101, Apt 2B"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Move-out Date *</label>
+                  <label className="block text-sm font-medium text-viridian/80">Move-out Date *</label>
                   <input
                     name="moveOutDate"
                     type="date"
                     required
-                    className="mt-1 w-full border rounded-md px-3 py-2"
+                    className="input mt-1"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Target Ready Date *</label>
+                  <label className="block text-sm font-medium text-viridian/80">Target Ready Date *</label>
                   <input
                     name="targetReadyDate"
                     type="date"
                     required
-                    className="mt-1 w-full border rounded-md px-3 py-2"
+                    className="input mt-1"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Estimated Cost</label>
+                <label className="block text-sm font-medium text-viridian/80">Estimated Cost</label>
                 <input
                   name="estimatedCost"
                   type="number"
                   step="0.01"
-                  className="mt-1 w-full border rounded-md px-3 py-2"
+                  className="input mt-1"
                   placeholder="0.00"
                 />
               </div>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-viridian/50">
                 Default make-ready tasks will be created automatically.
               </p>
               <div className="flex justify-end gap-2 pt-4">
                 <button
                   type="button"
                   onClick={() => setShowForm(false)}
-                  className="px-4 py-2 border rounded-md hover:bg-gray-50"
+                  className="btn-secondary"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  className="btn-primary"
                 >
                   Create Turnover
                 </button>
@@ -245,43 +245,43 @@ export default function Turnovers() {
 
       {/* Turnover Detail Modal */}
       {selectedTurnover && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-forest/90 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="card-holo w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-start mb-4">
               <div>
-                <h2 className="text-xl font-bold">{selectedTurnover.property?.name}</h2>
-                <p className="text-gray-500">{selectedTurnover.unit || 'Main Unit'}</p>
+                <h2 className="text-xl font-bold text-viridian font-orbitron">{selectedTurnover.property?.name}</h2>
+                <p className="text-viridian/50">{selectedTurnover.unit || 'Main Unit'}</p>
               </div>
-              <span className={`px-3 py-1 rounded-full text-sm font-medium ${STATUS_COLORS[selectedTurnover.status]}`}>
+              <span className={`badge ${STATUS_COLORS[selectedTurnover.status]}`}>
                 {selectedTurnover.status.replace(/_/g, ' ')}
               </span>
             </div>
 
             {/* Dates & Info */}
-            <div className="grid grid-cols-3 gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
+            <div className="grid grid-cols-3 gap-4 mb-6 p-4 bg-viridian/5 rounded-lg border border-viridian/20">
               <div>
-                <p className="text-sm text-gray-500">Move-out</p>
-                <p className="font-medium">{formatDate(selectedTurnover.moveOutDate)}</p>
+                <p className="text-sm text-viridian/50">Move-out</p>
+                <p className="font-medium text-viridian">{formatDate(selectedTurnover.moveOutDate)}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Target Ready</p>
-                <p className="font-medium">{formatDate(selectedTurnover.targetReadyDate)}</p>
+                <p className="text-sm text-viridian/50">Target Ready</p>
+                <p className="font-medium text-viridian">{formatDate(selectedTurnover.targetReadyDate)}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Days Vacant</p>
-                <p className="font-medium text-orange-600">{selectedTurnover.daysVacant || 0} days</p>
+                <p className="text-sm text-viridian/50">Days Vacant</p>
+                <p className="font-medium text-bronze">{selectedTurnover.daysVacant || 0} days</p>
               </div>
             </div>
 
             {/* Progress */}
             <div className="mb-6">
               <div className="flex justify-between text-sm mb-1">
-                <span>Task Progress</span>
-                <span>{selectedTurnover.tasksCompleted}/{selectedTurnover.tasksTotal} completed</span>
+                <span className="text-viridian/70">Task Progress</span>
+                <span className="text-viridian">{selectedTurnover.tasksCompleted}/{selectedTurnover.tasksTotal} completed</span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full bg-viridian/10 rounded-full h-2">
                 <div
-                  className="bg-green-600 h-2 rounded-full"
+                  className="bg-viridian h-2 rounded-full transition-all duration-300"
                   style={{ width: `${(selectedTurnover.tasksCompleted / selectedTurnover.tasksTotal) * 100}%` }}
                 />
               </div>
@@ -289,10 +289,10 @@ export default function Turnovers() {
 
             {/* Tasks */}
             <div className="mb-6">
-              <h3 className="font-semibold mb-3">Make-Ready Tasks</h3>
+              <h3 className="font-semibold mb-3 text-viridian font-orbitron">Make-Ready Tasks</h3>
               <div className="space-y-2">
                 {selectedTurnover.turnoverTasks?.map((task: any) => (
-                  <div key={task.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div key={task.id} className="flex items-center justify-between p-3 border border-viridian/20 rounded-lg bg-viridian/5">
                     <div className="flex items-center gap-3">
                       <input
                         type="checkbox"
@@ -305,16 +305,16 @@ export default function Turnovers() {
                             data: { status: newStatus },
                           });
                         }}
-                        className="h-5 w-5 rounded"
+                        className="h-5 w-5 rounded accent-viridian"
                       />
                       <div>
-                        <p className={task.status === 'COMPLETED' ? 'line-through text-gray-400' : ''}>
+                        <p className={task.status === 'COMPLETED' ? 'line-through text-viridian/40' : 'text-viridian'}>
                           {task.title}
                         </p>
-                        <p className="text-xs text-gray-500">{task.category}</p>
+                        <p className="text-xs text-viridian/50">{task.category}</p>
                       </div>
                     </div>
-                    <span className={`px-2 py-1 rounded text-xs ${TASK_STATUS_COLORS[task.status]}`}>
+                    <span className={`badge ${TASK_STATUS_COLORS[task.status]}`}>
                       {task.status}
                     </span>
                   </div>
@@ -323,11 +323,11 @@ export default function Turnovers() {
             </div>
 
             {/* Status Actions */}
-            <div className="flex gap-2 mb-4">
+            <div className="flex gap-2 mb-4 flex-wrap">
               {selectedTurnover.status === 'SCHEDULED' && (
                 <button
                   onClick={() => updateMutation.mutate({ id: selectedTurnover.id, data: { status: 'MOVE_OUT_COMPLETE' } })}
-                  className="px-3 py-2 bg-yellow-600 text-white rounded-md text-sm"
+                  className="px-3 py-2 bg-bronze/80 text-forest rounded text-sm font-orbitron hover:bg-bronze transition-colors"
                 >
                   Mark Move-out Complete
                 </button>
@@ -335,7 +335,7 @@ export default function Turnovers() {
               {selectedTurnover.status === 'MOVE_OUT_COMPLETE' && (
                 <button
                   onClick={() => updateMutation.mutate({ id: selectedTurnover.id, data: { status: 'IN_PROGRESS' } })}
-                  className="px-3 py-2 bg-blue-600 text-white rounded-md text-sm"
+                  className="px-3 py-2 bg-teal text-forest rounded text-sm font-orbitron hover:bg-teal/80 transition-colors"
                 >
                   Start Make-Ready
                 </button>
@@ -343,7 +343,7 @@ export default function Turnovers() {
               {selectedTurnover.status === 'IN_PROGRESS' && (
                 <button
                   onClick={() => updateMutation.mutate({ id: selectedTurnover.id, data: { status: 'FINAL_INSPECTION' } })}
-                  className="px-3 py-2 bg-purple-600 text-white rounded-md text-sm"
+                  className="px-3 py-2 bg-bronze text-forest rounded text-sm font-orbitron hover:bg-bronze/80 transition-colors"
                 >
                   Ready for Inspection
                 </button>
@@ -351,7 +351,7 @@ export default function Turnovers() {
               {selectedTurnover.status === 'FINAL_INSPECTION' && (
                 <button
                   onClick={() => updateMutation.mutate({ id: selectedTurnover.id, data: { status: 'READY' } })}
-                  className="px-3 py-2 bg-green-600 text-white rounded-md text-sm"
+                  className="px-3 py-2 bg-viridian text-forest rounded text-sm font-orbitron hover:bg-viridian/80 transition-colors"
                 >
                   Mark Ready
                 </button>
@@ -359,23 +359,23 @@ export default function Turnovers() {
               {selectedTurnover.status === 'READY' && (
                 <button
                   onClick={() => updateMutation.mutate({ id: selectedTurnover.id, data: { status: 'OCCUPIED' } })}
-                  className="px-3 py-2 bg-emerald-600 text-white rounded-md text-sm"
+                  className="px-3 py-2 bg-viridian text-forest rounded text-sm font-orbitron hover:bg-viridian/80 transition-colors"
                 >
                   Mark Occupied
                 </button>
               )}
             </div>
 
-            <div className="flex justify-between pt-4 border-t">
+            <div className="flex justify-between pt-4 border-t border-viridian/20">
               <button
                 onClick={() => deleteMutation.mutate(selectedTurnover.id)}
-                className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-md"
+                className="text-red-400 hover:text-red-300 hover:bg-red-400/10 px-4 py-2 rounded transition-colors"
               >
                 Delete
               </button>
               <button
                 onClick={() => setSelectedTurnover(null)}
-                className="px-4 py-2 border rounded-md hover:bg-gray-50"
+                className="btn-secondary"
               >
                 Close
               </button>
@@ -386,13 +386,13 @@ export default function Turnovers() {
 
       {/* Turnovers List */}
       {isLoading ? (
-        <div className="text-center py-8">Loading...</div>
+        <div className="text-center py-8 text-viridian/60">Loading...</div>
       ) : turnovers.length === 0 ? (
-        <div className="text-center py-8 bg-white rounded-lg shadow">
-          <p className="text-gray-500">No turnovers found</p>
+        <div className="text-center py-8 card-holo">
+          <p className="text-viridian/60">No turnovers found</p>
           <button
             onClick={() => setShowForm(true)}
-            className="mt-2 text-blue-600 hover:underline"
+            className="mt-2 text-viridian hover:underline"
           >
             Schedule your first turnover
           </button>
@@ -403,35 +403,35 @@ export default function Turnovers() {
             <div
               key={turnover.id}
               onClick={() => setSelectedTurnover(turnover)}
-              className="bg-white p-4 rounded-lg shadow hover:shadow-md cursor-pointer transition-shadow"
+              className="card-holo cursor-pointer hover:shadow-viridian transition-all duration-300"
             >
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="font-semibold">{turnover.property?.name}</h3>
-                  <p className="text-sm text-gray-500">{turnover.unit || 'Main Unit'} - {turnover.property?.address}</p>
+                  <h3 className="font-semibold text-viridian">{turnover.property?.name}</h3>
+                  <p className="text-sm text-viridian/50">{turnover.unit || 'Main Unit'} - {turnover.property?.address}</p>
                 </div>
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${STATUS_COLORS[turnover.status]}`}>
+                <span className={`badge ${STATUS_COLORS[turnover.status]}`}>
                   {turnover.status.replace(/_/g, ' ')}
                 </span>
               </div>
-              <div className="mt-3 flex gap-6 text-sm">
+              <div className="mt-3 flex gap-6 text-sm flex-wrap">
                 <div>
-                  <span className="text-gray-500">Move-out:</span>{' '}
-                  <span className="font-medium">{formatDate(turnover.moveOutDate)}</span>
+                  <span className="text-viridian/50">Move-out:</span>{' '}
+                  <span className="font-medium text-viridian">{formatDate(turnover.moveOutDate)}</span>
                 </div>
                 <div>
-                  <span className="text-gray-500">Target:</span>{' '}
-                  <span className="font-medium">{formatDate(turnover.targetReadyDate)}</span>
+                  <span className="text-viridian/50">Target:</span>{' '}
+                  <span className="font-medium text-viridian">{formatDate(turnover.targetReadyDate)}</span>
                 </div>
                 <div>
-                  <span className="text-gray-500">Vacant:</span>{' '}
-                  <span className={`font-medium ${(turnover.daysVacant || 0) > 14 ? 'text-red-600' : 'text-orange-600'}`}>
+                  <span className="text-viridian/50">Vacant:</span>{' '}
+                  <span className={`font-medium ${(turnover.daysVacant || 0) > 14 ? 'text-red-400' : 'text-bronze'}`}>
                     {turnover.daysVacant || 0} days
                   </span>
                 </div>
                 <div>
-                  <span className="text-gray-500">Tasks:</span>{' '}
-                  <span className="font-medium">{turnover.tasksCompleted}/{turnover.tasksTotal}</span>
+                  <span className="text-viridian/50">Tasks:</span>{' '}
+                  <span className="font-medium text-viridian">{turnover.tasksCompleted}/{turnover.tasksTotal}</span>
                 </div>
               </div>
             </div>

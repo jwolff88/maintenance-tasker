@@ -61,17 +61,17 @@ const plans = [
     id: 'STARTER',
     name: 'Starter',
     price: 49,
-    headerBg: 'bg-slate-800',
-    headerText: 'text-white',
-    buttonBg: 'bg-slate-800 hover:bg-slate-700',
-    buttonText: 'text-white',
+    headerBg: 'bg-viridian/20',
+    headerText: 'text-viridian',
+    buttonBg: 'bg-viridian/80 hover:bg-viridian',
+    buttonText: 'text-forest',
   },
   {
     id: 'PRO',
     name: 'Professional',
     price: 149,
-    headerBg: 'bg-purple-200',
-    headerText: 'text-purple-900',
+    headerBg: 'bg-purple-500/30',
+    headerText: 'text-purple-300',
     buttonBg: 'bg-purple-500 hover:bg-purple-600',
     buttonText: 'text-white',
     popular: true,
@@ -80,10 +80,10 @@ const plans = [
     id: 'ENTERPRISE',
     name: 'Enterprise',
     price: 349,
-    headerBg: 'bg-amber-400',
-    headerText: 'text-amber-900',
-    buttonBg: 'bg-amber-500 hover:bg-amber-600',
-    buttonText: 'text-white',
+    headerBg: 'bg-bronze/30',
+    headerText: 'text-bronze',
+    buttonBg: 'bg-bronze hover:bg-bronze/80',
+    buttonText: 'text-forest',
   },
 ];
 
@@ -117,20 +117,20 @@ export default function PricingTable() {
         {/* Header */}
         <thead className="sticky top-0 z-10">
           <tr>
-            <th className="bg-gray-100 p-4 text-left font-semibold text-gray-700 border-b-2 border-gray-200">
+            <th className="bg-viridian/10 p-4 text-left font-semibold text-viridian border-b-2 border-viridian/20 font-orbitron">
               Features
             </th>
             {plans.map((plan) => (
               <th
                 key={plan.id}
-                className={`${plan.headerBg} ${plan.headerText} p-4 text-center font-bold text-lg border-b-2 border-gray-200 relative`}
+                className={`${plan.headerBg} ${plan.headerText} p-4 text-center font-bold text-lg border-b-2 border-viridian/20 relative`}
               >
                 {plan.popular && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-purple-600 text-white text-xs px-3 py-1 rounded-full">
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-purple-500 text-white text-xs px-3 py-1 rounded-full">
                     Most Popular
                   </span>
                 )}
-                <div>{plan.name}</div>
+                <div className="font-orbitron">{plan.name}</div>
                 <div className="text-2xl mt-1">
                   ${plan.price}
                   <span className="text-sm font-normal">/mo</span>
@@ -148,7 +148,7 @@ export default function PricingTable() {
                 <tr key={`category-${feature.category}`}>
                   <td
                     colSpan={4}
-                    className="bg-gray-200 p-3 font-semibold text-gray-700 text-sm uppercase tracking-wide"
+                    className="bg-bronze/20 p-3 font-semibold text-bronze text-sm uppercase tracking-wide font-orbitron"
                   >
                     {feature.category}
                   </td>
@@ -156,12 +156,12 @@ export default function PricingTable() {
               )}
               <tr
                 key={feature.name}
-                className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}
+                className={index % 2 === 0 ? 'bg-viridian/5' : 'bg-forest'}
               >
-                <td className="p-4 text-gray-700 border-b border-gray-100">
+                <td className="p-4 text-viridian/80 border-b border-viridian/10">
                   {feature.name}
                 </td>
-                <td className="p-4 text-center border-b border-gray-100">
+                <td className="p-4 text-center border-b border-viridian/10">
                   {feature.basic && (
                     <Check
                       className="w-5 h-5 text-green-500 mx-auto"
@@ -169,7 +169,7 @@ export default function PricingTable() {
                     />
                   )}
                 </td>
-                <td className="p-4 text-center border-b border-gray-100">
+                <td className="p-4 text-center border-b border-viridian/10">
                   {feature.premium && (
                     <Check
                       className="w-5 h-5 text-green-500 mx-auto"
@@ -177,7 +177,7 @@ export default function PricingTable() {
                     />
                   )}
                 </td>
-                <td className="p-4 text-center border-b border-gray-100">
+                <td className="p-4 text-center border-b border-viridian/10">
                   {feature.business && (
                     <Check
                       className="w-5 h-5 text-green-500 mx-auto"
@@ -193,13 +193,13 @@ export default function PricingTable() {
         {/* Footer with Apply Buttons */}
         <tfoot>
           <tr>
-            <td className="p-4 bg-gray-100"></td>
+            <td className="p-4 bg-viridian/10"></td>
             {plans.map((plan) => (
-              <td key={plan.id} className="p-4 bg-gray-100 text-center">
+              <td key={plan.id} className="p-4 bg-viridian/10 text-center">
                 <button
                   onClick={() => handleApply(plan.id)}
                   disabled={checkoutMutation.isPending}
-                  className={`${plan.buttonBg} ${plan.buttonText} px-8 py-3 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg`}
+                  className={`${plan.buttonBg} ${plan.buttonText} px-8 py-3 rounded-lg font-semibold font-orbitron transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg`}
                 >
                   {checkoutMutation.isPending ? 'Loading...' : 'Apply!'}
                 </button>

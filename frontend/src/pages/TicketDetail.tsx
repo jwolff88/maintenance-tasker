@@ -13,12 +13,12 @@ const priorityColors = {
 };
 
 const statusColors = {
-  NEW: 'bg-blue-100 text-blue-800',
-  IN_PROGRESS: 'bg-yellow-100 text-yellow-800',
-  WAITING_ON_TENANT: 'bg-orange-100 text-orange-800',
-  WAITING_ON_VENDOR: 'bg-purple-100 text-purple-800',
-  COMPLETED: 'bg-green-100 text-green-800',
-  CANCELLED: 'bg-gray-100 text-gray-800',
+  NEW: 'badge-blue',
+  IN_PROGRESS: 'badge-yellow',
+  WAITING_ON_TENANT: 'badge-yellow',
+  WAITING_ON_VENDOR: 'badge-yellow',
+  COMPLETED: 'badge-green',
+  CANCELLED: 'badge-gray',
 };
 
 const statuses = [
@@ -60,29 +60,29 @@ export default function TicketDetail() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-viridian"></div>
       </div>
     );
   }
 
   if (!ticket) {
-    return <div className="text-center py-12">Ticket not found</div>;
+    return <div className="text-center py-12 text-viridian">Ticket not found</div>;
   }
 
   return (
     <div className="space-y-6">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-gray-500">
-        <Link to="/tickets" className="hover:text-primary-600">Tickets</Link>
+      <div className="flex items-center gap-2 text-sm text-viridian/50">
+        <Link to="/tickets" className="hover:text-viridian">Tickets</Link>
         <ChevronRight className="w-4 h-4" />
-        <span className="truncate">{ticket.title}</span>
+        <span className="truncate text-viridian">{ticket.title}</span>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Ticket Info */}
-          <div className="card">
+          <div className="card-holo">
             <div className="flex items-start justify-between mb-4">
               <div>
                 <div className="flex items-center gap-2 mb-2">
@@ -94,16 +94,16 @@ export default function TicketDetail() {
                   </span>
                   <span className="badge badge-gray">{ticket.category.replace(/_/g, ' ')}</span>
                 </div>
-                <h1 className="text-2xl font-bold text-gray-900">{ticket.title}</h1>
+                <h1 className="text-2xl font-bold text-viridian font-orbitron">{ticket.title}</h1>
               </div>
             </div>
 
-            <p className="text-gray-700 whitespace-pre-wrap mb-4">{ticket.description}</p>
+            <p className="text-viridian/70 whitespace-pre-wrap mb-4">{ticket.description}</p>
 
-            <div className="flex flex-wrap gap-4 text-sm text-gray-500 pt-4 border-t">
+            <div className="flex flex-wrap gap-4 text-sm text-viridian/50 pt-4 border-t border-viridian/20">
               <div className="flex items-center gap-1">
                 <Building2 className="w-4 h-4" />
-                <Link to={`/properties/${ticket.property.id}`} className="hover:text-primary-600">
+                <Link to={`/properties/${ticket.property.id}`} className="hover:text-viridian">
                   {ticket.property.name}
                 </Link>
               </div>
@@ -118,33 +118,33 @@ export default function TicketDetail() {
             </div>
 
             {ticket.suggestedFix && (
-              <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100">
+              <div className="mt-4 p-4 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-lg border border-blue-500/30">
                 <div className="flex items-center gap-2 mb-2">
-                  <Sparkles className="w-4 h-4 text-blue-600" />
-                  <p className="text-sm font-medium text-blue-800">AI Suggested Fix</p>
+                  <Sparkles className="w-4 h-4 text-blue-400" />
+                  <p className="text-sm font-medium text-blue-300">AI Suggested Fix</p>
                 </div>
-                <p className="text-sm text-blue-700">{ticket.suggestedFix}</p>
+                <p className="text-sm text-blue-200">{ticket.suggestedFix}</p>
               </div>
             )}
           </div>
 
           {/* Comments */}
-          <div className="card">
-            <h2 className="text-lg font-semibold mb-4">Comments</h2>
+          <div className="card-holo">
+            <h2 className="text-lg font-semibold mb-4 text-viridian font-orbitron">Comments</h2>
 
             {ticket.comments?.length > 0 ? (
               <div className="space-y-4 mb-6">
                 {ticket.comments.map((c: any) => (
-                  <div key={c.id} className="p-4 bg-gray-50 rounded-lg">
-                    <p className="text-gray-900">{c.content}</p>
-                    <p className="text-sm text-gray-500 mt-2">
+                  <div key={c.id} className="p-4 bg-viridian/5 border border-viridian/20 rounded-lg">
+                    <p className="text-viridian">{c.content}</p>
+                    <p className="text-sm text-viridian/50 mt-2">
                       {format(new Date(c.createdAt), 'MMM d, yyyy h:mm a')}
                     </p>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 text-center py-4 mb-4">No comments yet</p>
+              <p className="text-viridian/50 text-center py-4 mb-4">No comments yet</p>
             )}
 
             <form
@@ -178,12 +178,12 @@ export default function TicketDetail() {
         <div className="space-y-6">
           {/* AI Triage */}
           {!['COMPLETED', 'CANCELLED'].includes(ticket.status) && (
-            <div className="card bg-gradient-to-br from-blue-50 to-purple-50 border border-blue-100">
+            <div className="card-holo bg-gradient-to-br from-blue-500/10 to-purple-500/10 border-blue-500/30">
               <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="w-5 h-5 text-blue-600" />
-                <h3 className="font-semibold text-blue-900">AI Triage</h3>
+                <Sparkles className="w-5 h-5 text-blue-400" />
+                <h3 className="font-semibold text-blue-300">AI Triage</h3>
               </div>
-              <p className="text-sm text-blue-700 mb-4">
+              <p className="text-sm text-blue-200/70 mb-4">
                 Re-analyze this ticket with AI to update category, priority, and get a fresh diagnosis.
               </p>
               <button
@@ -207,8 +207,8 @@ export default function TicketDetail() {
           )}
 
           {/* Status Update */}
-          <div className="card">
-            <h3 className="font-semibold mb-4">Update Status</h3>
+          <div className="card-holo">
+            <h3 className="font-semibold mb-4 text-viridian font-orbitron">Update Status</h3>
             <select
               value={ticket.status}
               onChange={(e) => updateMutation.mutate({ status: e.target.value })}
@@ -222,12 +222,12 @@ export default function TicketDetail() {
           </div>
 
           {/* Assignment */}
-          <div className="card">
-            <h3 className="font-semibold mb-4">Details</h3>
+          <div className="card-holo">
+            <h3 className="font-semibold mb-4 text-viridian font-orbitron">Details</h3>
             <div className="space-y-3">
               <div>
-                <p className="text-sm text-gray-500">Assignee</p>
-                <p className="font-medium">
+                <p className="text-sm text-viridian/50">Assignee</p>
+                <p className="font-medium text-viridian">
                   {ticket.assignee
                     ? `${ticket.assignee.firstName} ${ticket.assignee.lastName}`
                     : 'Unassigned'}
@@ -235,34 +235,34 @@ export default function TicketDetail() {
               </div>
               {ticket.vendor && (
                 <div>
-                  <p className="text-sm text-gray-500">Vendor</p>
-                  <p className="font-medium">{ticket.vendor.name}</p>
+                  <p className="text-sm text-viridian/50">Vendor</p>
+                  <p className="font-medium text-viridian">{ticket.vendor.name}</p>
                 </div>
               )}
               {ticket.tenant && (
                 <div>
-                  <p className="text-sm text-gray-500">Tenant</p>
-                  <p className="font-medium">
+                  <p className="text-sm text-viridian/50">Tenant</p>
+                  <p className="font-medium text-viridian">
                     {ticket.tenant.firstName} {ticket.tenant.lastName}
                   </p>
                 </div>
               )}
               {ticket.estimatedCost && (
                 <div>
-                  <p className="text-sm text-gray-500">Estimated Cost</p>
-                  <p className="font-medium">${Number(ticket.estimatedCost).toFixed(2)}</p>
+                  <p className="text-sm text-viridian/50">Estimated Cost</p>
+                  <p className="font-medium text-viridian">${Number(ticket.estimatedCost).toFixed(2)}</p>
                 </div>
               )}
               {ticket.actualCost && (
                 <div>
-                  <p className="text-sm text-gray-500">Actual Cost</p>
-                  <p className="font-medium">${Number(ticket.actualCost).toFixed(2)}</p>
+                  <p className="text-sm text-viridian/50">Actual Cost</p>
+                  <p className="font-medium text-viridian">${Number(ticket.actualCost).toFixed(2)}</p>
                 </div>
               )}
               {ticket.completedAt && (
                 <div>
-                  <p className="text-sm text-gray-500">Completed</p>
-                  <p className="font-medium">
+                  <p className="text-sm text-viridian/50">Completed</p>
+                  <p className="font-medium text-viridian">
                     {format(new Date(ticket.completedAt), 'MMM d, yyyy')}
                   </p>
                 </div>
@@ -272,8 +272,8 @@ export default function TicketDetail() {
 
           {/* Cost Input */}
           {ticket.status === 'COMPLETED' && !ticket.actualCost && (
-            <div className="card">
-              <h3 className="font-semibold mb-4">Record Cost</h3>
+            <div className="card-holo">
+              <h3 className="font-semibold mb-4 text-viridian font-orbitron">Record Cost</h3>
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
