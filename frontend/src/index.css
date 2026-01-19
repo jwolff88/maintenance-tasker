@@ -1,83 +1,450 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Spectral:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ========================================
+   VIRIDIAN RELIC DESIGN SYSTEM
+   Gothic/Clockwork + Holographic Depth
+   ======================================== */
+
+:root {
+  --forest-black: #010B0A;
+  --viridian-glow: #00FFD4;
+  --teal-shadow: #008F7A;
+  --bronze-accent: #CD7F32;
+}
+
+/* Base Styles */
 body {
-  @apply bg-gray-50 text-gray-900 antialiased;
+  @apply antialiased;
+  background: var(--forest-black);
+  color: #E6FFFA;
+  font-family: 'Spectral', serif;
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Prevent iOS zoom on input focus */
+/* Typography */
+h1, h2, h3, h4, h5, h6, .font-header {
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 0.05em;
+}
+
+/* ========================================
+   BACKGROUND EFFECTS
+   ======================================== */
+
+/* Server room depth spotlight */
+.bg-glow-spotlight {
+  background: radial-gradient(circle at 50% 30%, rgba(0, 255, 212, 0.08) 0%, rgba(1, 11, 10, 1) 70%);
+}
+
+/* Circuitry pattern overlay */
+.bg-circuitry {
+  background-image:
+    linear-gradient(rgba(0, 255, 212, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 212, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+/* Animated background for parallax */
+.bg-parallax-slow {
+  animation: parallax-drift 60s linear infinite;
+}
+
+@keyframes parallax-drift {
+  0% { background-position: 0 0; }
+  100% { background-position: 100px 100px; }
+}
+
+/* ========================================
+   HOLOGRAPHIC CARDS
+   ======================================== */
+
+.card {
+  background: rgba(0, 255, 212, 0.05);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid transparent;
+  border-image: linear-gradient(
+    135deg,
+    var(--bronze-accent) 0%,
+    var(--bronze-accent) 50%,
+    var(--viridian-glow) 50%,
+    var(--viridian-glow) 100%
+  ) 1;
+  border-radius: 0;
+  clip-path: polygon(
+    0 10px, 10px 0, calc(100% - 10px) 0, 100% 10px,
+    100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px)
+  );
+  position: relative;
+  overflow: hidden;
+  padding: 1.5rem;
+}
+
+/* Simpler card with standard border-radius for compatibility */
+.card-holo {
+  background: rgba(0, 255, 212, 0.05);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-left: 2px solid var(--bronze-accent);
+  border-top: 2px solid var(--bronze-accent);
+  border-right: 2px solid var(--viridian-glow);
+  border-bottom: 2px solid var(--viridian-glow);
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+  padding: 1.5rem;
+  box-shadow:
+    0 0 20px rgba(0, 255, 212, 0.1),
+    inset 0 0 30px rgba(0, 255, 212, 0.03);
+}
+
+.card-holo::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 255, 212, 0.1),
+    transparent
+  );
+  transition: left 0.5s ease;
+  pointer-events: none;
+}
+
+.card-holo:hover::before {
+  left: 100%;
+}
+
+/* ========================================
+   RELIC BORDER (Ornate Frame)
+   ======================================== */
+
+.relic-frame {
+  position: relative;
+  border: 2px solid var(--bronze-accent);
+  border-radius: 4px;
+  box-shadow:
+    inset 0 0 15px rgba(0, 255, 212, 0.2),
+    0 0 10px rgba(205, 127, 50, 0.3);
+}
+
+.relic-frame::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border: 1px solid rgba(0, 255, 212, 0.4);
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+/* Corner ornaments */
+.relic-frame::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--bronze-accent);
+  top: -2px;
+  left: -2px;
+  border-right: none;
+  border-bottom: none;
+  box-shadow: 0 0 5px var(--viridian-glow);
+}
+
+/* ========================================
+   BUTTONS
+   ======================================== */
+
+.btn-primary {
+  @apply px-6 py-3 font-medium transition-all duration-300;
+  font-family: 'Orbitron', sans-serif;
+  background: linear-gradient(135deg, var(--teal-shadow), var(--viridian-glow));
+  color: var(--forest-black);
+  border: 1px solid var(--viridian-glow);
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.875rem;
+  box-shadow: 0 0 20px rgba(0, 255, 212, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 0 30px rgba(0, 255, 212, 0.5);
+  transform: translateY(-2px);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-secondary {
+  @apply px-6 py-3 font-medium transition-all duration-300;
+  font-family: 'Orbitron', sans-serif;
+  background: transparent;
+  color: var(--viridian-glow);
+  border: 1px solid var(--bronze-accent);
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.875rem;
+}
+
+.btn-secondary:hover {
+  background: rgba(205, 127, 50, 0.1);
+  border-color: var(--viridian-glow);
+  box-shadow: 0 0 15px rgba(0, 255, 212, 0.2);
+}
+
+.btn-danger {
+  @apply px-6 py-3 font-medium transition-all duration-300;
+  font-family: 'Orbitron', sans-serif;
+  background: linear-gradient(135deg, #7A0000, #FF3333);
+  color: white;
+  border: 1px solid #FF3333;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.875rem;
+}
+
+.btn-danger:hover {
+  box-shadow: 0 0 20px rgba(255, 51, 51, 0.4);
+}
+
+/* ========================================
+   INPUTS
+   ======================================== */
+
+.input {
+  @apply w-full px-4 py-3 outline-none transition-all duration-300;
+  background: rgba(0, 255, 212, 0.03);
+  border: 1px solid rgba(205, 127, 50, 0.4);
+  border-radius: 4px;
+  color: #E6FFFA;
+  font-family: 'Spectral', serif;
+}
+
+.input::placeholder {
+  color: rgba(0, 255, 212, 0.4);
+}
+
+.input:focus {
+  border-color: var(--viridian-glow);
+  box-shadow: 0 0 15px rgba(0, 255, 212, 0.2);
+  background: rgba(0, 255, 212, 0.05);
+}
+
+/* ========================================
+   BADGES
+   ======================================== */
+
+.badge {
+  @apply inline-flex items-center px-3 py-1 text-xs font-medium whitespace-nowrap;
+  font-family: 'Orbitron', sans-serif;
+  border-radius: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge-green {
+  background: rgba(0, 255, 212, 0.15);
+  color: var(--viridian-glow);
+  border: 1px solid rgba(0, 255, 212, 0.3);
+}
+
+.badge-yellow {
+  background: rgba(205, 127, 50, 0.15);
+  color: var(--bronze-accent);
+  border: 1px solid rgba(205, 127, 50, 0.3);
+}
+
+.badge-red {
+  background: rgba(255, 51, 51, 0.15);
+  color: #FF6666;
+  border: 1px solid rgba(255, 51, 51, 0.3);
+}
+
+.badge-blue {
+  background: rgba(0, 143, 122, 0.15);
+  color: #4DDBC6;
+  border: 1px solid rgba(0, 143, 122, 0.3);
+}
+
+.badge-gray {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ========================================
+   GLOW UTILITIES
+   ======================================== */
+
+.glow-viridian {
+  box-shadow: 0 0 20px rgba(0, 255, 212, 0.4);
+}
+
+.glow-viridian-text {
+  text-shadow: 0 0 10px rgba(0, 255, 212, 0.6);
+}
+
+.glow-bronze {
+  box-shadow: 0 0 15px rgba(205, 127, 50, 0.4);
+}
+
+.border-glow {
+  border: 1px solid var(--viridian-glow);
+  box-shadow:
+    0 0 10px rgba(0, 255, 212, 0.3),
+    inset 0 0 10px rgba(0, 255, 212, 0.1);
+}
+
+/* ========================================
+   BIO-LUMINESCENT SWEEP (Hover Effect)
+   ======================================== */
+
+.sweep-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.sweep-effect::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 255, 212, 0.15),
+    transparent
+  );
+  transform: skewX(-15deg);
+  transition: left 0.6s ease;
+  pointer-events: none;
+}
+
+.sweep-effect:hover::after {
+  left: 150%;
+}
+
+/* ========================================
+   ASTRAL GAUGE (Circular Meter)
+   ======================================== */
+
+.astral-gauge {
+  position: relative;
+  filter: drop-shadow(0 0 8px var(--viridian-glow));
+}
+
+.astral-gauge-ring {
+  animation: rotate 20s linear infinite;
+}
+
+.astral-gauge-runes {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* ========================================
+   SCROLLBAR
+   ======================================== */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--forest-black);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--teal-shadow);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--viridian-glow);
+}
+
+/* ========================================
+   TABLES
+   ======================================== */
+
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+th {
+  font-family: 'Orbitron', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.75rem;
+  color: var(--viridian-glow);
+  border-bottom: 1px solid rgba(0, 255, 212, 0.2);
+  padding: 1rem;
+  text-align: left;
+}
+
+td {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(205, 127, 50, 0.1);
+}
+
+tr:hover td {
+  background: rgba(0, 255, 212, 0.03);
+}
+
+/* ========================================
+   MOBILE ADJUSTMENTS
+   ======================================== */
+
 @media screen and (max-width: 768px) {
   input, select, textarea {
     font-size: 16px !important;
   }
 }
 
-.btn-primary {
-  @apply bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed;
-  @apply active:scale-95 touch-manipulation;
-}
-
-.btn-secondary {
-  @apply bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors font-medium;
-  @apply active:scale-95 touch-manipulation;
-}
-
-.btn-danger {
-  @apply bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors font-medium;
-  @apply active:scale-95 touch-manipulation;
-}
-
-.input {
-  @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all;
-}
-
-.card {
-  @apply bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6;
-}
-
-.badge {
-  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap;
-}
-
-.badge-green {
-  @apply bg-green-100 text-green-800;
-}
-
-.badge-yellow {
-  @apply bg-yellow-100 text-yellow-800;
-}
-
-.badge-red {
-  @apply bg-red-100 text-red-800;
-}
-
-.badge-blue {
-  @apply bg-blue-100 text-blue-800;
-}
-
-.badge-gray {
-  @apply bg-gray-100 text-gray-800;
-}
-
-/* Mobile-friendly touch targets */
 @media screen and (max-width: 640px) {
   .btn-primary, .btn-secondary, .btn-danger {
     @apply min-h-[44px] px-4 py-3;
   }
 
-  .card {
-    @apply rounded-lg;
-  }
-
-  /* Stack badges on mobile */
-  .badge-stack {
-    @apply flex flex-wrap gap-1;
+  .card-holo {
+    padding: 1rem;
   }
 }
 
-/* Smooth scrolling for mobile */
+/* Smooth scrolling */
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;
@@ -90,4 +457,10 @@ body {
     padding-left: max(0px, env(safe-area-inset-left));
     padding-right: max(0px, env(safe-area-inset-right));
   }
+}
+
+/* Selection color */
+::selection {
+  background: var(--viridian-glow);
+  color: var(--forest-black);
 }
