@@ -22,7 +22,7 @@ export default function Pricing() {
                   <Wrench className="w-5 h-5 text-forest" />
                 </div>
               </div>
-              <span className="text-xl font-bold text-viridian font-orbitron glow-viridian-text">MAINTENANCE HUB</span>
+              <span className="text-xl font-bold text-viridian font-orbitron glow-viridian-text">M.I.C.</span>
             </Link>
             {user ? (
               <Link to="/settings" className="btn-secondary">

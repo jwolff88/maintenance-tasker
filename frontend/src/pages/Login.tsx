@@ -39,8 +39,8 @@ export default function Login() {
               <Wrench className="w-8 h-8 text-forest" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-viridian font-orbitron glow-viridian-text">MAINTENANCE HUB</h1>
-          <p className="mt-2 text-viridian/60">Property Management Platform</p>
+          <h1 className="text-3xl font-bold text-viridian font-orbitron glow-viridian-text">M.I.C.</h1>
+          <p className="mt-2 text-viridian/60">Maintenance Intel Companion</p>
         </div>
 
         <div className="card-holo">

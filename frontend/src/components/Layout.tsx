@@ -79,7 +79,7 @@ export default function Layout({ children }: { children: ReactNode }) {
               </div>
             </div>
             <span className="font-orbitron text-lg font-bold text-viridian glow-viridian-text tracking-wider">
-              MAINTENANCE HUB
+              M.I.C.
             </span>
           </Link>
           <button
