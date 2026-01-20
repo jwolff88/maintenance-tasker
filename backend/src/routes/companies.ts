@@ -228,8 +228,8 @@ router.delete('/users/:userId', authenticate, authorize('COMPANY_ADMIN', 'SUPER_
 
       // Unassign tasks assigned to this user
       await tx.task.updateMany({
-        where: { assigneeId: userId },
-        data: { assigneeId: null }
+        where: { assignedToId: userId },
+        data: { assignedToId: null }
       });
 
       // For tickets created by this user, keep them but they'll have a dangling reference
@@ -242,8 +242,8 @@ router.delete('/users/:userId', authenticate, authorize('COMPANY_ADMIN', 'SUPER_
 
       // Same for tasks created by this user
       await tx.task.updateMany({
-        where: { creatorId: userId },
-        data: { creatorId: req.user!.id }
+        where: { createdById: userId },
+        data: { createdById: req.user!.id }
       });
 
       // Remove user from managed properties
