@@ -89,7 +89,10 @@
       "Bash(find:*)",
       "Bash(ssh-keygen:*)",
       "Bash(ssh-add:*)",
-      "Bash(ssh:*)"
+      "Bash(ssh:*)",
+      "Bash(git config:*)",
+      "Bash(git rebase:*)",
+      "Bash(git stash:*)"
     ]
   }
 }
