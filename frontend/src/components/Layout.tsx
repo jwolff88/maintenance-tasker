@@ -20,8 +20,8 @@ import {
   UserCircle,
   BarChart3,
   Shield,
+  Hexagon,
 } from 'lucide-react';
-import Logo from './Logo';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
@@ -71,8 +71,16 @@ export default function Layout({ children }: { children: ReactNode }) {
       >
         {/* Sidebar Header */}
         <div className="flex items-center justify-between h-16 px-4 border-b border-bronze/30 flex-shrink-0">
-          <Link to="/" className="flex items-center group">
-            <Logo size={48} />
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="relative">
+              <Hexagon className="w-8 h-8 text-viridian animate-pulse-glow" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Wrench className="w-4 h-4 text-forest" />
+              </div>
+            </div>
+            <span className="font-orbitron text-lg font-bold text-viridian glow-viridian-text tracking-wider">
+              M.I.C.
+            </span>
           </Link>
           <button
             onClick={() => setSidebarOpen(false)}

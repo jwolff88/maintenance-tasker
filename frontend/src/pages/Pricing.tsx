@@ -1,8 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Check } from 'lucide-react';
+import { Check, Hexagon, Wrench } from 'lucide-react';
 import PricingTable from '../components/PricingTable';
-import Logo from '../components/Logo';
 
 export default function Pricing() {
   const { user } = useAuth();
@@ -16,8 +15,14 @@ export default function Pricing() {
       <div className="relative z-10 border-b border-bronze/30" style={{ background: 'rgba(1, 11, 10, 0.95)' }}>
         <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center">
-              <Logo size={56} />
+            <Link to="/" className="flex items-center gap-2">
+              <div className="relative">
+                <Hexagon className="w-10 h-10 text-viridian animate-pulse-glow" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Wrench className="w-5 h-5 text-forest" />
+                </div>
+              </div>
+              <span className="text-xl font-bold text-viridian font-orbitron glow-viridian-text">M.I.C.</span>
             </Link>
             {user ? (
               <Link to="/settings" className="btn-secondary">

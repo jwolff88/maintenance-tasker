@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import Logo from '../components/Logo';
+import { Hexagon, Wrench } from 'lucide-react';
 
 export default function Register() {
   const navigate = useNavigate();
@@ -60,9 +60,14 @@ export default function Register() {
 
       <div className="max-w-md w-full relative z-10">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center mb-4">
-            <Logo size={160} />
+          <div className="inline-flex items-center justify-center w-16 h-16 relative mb-4">
+            <Hexagon className="w-16 h-16 text-viridian animate-pulse-glow" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Wrench className="w-8 h-8 text-forest" />
+            </div>
           </div>
+          <h1 className="text-3xl font-bold text-viridian font-orbitron glow-viridian-text">M.I.C.</h1>
+          <p className="mt-2 text-viridian/60">Maintenance Intel Companion</p>
         </div>
 
         <div className="card-holo">
