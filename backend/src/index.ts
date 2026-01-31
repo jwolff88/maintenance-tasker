@@ -84,7 +84,6 @@ app.use('/api/equipment', equipmentRoutes);
 app.use('/api/inspections', inspectionRoutes);
 app.use('/api/tenant-portal', tenantPortalRoutes);
 app.use('/api/assets', assetRoutes);
-import { prisma } from './utils/prisma.js';
 app.use('/api/tasks', taskRoutes);
 app.use('/api/billing', billingRoutes);
 app.use('/api/capex', capexRoutes);
