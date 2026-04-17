@@ -1,12 +1,12 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "vite",
-  "buildCommand": "cd /vercel/path0 && npm run build -w backend && npm run build -w frontend",
+  "buildCommand": "npm run build -w backend && npm run build -w frontend",
   "installCommand": "npm install --workspaces --include-workspace-root --include=dev",
   "outputDirectory": "frontend/dist",
   "functions": {
     "api/index.ts": {
-      "runtime": "@vercel/node@3.2.0",
+      "runtime": "@vercel/node@5.3.5",
       "includeFiles": "backend/build/**,node_modules/.prisma/**,node_modules/@prisma/client/**",
       "maxDuration": 30
     }
